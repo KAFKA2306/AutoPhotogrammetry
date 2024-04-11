@@ -113,21 +113,6 @@
 - 各ステップ間のデータの受け渡しや、中間結果の保存方法を明確に定義します。
 - エラーハンドリングや、異常値の検出・処理方法を組み込み、データ品質の管理を徹底します。
 
-graph TD
-    A[Start] --> B[Collect images]
-    B --> C{Clustered?}
-    C -->|No| D[Cluster images]
-    C -->|Yes| E[Generate images]
-    D --> E
-    E --> F[Select images]
-    F --> G[Build 3D model]
-    G --> H[Evaluate 3D model]
-    H --> I{Satisfactory?}
-    I -->|No| J[Adjust parameters]
-    J --> B
-    I -->|Yes| K[End]
-
-    
 ### 3.8. 品質管理と評価指標
 
 - 収集した画像データの品質を継続的に監視し、問題を早期に発見・対処するための方法を確立します。
