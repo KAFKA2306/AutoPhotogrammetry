@@ -1,0 +1,10 @@
+beautifulsoup4==4.9.3
+numpy==1.21.4
+opencv-python==4.5.4.60
+Pillow==9.0.0
+requests==2.26.0
+scikit-image==0.19.1
+scikit-learn==1.0.1
+torch==1.10.0
+diffusers==0.2.4
+transformers==4.15.0
