@@ -53,6 +53,33 @@ work/
     └── <sha256>.jpg
 ```
 
+## 外部フォトグラメトリ実行
+
+`photogrammetry.py` はMeshroom、VisualSFM、COLMAPの実行コマンドを引数配列で構築し、`shell=True`を使用しません。アプリケーションから外部ソフトを自動インストールせず、実行ファイルが見つからない場合は具体的な設定方法を示して停止します。
+
+実行ファイルは、`BackendConfig(executable=...)`、JSON設定、または次の環境変数で指定します。
+
+- `AUTOPHOTOGRAMMETRY_MESHROOM_EXECUTABLE`
+- `AUTOPHOTOGRAMMETRY_VISUALSFM_EXECUTABLE`
+- `AUTOPHOTOGRAMMETRY_COLMAP_EXECUTABLE`
+
+設定例:
+
+```json
+{
+  "meshroom": {
+    "executable": "C:/Tools/Meshroom/meshroom_photogrammetry.exe",
+    "extra_args": []
+  },
+  "colmap": {
+    "executable": "/usr/bin/colmap",
+    "extra_args": ["--quality", "medium"]
+  }
+}
+```
+
+各実行は`<output_root>/<backend>/<run_id>/`へ分離され、`manifest.json`、`stdout.log`、`stderr.log`、生成物一覧を保存します。対応OSは各外部ソフトが提供するWindowsまたはLinux環境です。VisualSFMのコマンドライン仕様は配布版によって異なるため、実環境で追加引数を確認してください。
+
 ## テスト
 
 ```bash
@@ -65,6 +92,9 @@ python -m unittest discover -s tests -v
 - 異なる解像度同士でもSSIMを計算できる
 - 選別が元ファイルを削除しない
 - 空入力を安全に処理する
+- 空白を含むパスを1引数として安全に扱う
+- 外部実行ファイルがない場合に自動インストールせず停止する
+- backendごとにrun、manifest、ログ、成果物を分離する
 
 ## 利用条件と限界
 
@@ -73,9 +103,10 @@ python -m unittest discover -s tests -v
 - 検索エンジンの無断スクレイピング機能はありません
 - 同じ対象物・同じ撮影条件・十分な視点重複を自動証明しません
 - クラスタ番号は3D形状やカメラ姿勢を意味しません
-- COLMAP、AliceVision、Meshroomによる再構成は未実装です
+- 外部バックエンドの導入、ライセンス、GPU要件、入力互換性は利用者が確認します
+- SSIMは生成レンダーと参照画像の画像類似度であり、再投影誤差やメッシュ精度の代替ではありません
 - 再投影誤差、登録画像率、メッシュ完全性を測るまでは、フォトグラメトリー品質を主張できません
 
 以前のREADMEにあった「最高品質」「再構成精度90%以上」等は、再現可能な証拠がないため削除しています。
 
-**README最終監査:** 2026-08-02
+**README最終監査:** 2026-08-06
