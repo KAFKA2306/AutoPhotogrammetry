@@ -1,0 +1,19 @@
+name: Weekly Repository Research
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "5 10 * * 6"
+      timezone: "Asia/Tokyo"
+
+concurrency:
+  group: weekly-repo-research
+  cancel-in-progress: false
+
+jobs:
+  research:
+    permissions:
+      contents: write
+    uses: KAFKA2306/agent-resources/.github/workflows/reusable-weekly-repo-research.yml@main
+    secrets:
+      XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
