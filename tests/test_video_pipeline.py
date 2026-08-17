@@ -11,6 +11,7 @@ from video_pipeline import (
     nerfstudio_process_images_command,
     probe_video,
     scene_cut_times,
+    select_video_frames,
     splatfacto_train_command,
     write_source_manifest,
 )
@@ -56,6 +57,37 @@ class VideoPipelineTests(unittest.TestCase):
     def test_scene_cut_times_parses_showinfo(self, mocked_run):
         mocked_run.return_value.stderr = "x pts_time:12.5 y\nx pts_time:88.25 y\n"
         self.assertEqual(scene_cut_times("source.webm"), [12.5, 88.25])
+
+    def test_select_video_frames_is_ordered_and_linear(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            frames = []
+            for index in range(4):
+                path = root / f"frame-{index}.jpg"
+                path.write_bytes(str(index).encode())
+                frames.append(path)
+
+            sharpness = {frames[0]: 1.0, frames[1]: 0.0, frames[2]: 1.0, frames[3]: 1.0}
+            similarity_calls = []
+
+            def similarity(left, right):
+                similarity_calls.append((Path(left), Path(right)))
+                return 0.95 if Path(left) == frames[2] else 0.1
+
+            result = select_video_frames(
+                frames,
+                root / "selected",
+                sharpness_threshold=0.5,
+                similarity_threshold=0.92,
+                sharpness_fn=lambda path: sharpness[Path(path)],
+                similarity_fn=similarity,
+            )
+
+            self.assertEqual(result["input"], 4)
+            self.assertEqual(result["selected"], 2)
+            self.assertEqual(result["rejected_blur"], 1)
+            self.assertEqual(result["rejected_duplicate"], 1)
+            self.assertEqual(len(similarity_calls), 2)
 
     def test_source_manifest_hashes_exact_input(self):
         with tempfile.TemporaryDirectory() as tmp:
