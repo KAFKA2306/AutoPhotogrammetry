@@ -26,7 +26,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg colmap
-          mkdir -p /tmp/evidence /tmp/frames2 /tmp/frames3 /tmp/selected /tmp/sparse /tmp/model_txt
+          mkdir -p /tmp/evidence /tmp/frames2 /tmp/frames3 /tmp/selected /tmp/colmap_images /tmp/sparse /tmp/model_txt
           curl --fail --location --retry 3 --output /tmp/cabo.webm \
             https://upload.wikimedia.org/wikipedia/commons/b/ba/Diving_in_Cabo_San_Lucas.webm
           echo "sha256=$(sha256sum /tmp/cabo.webm | cut -d' ' -f1)"
@@ -39,6 +39,7 @@ jobs:
           echo "frames_3fps=$(find /tmp/frames3 -type f -name 'frame-*.jpg' | wc -l)"
           python - <<'PY'
           import json
+          import shutil
           from pathlib import Path
           from video_pipeline import (
               VideoSource,
@@ -66,6 +67,21 @@ jobs:
           stats = select_video_frames(frames, "/tmp/selected")
           Path("/tmp/evidence/frame-selection.json").write_text(json.dumps(stats, indent=2) + "\n", encoding="utf-8")
           print(json.dumps({key: value for key, value in stats.items() if key != "selected_paths"}, sort_keys=True))
+
+          selected = sorted(Path("/tmp/selected").glob("*.jpg"))
+          colmap_input = selected[::2]
+          for path in colmap_input:
+              shutil.copy2(path, Path("/tmp/colmap_images") / path.name)
+          Path("/tmp/evidence/colmap-input.json").write_text(
+              json.dumps({
+                  "source_selected_frames": len(selected),
+                  "stride": 2,
+                  "colmap_input_frames": len(colmap_input),
+                  "frames": [path.name for path in colmap_input],
+              }, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(f"colmap_input_frames={len(colmap_input)}")
           PY
           ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm \
             -vf "fps=1/10,scale=320:-1,tile=4x4:padding=4:margin=4" \
@@ -75,7 +91,7 @@ jobs:
           set +e
           colmap feature_extractor \
             --database_path /tmp/colmap.db \
-            --image_path /tmp/selected \
+            --image_path /tmp/colmap_images \
             --ImageReader.single_camera 1 \
             --SiftExtraction.use_gpu 0 \
             > /tmp/evidence/colmap-feature-extractor.log 2>&1
@@ -87,7 +103,7 @@ jobs:
           matcher_rc=$?
           colmap mapper \
             --database_path /tmp/colmap.db \
-            --image_path /tmp/selected \
+            --image_path /tmp/colmap_images \
             --output_path /tmp/sparse \
             > /tmp/evidence/colmap-mapper.log 2>&1
           mapper_rc=$?
@@ -107,7 +123,7 @@ jobs:
           import re
           from pathlib import Path
 
-          selected = sorted(path.name for path in Path('/tmp/selected').glob('*.jpg'))
+          selected = sorted(path.name for path in Path('/tmp/colmap_images').glob('*.jpg'))
           image_lines = [line.rstrip('\n') for line in Path('/tmp/model_txt/images.txt').read_text().splitlines() if not line.startswith('#')]
           registered = []
           for index in range(0, len(image_lines), 2):
