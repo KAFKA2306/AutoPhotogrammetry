@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
@@ -43,7 +44,7 @@ def probe_video(path: str | Path, ffprobe: str = "ffprobe") -> dict:
     completed = run([
         ffprobe,
         "-v", "error",
-        "-show_entries", "format=duration,size:stream=codec_name,width,height",
+        "-show_entries", "format=duration,size,format_name:stream=codec_name,width,height",
         "-of", "json",
         str(Path(path)),
     ])
@@ -88,6 +89,19 @@ def extract_frames_command(
         "-vf", f"fps={fps:g}",
         "-q:v", "2",
         str(output / "frame-%06d.jpg"),
+    ]
+
+
+def frame_timestamp_records(
+    frame_paths: Sequence[str | Path],
+    *,
+    fps: float,
+) -> list[dict]:
+    if fps <= 0:
+        raise ValueError("fps must be positive")
+    return [
+        {"frame": Path(path).name, "source_time_seconds": index / fps}
+        for index, path in enumerate(sorted(map(Path, frame_paths)))
     ]
 
 
@@ -179,6 +193,8 @@ def write_source_manifest(
     source: VideoSource,
     probe: Mapping,
     output_path: str | Path,
+    *,
+    downloaded_at: str | None = None,
 ) -> dict:
     path = Path(video_path)
     manifest = {
@@ -188,6 +204,7 @@ def write_source_manifest(
             "filename": path.name,
             "size_bytes": path.stat().st_size,
             "sha256": sha256_file(path),
+            "downloaded_at": downloaded_at or datetime.now(timezone.utc).isoformat(),
             "probe": dict(probe),
         },
     }
