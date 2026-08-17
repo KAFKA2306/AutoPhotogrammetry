@@ -7,6 +7,7 @@ from unittest.mock import patch
 from video_pipeline import (
     VideoSource,
     extract_frames_command,
+    frame_timestamp_records,
     gaussian_splat_export_command,
     nerfstudio_process_images_command,
     probe_video,
@@ -45,13 +46,28 @@ class VideoPipelineTests(unittest.TestCase):
             ],
         )
 
+    def test_frame_timestamps_follow_sampling_rate(self):
+        records = frame_timestamp_records(
+            ["frame-000001.jpg", "frame-000002.jpg", "frame-000003.jpg"],
+            fps=2,
+        )
+        self.assertEqual(
+            records,
+            [
+                {"frame": "frame-000001.jpg", "source_time_seconds": 0.0},
+                {"frame": "frame-000002.jpg", "source_time_seconds": 0.5},
+                {"frame": "frame-000003.jpg", "source_time_seconds": 1.0},
+            ],
+        )
+
     @patch("video_pipeline.run")
     def test_probe_video_parses_ffprobe_json(self, mocked_run):
         mocked_run.return_value.stdout = json.dumps(
-            {"format": {"duration": "123.246"}, "streams": []}
+            {"format": {"duration": "123.246", "format_name": "matroska,webm"}, "streams": []}
         )
         result = probe_video("source.webm")
         self.assertEqual(result["format"]["duration"], "123.246")
+        self.assertEqual(result["format"]["format_name"], "matroska,webm")
 
     @patch("video_pipeline.run")
     def test_scene_cut_times_parses_showinfo(self, mocked_run):
@@ -107,11 +123,13 @@ class VideoPipelineTests(unittest.TestCase):
             manifest = write_source_manifest(
                 video,
                 source,
-                {"format": {"duration": "123"}},
+                {"format": {"duration": "123", "format_name": "matroska,webm"}},
                 manifest_path,
+                downloaded_at="2026-08-17T00:00:00+00:00",
             )
             self.assertEqual(manifest["video"]["size_bytes"], 11)
             self.assertEqual(len(manifest["video"]["sha256"]), 64)
+            self.assertEqual(manifest["video"]["downloaded_at"], "2026-08-17T00:00:00+00:00")
             self.assertEqual(
                 json.loads(manifest_path.read_text())["source"]["license"],
                 "CC BY 3.0",
