@@ -1,29 +1,60 @@
-# AutoPhotogrammetry — 実写画像の収集・選別プロトタイプ
+# AutoPhotogrammetry — 実写から監査可能な3D再構成へ
 
 [![Test](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml/badge.svg)](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml)
 
-明示されたWebページから、許諾を確認した実写画像を収集し、出典・ハッシュを保存した上で、固定長特徴量によるクラスタリングと非破壊選別を行う研究プロトタイプです。
+許諾を確認できる実写画像・動画を入力として、**出典とハッシュを保持したまま画像選別、COLMAPによるcamera pose推定、Nerfstudio SplatfactoによるGaussian Splat学習・PLY exportへ接続する**ためのリポジトリです。
 
-## 重要な設計判断
+独自のSfM、3D Gaussian Splatting training、rasterizerは実装しません。既存toolを外部CLIとして使い、入力・version・command・return code・生成物hashを追跡できることを優先します。
 
-**生成AIで作った別角度画像は、SfM/MVS入力へ混ぜません。** 見た目が自然でも、同じ実在対象の3D形状・模様・カメラ幾何が視点間で一致する保証がないためです。現パイプラインは実写だけを対象とし、出力に`generated_views_used: false`を記録します。
+## 現在の到達点
 
-## 監査で修正した問題
+実装済み:
 
-- 一つの`main.py`へ疑似モジュールを連結した後、存在しないモジュールをimportしていた構造を単一CLIへ修正
-- HTTPタイムアウト、ステータス、Content-Type、最大容量、画像デコード検査を追加
-- URL内の埋込み認証情報を拒否
-- SHA-256で重複を除去し、取得元ページ・画像URL・寸法・MIMEを`manifest.json`へ保存
-- 解像度依存のLBP全画素展開を、固定長LBPヒストグラムへ変更
-- HOG・色ヒストグラムを固定解像度で計算
-- DBSCAN前に特徴量を標準化
-- 鮮明度を平均LaplacianではなくLaplacian分散へ変更
-- 異なる解像度の画像を同一サイズへ正規化してSSIMを計算
-- 選別時の`rename`を廃止し、元画像を保持したままコピー
-- Stable Diffusion・CUDA依存と未使用依存を削除
-- 回帰テストを追加
+- 明示したWebページからの実写画像取得
+- URL、MIME、寸法、SHA-256、取得元を`manifest.json`へ保存
+- 固定長特徴量によるクラスタリングと非破壊画像選別
+- 動画の`ffprobe`情報取得とsource provenance記録
+- FFmpeg用frame抽出command生成
+- scene-change候補抽出
+- blur / near-duplicate frame選別
+- Meshroom / VisualSFM / COLMAPの外部実行
+- Nerfstudio `ns-train splatfacto` / `ns-export gaussian-splat` の外部実行runner
+- Nerfstudio / gsplat version、入力画像SHA-256、command、timestamps、return code、logs、checkpoint、PLY hash/sizeのmanifest化
+- training / export失敗時のfail-closed処理
 
-## 実行
+実データで確認済み:
+
+- Huejotzingoの連続ドローン動画から78 frameをCOLMAPへ入力
+- registered images: **78 / 78**
+- registration rate: **100%**
+- submodel: **1**
+- sparse points: **32,782**
+- mean reprojection error: **0.370830 px**
+
+未完了:
+
+- 実GPUでのHuejotzingo Splatfacto training
+- 実データからのGaussian Splat `.ply` export
+- source video SHA-256から最終PLY SHA-256までのE2E lineage確認
+
+したがって、現時点では**「実データからGaussian Splat PLYを生成済み」とは主張しません**。CPU CIのmock testは外部CLI契約とmanifest生成を検証するもので、GPU training成功の代替ではありません。
+
+## 正準パイプライン
+
+```text
+licensed real photos / single-take video
+  -> provenance + source SHA-256
+  -> frame extraction / filtering
+  -> COLMAP camera registration
+  -> Nerfstudio dataset
+  -> ns-train splatfacto
+  -> ns-export gaussian-splat
+  -> splat.ply + SHA-256
+```
+
+生成AIで作った別角度画像はSfM / 3DGS入力へ混ぜません。見た目が自然でも、同じ実在対象の形状・模様・camera geometryが視点間で一致する保証がないためです。
+
+## 画像収集
 
 ```bash
 python -m pip install -r requirements.txt
@@ -33,7 +64,7 @@ python main.py \
   --work-dir work
 ```
 
-複数ページ・キーワードは引数を繰り返します。
+複数ページ・キーワードは引数を繰り返せます。
 
 ```bash
 python main.py \
@@ -55,32 +86,75 @@ work/
     └── <sha256>.jpg
 ```
 
-## 外部フォトグラメトリ実行
+## 動画処理
 
-`photogrammetry.py` はMeshroom、VisualSFM、COLMAPの実行コマンドを引数配列で構築し、`shell=True`を使用しません。アプリケーションから外部ソフトを自動インストールせず、実行ファイルが見つからない場合は具体的な設定方法を示して停止します。
+`video_pipeline.py`には以下を置いています。
 
-実行ファイルは、`BackendConfig(executable=...)`、JSON設定、または次の環境変数で指定します。
+- `probe_video()` — ffprobe metadata取得
+- `scene_cut_times()` — scene-change候補時刻の抽出
+- `extract_frames_command()` — FFmpeg frame抽出command生成
+- `frame_timestamp_records()` — frameと元動画timestampの対応付け
+- `select_video_frames()` — blur / near-duplicate除去
+- `write_source_manifest()` — source page、media URL、author、license、SHA-256等の保存
+
+動画・抽出frame・checkpoint・PLYのような大容量生成物はGit履歴へcommitしません。
+
+## 外部フォトグラメトリ
+
+`photogrammetry.py`はMeshroom、VisualSFM、COLMAPの実行commandを引数配列で構築し、`shell=True`を使用しません。外部softwareを自動インストールせず、実行ファイルが見つからない場合は具体的な設定方法を示して停止します。
+
+実行ファイルは`BackendConfig(executable=...)`、JSON設定、または次の環境変数で指定します。
 
 - `AUTOPHOTOGRAMMETRY_MESHROOM_EXECUTABLE`
 - `AUTOPHOTOGRAMMETRY_VISUALSFM_EXECUTABLE`
 - `AUTOPHOTOGRAMMETRY_COLMAP_EXECUTABLE`
 
-設定例:
+各実行は`<output_root>/<backend>/<run_id>/`へ分離し、`manifest.json`、`stdout.log`、`stderr.log`、生成物一覧を保存します。
 
-```json
-{
-  "meshroom": {
-    "executable": "C:/Tools/Meshroom/meshroom_photogrammetry.exe",
-    "extra_args": []
-  },
-  "colmap": {
-    "executable": "/usr/bin/colmap",
-    "extra_args": ["--quality", "medium"]
-  }
-}
+## Nerfstudio Splatfacto
+
+Nerfstudioとgsplatはこのrepositoryへvendorせず、実行環境へ別途installします。
+
+Pythonからの実行入口:
+
+```python
+from video_pipeline import run_splatfacto_export
+
+result = run_splatfacto_export(
+    "path/to/nerfstudio-data",
+    "runs",
+)
+print(result["manifest_path"])
 ```
 
-各実行は`<output_root>/<backend>/<run_id>/`へ分離され、`manifest.json`、`stdout.log`、`stderr.log`、生成物一覧を保存します。対応OSは各外部ソフトが提供するWindowsまたはLinux環境です。VisualSFMのコマンドライン仕様は配布版によって異なるため、実環境で追加引数を確認してください。
+runnerは`ns-train`と`ns-export`が存在しない場合に停止します。成功時は1 runごとに少なくとも次を保存します。
+
+```text
+runs/splatfacto/<run-id>/
+├── manifest.json
+├── train.stdout.log
+├── train.stderr.log
+├── export.stdout.log
+├── export.stderr.log
+└── export/
+    └── *.ply
+```
+
+manifestには以下を記録します。
+
+- input image count
+- per-image SHA-256
+- Nerfstudio version
+- gsplat version
+- training / export command
+- start / end timestamp
+- return code
+- config path
+- checkpoint path
+- PLY path
+- PLY size
+- PLY SHA-256
+- failed phase
 
 ## テスト
 
@@ -88,27 +162,53 @@ work/
 python -m unittest discover -s tests -v
 ```
 
-検証対象:
+現在の通常CIはCPUだけで実行し、以下を検証します。
 
-- 元画像の解像度が異なっても特徴量長が一定
-- 異なる解像度同士でもSSIMを計算できる
-- 選別が元ファイルを削除しない
-- 空入力を安全に処理する
-- 空白を含むパスを1引数として安全に扱う
-- 外部実行ファイルがない場合に自動インストールせず停止する
-- backendごとにrun、manifest、ログ、成果物を分離する
+- 異なる解像度でも特徴量長が一定
+- 異なる解像度同士のSSIM
+- 選別が元画像を削除しない
+- 空入力の安全な処理
+- 空白を含むpathを1引数として扱う
+- 外部実行ファイル欠落時のfail-closed
+- backendごとのrun / manifest / log分離
+- Splatfacto training / export command construction
+- training失敗時のmanifest
+- 成功contract時のcheckpoint / PLY metadataとSHA-256
+
+通常CIではGPU trainingを実行しません。実データCOLMAP検証のために使用した一時workflowもroutine CIから削除済みです。
+
+## 責務境界
+
+`AutoPhotogrammetry`:
+
+```text
+real images / video
+  -> provenance
+  -> reconstruction / training
+  -> Gaussian Splat PLY + evidence
+```
+
+`vrmine`:
+
+```text
+Gaussian Splat PLY + evidence
+  -> Web / Unity / VRChat側での表示・互換性検証
+```
+
+training pipelineを両repositoryへ二重実装しません。
 
 ## 利用条件と限界
 
-- 本ツールはrobots.txt・利用規約・著作権ライセンスを自動判定しません
-- 利用者が明示したHTMLページだけを取得対象にします
-- 検索エンジンの無断スクレイピング機能はありません
-- 同じ対象物・同じ撮影条件・十分な視点重複を自動証明しません
-- クラスタ番号は3D形状やカメラ姿勢を意味しません
-- 外部バックエンドの導入、ライセンス、GPU要件、入力互換性は利用者が確認します
-- SSIMは生成レンダーと参照画像の画像類似度であり、再投影誤差やメッシュ精度の代替ではありません
-- 再投影誤差、登録画像率、メッシュ完全性を測るまでは、フォトグラメトリー品質を主張できません
+- robots.txt、利用規約、著作権licenseを自動判定しません
+- 利用者が明示したHTML pageだけを画像収集対象にします
+- 検索engineの無断scraping機能はありません
+- 同じ対象物、十分なviewpoint overlap、照明条件を自動証明しません
+- cluster番号は3D形状やcamera poseを意味しません
+- 外部backendのinstall、license、GPU要件、入力互換性は利用者が確認します
+- SSIMは画像類似度であり、reprojection errorや3D精度の代替ではありません
+- COLMAP registration成功だけではGaussian Splat品質を保証しません
+- GPU実機でPLYを生成するまではE2E 3DGS成功とは扱いません
 
-以前のREADMEにあった「最高品質」「再構成精度90%以上」等は、再現可能な証拠がないため削除しています。
+以前のREADMEにあった「最高品質」「再構成精度90%以上」等の再現不能な表現は使用しません。
 
-**README最終監査:** 2026-08-06
+**README最終監査:** 2026-08-18
