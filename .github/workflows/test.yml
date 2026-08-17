@@ -21,3 +21,16 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - run: python -m py_compile photogrammetry.py config.py video_pipeline.py tests/test_photogrammetry.py tests/test_video_pipeline.py
       - run: python -m unittest discover -s tests -v
+      - name: Temporary Cabo single-take fixture evidence
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --output /tmp/cabo.webm \
+            https://upload.wikimedia.org/wikipedia/commons/b/ba/Diving_in_Cabo_San_Lucas.webm
+          echo "sha256=$(sha256sum /tmp/cabo.webm | cut -d' ' -f1)"
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height -of json /tmp/cabo.webm
+          ffmpeg -hide_banner -i /tmp/cabo.webm -filter:v "select='gt(scene,0.4)',showinfo" -an -f null - 2> /tmp/scene.log
+          echo "scene_cut_candidates"
+          grep -oE 'pts_time:[0-9.]+' /tmp/scene.log || true
+          mkdir -p /tmp/frames
+          ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm -vf fps=3 -q:v 2 /tmp/frames/frame-%06d.jpg
+          echo "frames_3fps=$(find /tmp/frames -type f -name 'frame-*.jpg' | wc -l)"
