@@ -21,12 +21,12 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - run: python -m py_compile photogrammetry.py config.py video_pipeline.py tests/test_photogrammetry.py tests/test_video_pipeline.py
       - run: python -m unittest discover -s tests -v
-      - name: Temporary Cabo video evidence
+      - name: Temporary Cabo reconstruction evidence
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
-          mkdir -p /tmp/evidence /tmp/frames2 /tmp/frames3 /tmp/selected
+          sudo apt-get install -y -qq ffmpeg colmap
+          mkdir -p /tmp/evidence /tmp/frames2 /tmp/frames3 /tmp/selected /tmp/sparse /tmp/model_txt
           curl --fail --location --retry 3 --output /tmp/cabo.webm \
             https://upload.wikimedia.org/wikipedia/commons/b/ba/Diving_in_Cabo_San_Lucas.webm
           echo "sha256=$(sha256sum /tmp/cabo.webm | cut -d' ' -f1)"
@@ -70,9 +70,76 @@ jobs:
           ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm \
             -vf "fps=1/10,scale=320:-1,tile=4x4:padding=4:margin=4" \
             -frames:v 1 /tmp/evidence/contact-sheet.jpg
+
+          colmap -h | head -40 | tee /tmp/evidence/colmap-version.txt
+          set +e
+          colmap feature_extractor \
+            --database_path /tmp/colmap.db \
+            --image_path /tmp/selected \
+            --ImageReader.single_camera 1 \
+            --SiftExtraction.use_gpu 0 \
+            > /tmp/evidence/colmap-feature-extractor.log 2>&1
+          feature_rc=$?
+          colmap sequential_matcher \
+            --database_path /tmp/colmap.db \
+            --SiftMatching.use_gpu 0 \
+            > /tmp/evidence/colmap-sequential-matcher.log 2>&1
+          matcher_rc=$?
+          colmap mapper \
+            --database_path /tmp/colmap.db \
+            --image_path /tmp/selected \
+            --output_path /tmp/sparse \
+            > /tmp/evidence/colmap-mapper.log 2>&1
+          mapper_rc=$?
+          set -e
+
+          model_count=$(find /tmp/sparse -mindepth 1 -maxdepth 1 -type d | wc -l)
+          echo "feature_extractor_return_code=$feature_rc" | tee /tmp/evidence/colmap-status.txt
+          echo "sequential_matcher_return_code=$matcher_rc" | tee -a /tmp/evidence/colmap-status.txt
+          echo "mapper_return_code=$mapper_rc" | tee -a /tmp/evidence/colmap-status.txt
+          echo "submodel_count=$model_count" | tee -a /tmp/evidence/colmap-status.txt
+
+          if [ "$model_count" -gt 0 ]; then
+            colmap model_analyzer --path /tmp/sparse/0 | tee /tmp/evidence/colmap-model-analyzer.txt
+            colmap model_converter --input_path /tmp/sparse/0 --output_path /tmp/model_txt --output_type TXT
+            python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          selected = sorted(path.name for path in Path('/tmp/selected').glob('*.jpg'))
+          image_lines = [line.rstrip('\n') for line in Path('/tmp/model_txt/images.txt').read_text().splitlines() if not line.startswith('#')]
+          registered = []
+          for index in range(0, len(image_lines), 2):
+              line = image_lines[index].strip()
+              if line:
+                  registered.append(line.split()[-1])
+          points = sum(
+              1 for line in Path('/tmp/model_txt/points3D.txt').read_text().splitlines()
+              if line.strip() and not line.startswith('#')
+          )
+          analyzer = Path('/tmp/evidence/colmap-model-analyzer.txt').read_text()
+          error_match = re.search(r'Mean reprojection error:\s*([0-9.eE+-]+)', analyzer)
+          summary = {
+              'input_images': len(selected),
+              'registered_images': len(registered),
+              'registration_rate': len(registered) / len(selected) if selected else 0.0,
+              'sparse_points': points,
+              'failed_images': sorted(set(selected) - set(registered)),
+              'mean_reprojection_error': float(error_match.group(1)) if error_match else None,
+          }
+          Path('/tmp/evidence/colmap-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+          print(json.dumps({k: v for k, v in summary.items() if k != 'failed_images'}, sort_keys=True))
+          PY
+          fi
+
+          if [ "$feature_rc" -ne 0 ] || [ "$matcher_rc" -ne 0 ] || [ "$mapper_rc" -ne 0 ] || [ "$model_count" -eq 0 ]; then
+            echo "COLMAP reconstruction did not produce a usable sparse model" >&2
+            exit 1
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: cabo-video-evidence
+          name: cabo-reconstruction-evidence
           path: /tmp/evidence
           if-no-files-found: error
