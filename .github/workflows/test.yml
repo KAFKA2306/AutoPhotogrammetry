@@ -21,24 +21,32 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - run: python -m py_compile photogrammetry.py config.py video_pipeline.py tests/test_photogrammetry.py tests/test_video_pipeline.py
       - run: python -m unittest discover -s tests -v
-      - name: Temporary Cabo single-take fixture evidence
+      - name: Temporary Cabo video evidence
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-          mkdir -p /tmp/evidence /tmp/frames /tmp/selected
+          mkdir -p /tmp/evidence /tmp/frames2 /tmp/frames3 /tmp/selected
           curl --fail --location --retry 3 --output /tmp/cabo.webm \
             https://upload.wikimedia.org/wikipedia/commons/b/ba/Diving_in_Cabo_San_Lucas.webm
           echo "sha256=$(sha256sum /tmp/cabo.webm | cut -d' ' -f1)"
-          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height -of json /tmp/cabo.webm | tee /tmp/evidence/ffprobe.json
+          ffprobe -v error -show_entries format=duration,size,format_name:stream=codec_name,width,height -of json /tmp/cabo.webm | tee /tmp/evidence/ffprobe.json
           ffmpeg -hide_banner -i /tmp/cabo.webm -filter:v "select='gt(scene,0.4)',showinfo" -an -f null - 2> /tmp/scene.log
           grep -oE 'pts_time:[0-9.]+' /tmp/scene.log | tee /tmp/evidence/scene-cut-candidates.txt || true
-          ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm -vf fps=3 -q:v 2 /tmp/frames/frame-%06d.jpg
-          echo "frames_3fps=$(find /tmp/frames -type f -name 'frame-*.jpg' | wc -l)"
+          ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm -vf fps=2 -q:v 2 /tmp/frames2/frame-%06d.jpg
+          ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm -vf fps=3 -q:v 2 /tmp/frames3/frame-%06d.jpg
+          echo "frames_2fps=$(find /tmp/frames2 -type f -name 'frame-*.jpg' | wc -l)"
+          echo "frames_3fps=$(find /tmp/frames3 -type f -name 'frame-*.jpg' | wc -l)"
           python - <<'PY'
           import json
           from pathlib import Path
-          from video_pipeline import VideoSource, probe_video, select_video_frames, write_source_manifest
+          from video_pipeline import (
+              VideoSource,
+              frame_timestamp_records,
+              probe_video,
+              select_video_frames,
+              write_source_manifest,
+          )
 
           source = VideoSource(
               title="Diving in Cabo San Lucas",
@@ -50,7 +58,11 @@ jobs:
               target="ship wreck near Land's End, Cabo San Lucas, Mexico",
           )
           write_source_manifest("/tmp/cabo.webm", source, probe_video("/tmp/cabo.webm"), "/tmp/evidence/source-manifest.json")
-          frames = sorted(Path("/tmp/frames").glob("frame-*.jpg"))
+          frames = sorted(Path("/tmp/frames3").glob("frame-*.jpg"))
+          Path("/tmp/evidence/frame-timestamps.json").write_text(
+              json.dumps(frame_timestamp_records(frames, fps=3), indent=2) + "\n",
+              encoding="utf-8",
+          )
           stats = select_video_frames(frames, "/tmp/selected")
           Path("/tmp/evidence/frame-selection.json").write_text(json.dumps(stats, indent=2) + "\n", encoding="utf-8")
           print(json.dumps({key: value for key, value in stats.items() if key != "selected_paths"}, sort_keys=True))
@@ -61,6 +73,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: cabo-single-take-evidence
+          name: cabo-video-evidence
           path: /tmp/evidence
           if-no-files-found: error
