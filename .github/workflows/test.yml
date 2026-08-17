@@ -53,10 +53,10 @@ jobs:
           info = page["videoinfo"][0]
           candidates = [
               item for item in info.get("derivatives", [])
-              if item.get("width") == 1280 and item.get("height") == 720 and "webm" in item.get("src", "")
+              if item.get("width") == 1920 and item.get("height") == 1080 and "webm" in item.get("src", "")
           ]
           if not candidates:
-              raise SystemExit("No 1280x720 WebM derivative found")
+              raise SystemExit("No 1920x1080 WebM derivative found")
           chosen = min(candidates, key=lambda item: int(item.get("bandwidth", 10**12)))
           Path("/tmp/evidence/media-source.json").write_text(json.dumps({
               "source_page": "https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm",
