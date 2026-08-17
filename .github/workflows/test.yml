@@ -21,141 +21,87 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - run: python -m py_compile photogrammetry.py config.py video_pipeline.py tests/test_photogrammetry.py tests/test_video_pipeline.py
       - run: python -m unittest discover -s tests -v
-      - name: Temporary Cabo reconstruction evidence
+      - name: Temporary Huejotzingo single-take gate
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg colmap
-          mkdir -p /tmp/evidence /tmp/frames2 /tmp/frames3 /tmp/selected /tmp/colmap_images /tmp/sparse /tmp/model_txt
-          curl --fail --location --retry 3 --output /tmp/cabo.webm \
-            https://upload.wikimedia.org/wikipedia/commons/b/ba/Diving_in_Cabo_San_Lucas.webm
-          echo "sha256=$(sha256sum /tmp/cabo.webm | cut -d' ' -f1)"
-          ffprobe -v error -show_entries format=duration,size,format_name:stream=codec_name,width,height -of json /tmp/cabo.webm | tee /tmp/evidence/ffprobe.json
-          ffmpeg -hide_banner -i /tmp/cabo.webm -filter:v "select='gt(scene,0.4)',showinfo" -an -f null - 2> /tmp/scene.log
-          grep -oE 'pts_time:[0-9.]+' /tmp/scene.log | tee /tmp/evidence/scene-cut-candidates.txt || true
-          ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm -vf fps=2 -q:v 2 /tmp/frames2/frame-%06d.jpg
-          ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm -vf fps=3 -q:v 2 /tmp/frames3/frame-%06d.jpg
-          echo "frames_2fps=$(find /tmp/frames2 -type f -name 'frame-*.jpg' | wc -l)"
-          echo "frames_3fps=$(find /tmp/frames3 -type f -name 'frame-*.jpg' | wc -l)"
+          sudo apt-get install -y -qq ffmpeg
+          mkdir -p /tmp/evidence
           python - <<'PY'
           import json
-          import shutil
           from pathlib import Path
-          from video_pipeline import (
-              VideoSource,
-              frame_timestamp_records,
-              probe_video,
-              select_video_frames,
-              write_source_manifest,
-          )
+          import requests
 
-          source = VideoSource(
-              title="Diving in Cabo San Lucas",
-              source_page="https://commons.wikimedia.org/wiki/File:Diving_in_Cabo_San_Lucas.webm",
-              media_url="https://upload.wikimedia.org/wikipedia/commons/b/ba/Diving_in_Cabo_San_Lucas.webm",
-              author="KumiM",
-              license="CC BY 3.0",
-              license_url="https://creativecommons.org/licenses/by/3.0/",
-              target="ship wreck near Land's End, Cabo San Lucas, Mexico",
+          title = "File:Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron.webm"
+          response = requests.get(
+              "https://commons.wikimedia.org/w/api.php",
+              params={
+                  "action": "query",
+                  "format": "json",
+                  "titles": title,
+                  "prop": "videoinfo",
+                  "viprop": "url|size|derivatives",
+              },
+              timeout=60,
           )
-          write_source_manifest("/tmp/cabo.webm", source, probe_video("/tmp/cabo.webm"), "/tmp/evidence/source-manifest.json")
-          frames = sorted(Path("/tmp/frames3").glob("frame-*.jpg"))
-          Path("/tmp/evidence/frame-timestamps.json").write_text(
-              json.dumps(frame_timestamp_records(frames, fps=3), indent=2) + "\n",
-              encoding="utf-8",
-          )
-          stats = select_video_frames(frames, "/tmp/selected")
-          Path("/tmp/evidence/frame-selection.json").write_text(json.dumps(stats, indent=2) + "\n", encoding="utf-8")
-          print(json.dumps({key: value for key, value in stats.items() if key != "selected_paths"}, sort_keys=True))
-
-          selected = sorted(Path("/tmp/selected").glob("*.jpg"))
-          colmap_input = selected[::2]
-          for path in colmap_input:
-              shutil.copy2(path, Path("/tmp/colmap_images") / path.name)
-          Path("/tmp/evidence/colmap-input.json").write_text(
-              json.dumps({
-                  "source_selected_frames": len(selected),
-                  "stride": 2,
-                  "colmap_input_frames": len(colmap_input),
-                  "frames": [path.name for path in colmap_input],
-              }, indent=2) + "\n",
-              encoding="utf-8",
-          )
-          print(f"colmap_input_frames={len(colmap_input)}")
+          response.raise_for_status()
+          data = response.json()
+          Path("/tmp/evidence/commons-videoinfo.json").write_text(json.dumps(data, indent=2) + "\n")
+          page = next(iter(data["query"]["pages"].values()))
+          info = page["videoinfo"][0]
+          candidates = [
+              item for item in info.get("derivatives", [])
+              if item.get("width") == 1280 and item.get("height") == 720 and "webm" in item.get("src", "")
+          ]
+          if not candidates:
+              raise SystemExit("No 1280x720 WebM derivative found")
+          chosen = min(candidates, key=lambda item: int(item.get("bandwidth", 10**12)))
+          Path("/tmp/evidence/media-source.json").write_text(json.dumps({
+              "source_page": "https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm",
+              "original_url": info["url"],
+              "original_size": info["size"],
+              "derivative": chosen,
+          }, indent=2) + "\n")
+          with requests.get(chosen["src"], stream=True, timeout=120) as media:
+              media.raise_for_status()
+              with open("/tmp/huejotzingo.webm", "wb") as output:
+                  for chunk in media.iter_content(1024 * 1024):
+                      if chunk:
+                          output.write(chunk)
+          print(f"derivative_url={chosen['src']}")
+          print(f"downloaded_bytes={Path('/tmp/huejotzingo.webm').stat().st_size}")
           PY
-          ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm \
-            -vf "fps=1/10,scale=320:-1,tile=4x4:padding=4:margin=4" \
-            -frames:v 1 /tmp/evidence/contact-sheet.jpg
-
-          colmap -h | head -40 | tee /tmp/evidence/colmap-version.txt
-          set +e
-          colmap feature_extractor \
-            --database_path /tmp/colmap.db \
-            --image_path /tmp/colmap_images \
-            --ImageReader.single_camera 1 \
-            --SiftExtraction.use_gpu 0 \
-            > /tmp/evidence/colmap-feature-extractor.log 2>&1
-          feature_rc=$?
-          colmap sequential_matcher \
-            --database_path /tmp/colmap.db \
-            --SiftMatching.use_gpu 0 \
-            > /tmp/evidence/colmap-sequential-matcher.log 2>&1
-          matcher_rc=$?
-          colmap mapper \
-            --database_path /tmp/colmap.db \
-            --image_path /tmp/colmap_images \
-            --output_path /tmp/sparse \
-            > /tmp/evidence/colmap-mapper.log 2>&1
-          mapper_rc=$?
-          set -e
-
-          model_count=$(find /tmp/sparse -mindepth 1 -maxdepth 1 -type d | wc -l)
-          echo "feature_extractor_return_code=$feature_rc" | tee /tmp/evidence/colmap-status.txt
-          echo "sequential_matcher_return_code=$matcher_rc" | tee -a /tmp/evidence/colmap-status.txt
-          echo "mapper_return_code=$mapper_rc" | tee -a /tmp/evidence/colmap-status.txt
-          echo "submodel_count=$model_count" | tee -a /tmp/evidence/colmap-status.txt
-
-          if [ "$model_count" -gt 0 ]; then
-            colmap model_analyzer --path /tmp/sparse/0 | tee /tmp/evidence/colmap-model-analyzer.txt
-            colmap model_converter --input_path /tmp/sparse/0 --output_path /tmp/model_txt --output_type TXT
-            python - <<'PY'
+          echo "sha256=$(sha256sum /tmp/huejotzingo.webm | cut -d' ' -f1)" | tee /tmp/evidence/sha256.txt
+          ffprobe -v error -show_entries format=duration,size,format_name:stream=codec_name,width,height -of json /tmp/huejotzingo.webm | tee /tmp/evidence/ffprobe.json
+          ffmpeg -hide_banner -i /tmp/huejotzingo.webm -filter:v "select='gt(scene,0.4)',showinfo" -an -f null - 2> /tmp/scene.log
+          grep -oE 'pts_time:[0-9.]+' /tmp/scene.log | tee /tmp/evidence/scene-cut-candidates.txt || true
+          python - <<'PY'
           import json
-          import re
-          from pathlib import Path
+          from video_pipeline import VideoSource, probe_video, write_source_manifest
 
-          selected = sorted(path.name for path in Path('/tmp/colmap_images').glob('*.jpg'))
-          image_lines = [line.rstrip('\n') for line in Path('/tmp/model_txt/images.txt').read_text().splitlines() if not line.startswith('#')]
-          registered = []
-          for index in range(0, len(image_lines), 2):
-              line = image_lines[index].strip()
-              if line:
-                  registered.append(line.split()[-1])
-          points = sum(
-              1 for line in Path('/tmp/model_txt/points3D.txt').read_text().splitlines()
-              if line.strip() and not line.startswith('#')
+          source_info = json.load(open("/tmp/evidence/media-source.json"))
+          source = VideoSource(
+              title="Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron",
+              source_page=source_info["source_page"],
+              media_url=source_info["derivative"]["src"],
+              author="Luisalvaz",
+              license="CC0 1.0",
+              license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+              target="Ex Convento de San Miguel Arcángel, Huejotzingo, Puebla, Mexico",
           )
-          analyzer = Path('/tmp/evidence/colmap-model-analyzer.txt').read_text()
-          error_match = re.search(r'Mean reprojection error:\s*([0-9.eE+-]+)', analyzer)
-          summary = {
-              'input_images': len(selected),
-              'registered_images': len(registered),
-              'registration_rate': len(registered) / len(selected) if selected else 0.0,
-              'sparse_points': points,
-              'failed_images': sorted(set(selected) - set(registered)),
-              'mean_reprojection_error': float(error_match.group(1)) if error_match else None,
-          }
-          Path('/tmp/evidence/colmap-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
-          print(json.dumps({k: v for k, v in summary.items() if k != 'failed_images'}, sort_keys=True))
+          write_source_manifest(
+              "/tmp/huejotzingo.webm",
+              source,
+              probe_video("/tmp/huejotzingo.webm"),
+              "/tmp/evidence/source-manifest.json",
+          )
           PY
-          fi
-
-          if [ "$feature_rc" -ne 0 ] || [ "$matcher_rc" -ne 0 ] || [ "$mapper_rc" -ne 0 ] || [ "$model_count" -eq 0 ]; then
-            echo "COLMAP reconstruction did not produce a usable sparse model" >&2
-            exit 1
-          fi
+          ffmpeg -hide_banner -loglevel error -i /tmp/huejotzingo.webm \
+            -vf "fps=1/10,scale=320:-1,tile=6x4:padding=4:margin=4" \
+            -frames:v 1 /tmp/evidence/contact-sheet.jpg
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: cabo-reconstruction-evidence
+          name: huejotzingo-single-take-gate
           path: /tmp/evidence
           if-no-files-found: error
