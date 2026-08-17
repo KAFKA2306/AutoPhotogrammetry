@@ -24,13 +24,43 @@ jobs:
       - name: Temporary Cabo single-take fixture evidence
         run: |
           set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          mkdir -p /tmp/evidence /tmp/frames /tmp/selected
           curl --fail --location --retry 3 --output /tmp/cabo.webm \
             https://upload.wikimedia.org/wikipedia/commons/b/ba/Diving_in_Cabo_San_Lucas.webm
           echo "sha256=$(sha256sum /tmp/cabo.webm | cut -d' ' -f1)"
-          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height -of json /tmp/cabo.webm
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height -of json /tmp/cabo.webm | tee /tmp/evidence/ffprobe.json
           ffmpeg -hide_banner -i /tmp/cabo.webm -filter:v "select='gt(scene,0.4)',showinfo" -an -f null - 2> /tmp/scene.log
-          echo "scene_cut_candidates"
-          grep -oE 'pts_time:[0-9.]+' /tmp/scene.log || true
-          mkdir -p /tmp/frames
+          grep -oE 'pts_time:[0-9.]+' /tmp/scene.log | tee /tmp/evidence/scene-cut-candidates.txt || true
           ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm -vf fps=3 -q:v 2 /tmp/frames/frame-%06d.jpg
           echo "frames_3fps=$(find /tmp/frames -type f -name 'frame-*.jpg' | wc -l)"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from video_pipeline import VideoSource, probe_video, select_video_frames, write_source_manifest
+
+          source = VideoSource(
+              title="Diving in Cabo San Lucas",
+              source_page="https://commons.wikimedia.org/wiki/File:Diving_in_Cabo_San_Lucas.webm",
+              media_url="https://upload.wikimedia.org/wikipedia/commons/b/ba/Diving_in_Cabo_San_Lucas.webm",
+              author="KumiM",
+              license="CC BY 3.0",
+              license_url="https://creativecommons.org/licenses/by/3.0/",
+              target="ship wreck near Land's End, Cabo San Lucas, Mexico",
+          )
+          write_source_manifest("/tmp/cabo.webm", source, probe_video("/tmp/cabo.webm"), "/tmp/evidence/source-manifest.json")
+          frames = sorted(Path("/tmp/frames").glob("frame-*.jpg"))
+          stats = select_video_frames(frames, "/tmp/selected")
+          Path("/tmp/evidence/frame-selection.json").write_text(json.dumps(stats, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps({key: value for key, value in stats.items() if key != "selected_paths"}, sort_keys=True))
+          PY
+          ffmpeg -hide_banner -loglevel error -i /tmp/cabo.webm \
+            -vf "fps=1/10,scale=320:-1,tile=4x4:padding=4:margin=4" \
+            -frames:v 1 /tmp/evidence/contact-sheet.jpg
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cabo-single-take-evidence
+          path: /tmp/evidence
+          if-no-files-found: error
