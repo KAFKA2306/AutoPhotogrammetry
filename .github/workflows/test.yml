@@ -56,7 +56,7 @@ jobs:
           )
 
           selected = sorted(Path('/tmp/selected').glob('*.jpg'))
-          stride = max(1, math.ceil(len(selected) / 160))
+          stride = max(1, math.ceil(len(selected) / 80))
           colmap_input = selected[::stride]
           for path in colmap_input:
               shutil.copy2(path, Path('/tmp/colmap_images') / path.name)
@@ -112,10 +112,7 @@ jobs:
             model_id=$(basename "$model_dir")
             mkdir -p "/tmp/models_txt/$model_id"
             colmap model_analyzer --path "$model_dir" | tee "/tmp/evidence/colmap-model-${model_id}-analyzer.txt"
-            colmap model_converter \
-              --input_path "$model_dir" \
-              --output_path "/tmp/models_txt/$model_id" \
-              --output_type TXT
+            colmap model_converter --input_path "$model_dir" --output_path "/tmp/models_txt/$model_id" --output_type TXT
           done
 
           python - <<'PY'
@@ -126,7 +123,9 @@ jobs:
           input_record = json.loads(Path('/tmp/evidence/colmap-input.json').read_text())
           input_names = input_record['frames']
           models = []
-          for model_dir in sorted(Path('/tmp/models_txt').iterdir(), key=lambda p: int(p.name)) if Path('/tmp/models_txt').exists() else []:
+          model_root = Path('/tmp/models_txt')
+          model_dirs = sorted(model_root.iterdir(), key=lambda p: int(p.name)) if model_root.exists() else []
+          for model_dir in model_dirs:
               images_path = model_dir / 'images.txt'
               points_path = model_dir / 'points3D.txt'
               if not images_path.exists():
@@ -139,10 +138,7 @@ jobs:
                       registered.append(metadata.split(maxsplit=9)[-1])
               points = 0
               if points_path.exists():
-                  points = sum(
-                      1 for line in points_path.read_text().splitlines()
-                      if line.strip() and not line.startswith('#')
-                  )
+                  points = sum(1 for line in points_path.read_text().splitlines() if line.strip() and not line.startswith('#'))
               analyzer_path = Path(f'/tmp/evidence/colmap-model-{model_dir.name}-analyzer.txt')
               analyzer = analyzer_path.read_text() if analyzer_path.exists() else ''
               error_match = re.search(r'Mean reprojection error:\s*([0-9.eE+-]+)px', analyzer)
@@ -167,9 +163,7 @@ jobs:
               'dominant_mean_reprojection_error_px': dominant['mean_reprojection_error_px'] if dominant else None,
               'dominant_failed_images': sorted(set(input_names) - set(dominant['registered_names'])) if dominant else input_names,
           }
-          Path('/tmp/evidence/colmap-models.json').write_text(
-              json.dumps(summary, indent=2) + '\n', encoding='utf-8'
-          )
+          Path('/tmp/evidence/colmap-models.json').write_text(json.dumps(summary, indent=2) + '\n', encoding='utf-8')
           print(json.dumps({
               'input_images': summary['input_images'],
               'submodel_count': summary['submodel_count'],
