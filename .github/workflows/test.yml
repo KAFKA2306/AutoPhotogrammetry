@@ -27,7 +27,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg colmap
-          mkdir -p /tmp/evidence /tmp/frames /tmp/selected /tmp/colmap_images /tmp/sparse /tmp/models_txt
+          mkdir -p /tmp/evidence /tmp/frames /tmp/selected /tmp/sparse /tmp/models_txt
 
           media_url='https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm'
           expected_sha256='c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30'
@@ -37,35 +37,30 @@ jobs:
           test "$actual_sha256" = "$expected_sha256"
           ffprobe -v error -show_entries format=duration,size,format_name:stream=codec_name,width,height -of json /tmp/huejotzingo.webm | tee /tmp/evidence/ffprobe.json
 
-          ffmpeg -hide_banner -loglevel error -i /tmp/huejotzingo.webm -vf fps=1 -q:v 2 /tmp/frames/frame-%06d.jpg
+          ffmpeg -hide_banner -loglevel error -i /tmp/huejotzingo.webm \
+            -vf 'fps=1/3,scale=1024:-2' -q:v 2 /tmp/frames/frame-%06d.jpg
           python - <<'PY'
           import json
-          import math
-          import shutil
           from pathlib import Path
           from video_pipeline import frame_timestamp_records, select_video_frames
 
           frames = sorted(Path('/tmp/frames').glob('frame-*.jpg'))
           Path('/tmp/evidence/frame-timestamps.json').write_text(
-              json.dumps(frame_timestamp_records(frames, fps=1), indent=2) + '\n',
+              json.dumps(frame_timestamp_records(frames, fps=1/3), indent=2) + '\n',
               encoding='utf-8',
           )
           stats = select_video_frames(frames, '/tmp/selected')
           Path('/tmp/evidence/frame-selection.json').write_text(json.dumps(stats, indent=2) + '\n', encoding='utf-8')
-
           selected = sorted(Path('/tmp/selected').glob('*.jpg'))
-          stride = max(1, math.ceil(len(selected) / 80))
-          colmap_input = selected[::stride]
-          for path in colmap_input:
-              shutil.copy2(path, Path('/tmp/colmap_images') / path.name)
           input_record = {
+              'sampling_interval_seconds': 3,
               'extracted_frames': len(frames),
               'selected_frames': len(selected),
-              'temporal_stride': stride,
-              'colmap_input_frames': len(colmap_input),
+              'colmap_input_frames': len(selected),
+              'frame_width': 1024,
               'sift_max_image_size': 1024,
               'sift_max_num_features': 4096,
-              'frames': [path.name for path in colmap_input],
+              'frames': [path.name for path in selected],
           }
           Path('/tmp/evidence/colmap-input.json').write_text(json.dumps(input_record, indent=2) + '\n', encoding='utf-8')
           print(json.dumps({key: value for key, value in input_record.items() if key != 'frames'}, sort_keys=True))
@@ -75,7 +70,7 @@ jobs:
           set +e
           colmap feature_extractor \
             --database_path /tmp/colmap.db \
-            --image_path /tmp/colmap_images \
+            --image_path /tmp/selected \
             --ImageReader.single_camera 1 \
             --SiftExtraction.use_gpu 0 \
             --SiftExtraction.max_image_size 1024 \
@@ -89,7 +84,7 @@ jobs:
           matcher_rc=$?
           colmap mapper \
             --database_path /tmp/colmap.db \
-            --image_path /tmp/colmap_images \
+            --image_path /tmp/selected \
             --output_path /tmp/sparse \
             > /tmp/evidence/colmap-mapper.log 2>&1
           mapper_rc=$?
@@ -119,8 +114,7 @@ jobs:
           input_names = input_record['frames']
           models = []
           model_root = Path('/tmp/models_txt')
-          model_dirs = sorted(model_root.iterdir(), key=lambda p: int(p.name)) if model_root.exists() else []
-          for model_dir in model_dirs:
+          for model_dir in sorted(model_root.iterdir(), key=lambda p: int(p.name)) if model_root.exists() else []:
               images_path = model_dir / 'images.txt'
               points_path = model_dir / 'points3D.txt'
               if not images_path.exists():
@@ -131,11 +125,11 @@ jobs:
                   metadata = raw_lines[index].strip()
                   if metadata:
                       registered.append(metadata.split(maxsplit=9)[-1])
-              points = 0
-              if points_path.exists():
-                  points = sum(1 for line in points_path.read_text().splitlines() if line.strip() and not line.startswith('#'))
-              analyzer_path = Path(f'/tmp/evidence/colmap-model-{model_dir.name}-analyzer.txt')
-              analyzer = analyzer_path.read_text() if analyzer_path.exists() else ''
+              points = sum(
+                  1 for line in points_path.read_text().splitlines()
+                  if line.strip() and not line.startswith('#')
+              ) if points_path.exists() else 0
+              analyzer = Path(f'/tmp/evidence/colmap-model-{model_dir.name}-analyzer.txt').read_text()
               error_match = re.search(r'Mean reprojection error:\s*([0-9.eE+-]+)px', analyzer)
               models.append({
                   'model_id': int(model_dir.name),
