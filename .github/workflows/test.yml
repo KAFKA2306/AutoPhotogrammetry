@@ -32,6 +32,7 @@ jobs:
           from pathlib import Path
           import requests
 
+          headers = {"User-Agent": "AutoPhotogrammetry/0.1 (https://github.com/KAFKA2306/AutoPhotogrammetry)"}
           title = "File:Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron.webm"
           response = requests.get(
               "https://commons.wikimedia.org/w/api.php",
@@ -42,6 +43,7 @@ jobs:
                   "prop": "videoinfo",
                   "viprop": "url|size|derivatives",
               },
+              headers=headers,
               timeout=60,
           )
           response.raise_for_status()
@@ -62,7 +64,7 @@ jobs:
               "original_size": info["size"],
               "derivative": chosen,
           }, indent=2) + "\n")
-          with requests.get(chosen["src"], stream=True, timeout=120) as media:
+          with requests.get(chosen["src"], headers=headers, stream=True, timeout=120) as media:
               media.raise_for_status()
               with open("/tmp/huejotzingo.webm", "wb") as output:
                   for chunk in media.iter_content(1024 * 1024):
