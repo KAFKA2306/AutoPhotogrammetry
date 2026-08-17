@@ -101,7 +101,7 @@ jobs:
           for model_dir in $(find /tmp/sparse -mindepth 1 -maxdepth 1 -type d | sort -V); do
             model_id=$(basename "$model_dir")
             mkdir -p "/tmp/models_txt/$model_id"
-            colmap model_analyzer --path "$model_dir" | tee "/tmp/evidence/colmap-model-${model_id}-analyzer.txt"
+            colmap model_analyzer --path "$model_dir" 2>&1 | tee "/tmp/evidence/colmap-model-${model_id}-analyzer.txt"
             colmap model_converter --input_path "$model_dir" --output_path "/tmp/models_txt/$model_id" --output_type TXT
           done
 
