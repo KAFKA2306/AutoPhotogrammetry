@@ -51,9 +51,7 @@ jobs:
               encoding='utf-8',
           )
           stats = select_video_frames(frames, '/tmp/selected')
-          Path('/tmp/evidence/frame-selection.json').write_text(
-              json.dumps(stats, indent=2) + '\n', encoding='utf-8'
-          )
+          Path('/tmp/evidence/frame-selection.json').write_text(json.dumps(stats, indent=2) + '\n', encoding='utf-8')
 
           selected = sorted(Path('/tmp/selected').glob('*.jpg'))
           stride = max(1, math.ceil(len(selected) / 80))
@@ -65,17 +63,12 @@ jobs:
               'selected_frames': len(selected),
               'temporal_stride': stride,
               'colmap_input_frames': len(colmap_input),
+              'sift_max_image_size': 1024,
+              'sift_max_num_features': 4096,
               'frames': [path.name for path in colmap_input],
           }
-          Path('/tmp/evidence/colmap-input.json').write_text(
-              json.dumps(input_record, indent=2) + '\n', encoding='utf-8'
-          )
-          print(json.dumps({
-              'extracted_frames': len(frames),
-              'selected_frames': len(selected),
-              'temporal_stride': stride,
-              'colmap_input_frames': len(colmap_input),
-          }, sort_keys=True))
+          Path('/tmp/evidence/colmap-input.json').write_text(json.dumps(input_record, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps({key: value for key, value in input_record.items() if key != 'frames'}, sort_keys=True))
           PY
 
           colmap -h | head -40 | tee /tmp/evidence/colmap-version.txt
@@ -85,6 +78,8 @@ jobs:
             --image_path /tmp/colmap_images \
             --ImageReader.single_camera 1 \
             --SiftExtraction.use_gpu 0 \
+            --SiftExtraction.max_image_size 1024 \
+            --SiftExtraction.max_num_features 4096 \
             > /tmp/evidence/colmap-feature-extractor.log 2>&1
           feature_rc=$?
           colmap sequential_matcher \
