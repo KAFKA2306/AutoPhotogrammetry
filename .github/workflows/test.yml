@@ -19,5 +19,158 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -r requirements.txt
-      - run: python -m py_compile photogrammetry.py config.py tests/test_photogrammetry.py
+      - run: python -m py_compile photogrammetry.py config.py video_pipeline.py tests/test_photogrammetry.py tests/test_video_pipeline.py
       - run: python -m unittest discover -s tests -v
+
+      - name: Temporary Huejotzingo COLMAP evidence
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg colmap
+          mkdir -p /tmp/evidence /tmp/frames /tmp/selected /tmp/sparse /tmp/models_txt
+
+          media_url='https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm'
+          expected_sha256='c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30'
+          curl --fail --location --retry 3 --user-agent 'AutoPhotogrammetry/0.1 (https://github.com/KAFKA2306/AutoPhotogrammetry)' --output /tmp/huejotzingo.webm "$media_url"
+          actual_sha256=$(sha256sum /tmp/huejotzingo.webm | cut -d' ' -f1)
+          printf 'expected_sha256=%s\nactual_sha256=%s\n' "$expected_sha256" "$actual_sha256" | tee /tmp/evidence/source-hash.txt
+          test "$actual_sha256" = "$expected_sha256"
+          ffprobe -v error -show_entries format=duration,size,format_name:stream=codec_name,width,height -of json /tmp/huejotzingo.webm | tee /tmp/evidence/ffprobe.json
+
+          ffmpeg -hide_banner -loglevel error -i /tmp/huejotzingo.webm \
+            -vf 'fps=1/3,scale=1024:-2' -q:v 2 /tmp/frames/frame-%06d.jpg
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from video_pipeline import frame_timestamp_records, select_video_frames
+
+          frames = sorted(Path('/tmp/frames').glob('frame-*.jpg'))
+          Path('/tmp/evidence/frame-timestamps.json').write_text(
+              json.dumps(frame_timestamp_records(frames, fps=1/3), indent=2) + '\n',
+              encoding='utf-8',
+          )
+          stats = select_video_frames(frames, '/tmp/selected')
+          Path('/tmp/evidence/frame-selection.json').write_text(json.dumps(stats, indent=2) + '\n', encoding='utf-8')
+          selected = sorted(Path('/tmp/selected').glob('*.jpg'))
+          input_record = {
+              'sampling_interval_seconds': 3,
+              'extracted_frames': len(frames),
+              'selected_frames': len(selected),
+              'colmap_input_frames': len(selected),
+              'frame_width': 1024,
+              'sift_max_image_size': 1024,
+              'sift_max_num_features': 4096,
+              'frames': [path.name for path in selected],
+          }
+          Path('/tmp/evidence/colmap-input.json').write_text(json.dumps(input_record, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps({key: value for key, value in input_record.items() if key != 'frames'}, sort_keys=True))
+          PY
+
+          colmap -h | head -40 | tee /tmp/evidence/colmap-version.txt
+          set +e
+          colmap feature_extractor \
+            --database_path /tmp/colmap.db \
+            --image_path /tmp/selected \
+            --ImageReader.single_camera 1 \
+            --SiftExtraction.use_gpu 0 \
+            --SiftExtraction.max_image_size 1024 \
+            --SiftExtraction.max_num_features 4096 \
+            > /tmp/evidence/colmap-feature-extractor.log 2>&1
+          feature_rc=$?
+          colmap sequential_matcher \
+            --database_path /tmp/colmap.db \
+            --SiftMatching.use_gpu 0 \
+            > /tmp/evidence/colmap-sequential-matcher.log 2>&1
+          matcher_rc=$?
+          colmap mapper \
+            --database_path /tmp/colmap.db \
+            --image_path /tmp/selected \
+            --output_path /tmp/sparse \
+            > /tmp/evidence/colmap-mapper.log 2>&1
+          mapper_rc=$?
+          set -e
+
+          model_count=$(find /tmp/sparse -mindepth 1 -maxdepth 1 -type d | wc -l)
+          {
+            echo "feature_extractor_return_code=$feature_rc"
+            echo "sequential_matcher_return_code=$matcher_rc"
+            echo "mapper_return_code=$mapper_rc"
+            echo "submodel_count=$model_count"
+          } | tee /tmp/evidence/colmap-status.txt
+
+          for model_dir in $(find /tmp/sparse -mindepth 1 -maxdepth 1 -type d | sort -V); do
+            model_id=$(basename "$model_dir")
+            mkdir -p "/tmp/models_txt/$model_id"
+            colmap model_analyzer --path "$model_dir" | tee "/tmp/evidence/colmap-model-${model_id}-analyzer.txt"
+            colmap model_converter --input_path "$model_dir" --output_path "/tmp/models_txt/$model_id" --output_type TXT
+          done
+
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          input_record = json.loads(Path('/tmp/evidence/colmap-input.json').read_text())
+          input_names = input_record['frames']
+          models = []
+          model_root = Path('/tmp/models_txt')
+          for model_dir in sorted(model_root.iterdir(), key=lambda p: int(p.name)) if model_root.exists() else []:
+              images_path = model_dir / 'images.txt'
+              points_path = model_dir / 'points3D.txt'
+              if not images_path.exists():
+                  continue
+              raw_lines = [line for line in images_path.read_text().splitlines() if not line.startswith('#')]
+              registered = []
+              for index in range(0, len(raw_lines), 2):
+                  metadata = raw_lines[index].strip()
+                  if metadata:
+                      registered.append(metadata.split(maxsplit=9)[-1])
+              points = sum(
+                  1 for line in points_path.read_text().splitlines()
+                  if line.strip() and not line.startswith('#')
+              ) if points_path.exists() else 0
+              analyzer = Path(f'/tmp/evidence/colmap-model-{model_dir.name}-analyzer.txt').read_text()
+              error_match = re.search(r'Mean reprojection error:\s*([0-9.eE+-]+)px', analyzer)
+              models.append({
+                  'model_id': int(model_dir.name),
+                  'registered_images': len(registered),
+                  'registration_rate': len(registered) / len(input_names) if input_names else 0.0,
+                  'sparse_points': points,
+                  'mean_reprojection_error_px': float(error_match.group(1)) if error_match else None,
+                  'registered_names': registered,
+              })
+
+          models.sort(key=lambda item: item['registered_images'], reverse=True)
+          dominant = models[0] if models else None
+          summary = {
+              'input_images': len(input_names),
+              'submodel_count': len(models),
+              'models': models,
+              'dominant_registered_images': dominant['registered_images'] if dominant else 0,
+              'dominant_registration_rate': dominant['registration_rate'] if dominant else 0.0,
+              'dominant_sparse_points': dominant['sparse_points'] if dominant else 0,
+              'dominant_mean_reprojection_error_px': dominant['mean_reprojection_error_px'] if dominant else None,
+              'dominant_failed_images': sorted(set(input_names) - set(dominant['registered_names'])) if dominant else input_names,
+          }
+          Path('/tmp/evidence/colmap-models.json').write_text(json.dumps(summary, indent=2) + '\n', encoding='utf-8')
+          print(json.dumps({
+              'input_images': summary['input_images'],
+              'submodel_count': summary['submodel_count'],
+              'dominant_registered_images': summary['dominant_registered_images'],
+              'dominant_registration_rate': summary['dominant_registration_rate'],
+              'dominant_sparse_points': summary['dominant_sparse_points'],
+              'dominant_mean_reprojection_error_px': summary['dominant_mean_reprojection_error_px'],
+          }, sort_keys=True))
+          PY
+
+          if [ "$feature_rc" -ne 0 ] || [ "$matcher_rc" -ne 0 ] || [ "$mapper_rc" -ne 0 ] || [ "$model_count" -eq 0 ]; then
+            echo 'COLMAP did not produce a sparse model' >&2
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: huejotzingo-colmap-evidence
+          path: /tmp/evidence
+          if-no-files-found: error
