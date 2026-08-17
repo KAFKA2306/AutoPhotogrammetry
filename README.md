@@ -1,5 +1,7 @@
 # AutoPhotogrammetry — 実写画像の収集・選別プロトタイプ
 
+[![Test](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml/badge.svg)](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml)
+
 明示されたWebページから、許諾を確認した実写画像を収集し、出典・ハッシュを保存した上で、固定長特徴量によるクラスタリングと非破壊選別を行う研究プロトタイプです。
 
 ## 重要な設計判断
