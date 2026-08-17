@@ -18,7 +18,9 @@ ENV_VARS = {
     "colmap": "AUTOPHOTOGRAMMETRY_COLMAP_EXECUTABLE",
 }
 DEFAULT_EXECUTABLES = {
-    "meshroom": "meshroom_photogrammetry.exe" if platform.system() == "Windows" else "meshroom_photogrammetry",
+    "meshroom": "meshroom_photogrammetry.exe"
+    if platform.system() == "Windows"
+    else "meshroom_photogrammetry",
     "visualsfm": "VisualSFM.exe" if platform.system() == "Windows" else "visualsfm",
     "colmap": "colmap.exe" if platform.system() == "Windows" else "colmap",
 }
@@ -58,7 +60,9 @@ def _utc_now() -> str:
 def _validate_backend(backend: str) -> str:
     normalized = backend.strip().lower()
     if normalized not in SUPPORTED_BACKENDS:
-        raise ValueError(f"Unsupported backend: {backend!r}. Expected one of {SUPPORTED_BACKENDS}.")
+        raise ValueError(
+            f"Unsupported backend: {backend!r}. Expected one of {SUPPORTED_BACKENDS}."
+        )
     return normalized
 
 
@@ -70,7 +74,11 @@ def resolve_executable(
     backend = _validate_backend(backend)
     config = config or BackendConfig()
     env = env or os.environ
-    candidate = config.executable or env.get(ENV_VARS[backend]) or DEFAULT_EXECUTABLES[backend]
+    candidate = (
+        config.executable
+        or env.get(ENV_VARS[backend])
+        or DEFAULT_EXECUTABLES[backend]
+    )
     candidate_path = Path(candidate).expanduser()
 
     if candidate_path.is_absolute() or candidate_path.parent != Path("."):
@@ -157,7 +165,9 @@ def run_backend(
     config = config or BackendConfig()
     image_dir = Path(image_dir).expanduser().resolve()
     if not image_dir.is_dir():
-        raise ValueError(f"Image directory does not exist or is not a directory: {image_dir}")
+        raise ValueError(
+            f"Image directory does not exist or is not a directory: {image_dir}"
+        )
 
     executable = resolve_executable(backend, config, env)
     run_id = f"{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}-{uuid.uuid4().hex[:8]}"
@@ -168,7 +178,9 @@ def run_backend(
     stdout_log = run_dir / "stdout.log"
     stderr_log = run_dir / "stderr.log"
     manifest_path = run_dir / "manifest.json"
-    command = build_command(backend, executable, image_dir, model_dir, config.extra_args)
+    command = build_command(
+        backend, executable, image_dir, model_dir, config.extra_args
+    )
     started_at = _utc_now()
 
     try:
@@ -209,7 +221,10 @@ def run_backend(
         "stderr_log": stderr_log.name,
         "artifacts": artifacts,
     }
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    manifest_path.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
     result = RunResult(
         backend=backend,
@@ -227,7 +242,9 @@ def run_backend(
         manifest_path=str(manifest_path),
     )
     if return_code != 0:
-        raise subprocess.CalledProcessError(return_code, command, output=stdout, stderr=stderr)
+        raise subprocess.CalledProcessError(
+            return_code, command, output=stdout, stderr=stderr
+        )
     return result
 
 
@@ -244,27 +261,29 @@ def run_photogrammetry(
     ]
 
 
-def evaluate_3d_model(image_dir: str | Path, output_dir: str | Path) -> float:
-    """Compare generated renders to the first reference image; reconstruction quality is not implied."""
-    import numpy as np
-    from skimage.io import imread
-    from skimage.metrics import structural_similarity as ssim
-    from skimage.transform import resize
-
-    image_dir = Path(image_dir)
-    output_dir = Path(output_dir)
-    reference_files = sorted(path for path in image_dir.iterdir() if path.is_file())
-    if not reference_files:
-        raise ValueError("No reference image was found.")
-    ref_image = imread(reference_files[0])
-    generated_images = [
-        resize(imread(path), ref_image.shape, preserve_range=True, anti_aliasing=True)
-        for path in sorted(output_dir.iterdir())
-        if path.suffix.lower() in {".jpg", ".jpeg", ".png"}
-        and not path.name.startswith(("depth", "normal"))
-    ]
-    if not generated_images:
-        raise ValueError("No generated render was found for evaluation.")
-    channel_axis = -1 if ref_image.ndim == 3 else None
-    scores = [ssim(ref_image, image, channel_axis=channel_axis, data_range=255) for image in generated_images]
-    return float(np.mean(scores))
+def load_backend_configs(path: str | Path) -> dict[str, BackendConfig]:
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    unknown = sorted(set(data) - set(SUPPORTED_BACKENDS))
+    if unknown:
+        raise ValueError(f"Unsupported backend keys: {unknown}")
+    configs: dict[str, BackendConfig] = {}
+    for backend, raw in data.items():
+        if not isinstance(raw, dict):
+            raise ValueError(f"Configuration for {backend} must be an object.")
+        extra_args = raw.get("extra_args", [])
+        if not isinstance(extra_args, list) or not all(
+            isinstance(item, str) for item in extra_args
+        ):
+            raise ValueError(
+                f"extra_args for {backend} must be an array of strings."
+            )
+        executable = raw.get("executable")
+        if executable is not None and not isinstance(executable, str):
+            raise ValueError(
+                f"executable for {backend} must be a string or null."
+            )
+        configs[backend] = BackendConfig(
+            executable=executable,
+            extra_args=tuple(extra_args),
+        )
+    return configs
