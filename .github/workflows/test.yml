@@ -21,89 +21,173 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - run: python -m py_compile photogrammetry.py config.py video_pipeline.py tests/test_photogrammetry.py tests/test_video_pipeline.py
       - run: python -m unittest discover -s tests -v
-      - name: Temporary Huejotzingo single-take gate
+
+      - name: Temporary Huejotzingo COLMAP evidence
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
-          mkdir -p /tmp/evidence
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          import requests
+          sudo apt-get install -y -qq ffmpeg colmap
+          mkdir -p /tmp/evidence /tmp/frames /tmp/selected /tmp/colmap_images /tmp/sparse /tmp/models_txt
 
-          headers = {"User-Agent": "AutoPhotogrammetry/0.1 (https://github.com/KAFKA2306/AutoPhotogrammetry)"}
-          title = "File:Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron.webm"
-          response = requests.get(
-              "https://commons.wikimedia.org/w/api.php",
-              params={
-                  "action": "query",
-                  "format": "json",
-                  "titles": title,
-                  "prop": "videoinfo",
-                  "viprop": "url|size|derivatives",
-              },
-              headers=headers,
-              timeout=60,
-          )
-          response.raise_for_status()
-          data = response.json()
-          Path("/tmp/evidence/commons-videoinfo.json").write_text(json.dumps(data, indent=2) + "\n")
-          page = next(iter(data["query"]["pages"].values()))
-          info = page["videoinfo"][0]
-          candidates = [
-              item for item in info.get("derivatives", [])
-              if item.get("width") == 1920 and item.get("height") == 1080 and "webm" in item.get("src", "")
-          ]
-          if not candidates:
-              raise SystemExit("No 1920x1080 WebM derivative found")
-          chosen = min(candidates, key=lambda item: int(item.get("bandwidth", 10**12)))
-          Path("/tmp/evidence/media-source.json").write_text(json.dumps({
-              "source_page": "https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm",
-              "original_url": info["url"],
-              "original_size": info["size"],
-              "derivative": chosen,
-          }, indent=2) + "\n")
-          with requests.get(chosen["src"], headers=headers, stream=True, timeout=120) as media:
-              media.raise_for_status()
-              with open("/tmp/huejotzingo.webm", "wb") as output:
-                  for chunk in media.iter_content(1024 * 1024):
-                      if chunk:
-                          output.write(chunk)
-          print(f"derivative_url={chosen['src']}")
-          print(f"downloaded_bytes={Path('/tmp/huejotzingo.webm').stat().st_size}")
-          PY
-          echo "sha256=$(sha256sum /tmp/huejotzingo.webm | cut -d' ' -f1)" | tee /tmp/evidence/sha256.txt
+          media_url='https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm'
+          expected_sha256='c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30'
+          curl --fail --location --retry 3 --user-agent 'AutoPhotogrammetry/0.1 (https://github.com/KAFKA2306/AutoPhotogrammetry)' --output /tmp/huejotzingo.webm "$media_url"
+          actual_sha256=$(sha256sum /tmp/huejotzingo.webm | cut -d' ' -f1)
+          printf 'expected_sha256=%s\nactual_sha256=%s\n' "$expected_sha256" "$actual_sha256" | tee /tmp/evidence/source-hash.txt
+          test "$actual_sha256" = "$expected_sha256"
           ffprobe -v error -show_entries format=duration,size,format_name:stream=codec_name,width,height -of json /tmp/huejotzingo.webm | tee /tmp/evidence/ffprobe.json
-          ffmpeg -hide_banner -i /tmp/huejotzingo.webm -filter:v "select='gt(scene,0.4)',showinfo" -an -f null - 2> /tmp/scene.log
-          grep -oE 'pts_time:[0-9.]+' /tmp/scene.log | tee /tmp/evidence/scene-cut-candidates.txt || true
+
+          ffmpeg -hide_banner -loglevel error -i /tmp/huejotzingo.webm -vf fps=1 -q:v 2 /tmp/frames/frame-%06d.jpg
           python - <<'PY'
           import json
-          from video_pipeline import VideoSource, probe_video, write_source_manifest
+          import math
+          import shutil
+          from pathlib import Path
+          from video_pipeline import frame_timestamp_records, select_video_frames
 
-          source_info = json.load(open("/tmp/evidence/media-source.json"))
-          source = VideoSource(
-              title="Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron",
-              source_page=source_info["source_page"],
-              media_url=source_info["derivative"]["src"],
-              author="Luisalvaz",
-              license="CC0 1.0",
-              license_url="https://creativecommons.org/publicdomain/zero/1.0/",
-              target="Ex Convento de San Miguel Arcángel, Huejotzingo, Puebla, Mexico",
+          frames = sorted(Path('/tmp/frames').glob('frame-*.jpg'))
+          Path('/tmp/evidence/frame-timestamps.json').write_text(
+              json.dumps(frame_timestamp_records(frames, fps=1), indent=2) + '\n',
+              encoding='utf-8',
           )
-          write_source_manifest(
-              "/tmp/huejotzingo.webm",
-              source,
-              probe_video("/tmp/huejotzingo.webm"),
-              "/tmp/evidence/source-manifest.json",
+          stats = select_video_frames(frames, '/tmp/selected')
+          Path('/tmp/evidence/frame-selection.json').write_text(
+              json.dumps(stats, indent=2) + '\n', encoding='utf-8'
           )
+
+          selected = sorted(Path('/tmp/selected').glob('*.jpg'))
+          stride = max(1, math.ceil(len(selected) / 160))
+          colmap_input = selected[::stride]
+          for path in colmap_input:
+              shutil.copy2(path, Path('/tmp/colmap_images') / path.name)
+          input_record = {
+              'extracted_frames': len(frames),
+              'selected_frames': len(selected),
+              'temporal_stride': stride,
+              'colmap_input_frames': len(colmap_input),
+              'frames': [path.name for path in colmap_input],
+          }
+          Path('/tmp/evidence/colmap-input.json').write_text(
+              json.dumps(input_record, indent=2) + '\n', encoding='utf-8'
+          )
+          print(json.dumps({
+              'extracted_frames': len(frames),
+              'selected_frames': len(selected),
+              'temporal_stride': stride,
+              'colmap_input_frames': len(colmap_input),
+          }, sort_keys=True))
           PY
-          ffmpeg -hide_banner -loglevel error -i /tmp/huejotzingo.webm \
-            -vf "fps=1/10,scale=320:-1,tile=6x4:padding=4:margin=4" \
-            -frames:v 1 /tmp/evidence/contact-sheet.jpg
+
+          colmap -h | head -40 | tee /tmp/evidence/colmap-version.txt
+          set +e
+          colmap feature_extractor \
+            --database_path /tmp/colmap.db \
+            --image_path /tmp/colmap_images \
+            --ImageReader.single_camera 1 \
+            --SiftExtraction.use_gpu 0 \
+            > /tmp/evidence/colmap-feature-extractor.log 2>&1
+          feature_rc=$?
+          colmap sequential_matcher \
+            --database_path /tmp/colmap.db \
+            --SiftMatching.use_gpu 0 \
+            > /tmp/evidence/colmap-sequential-matcher.log 2>&1
+          matcher_rc=$?
+          colmap mapper \
+            --database_path /tmp/colmap.db \
+            --image_path /tmp/colmap_images \
+            --output_path /tmp/sparse \
+            > /tmp/evidence/colmap-mapper.log 2>&1
+          mapper_rc=$?
+          set -e
+
+          model_count=$(find /tmp/sparse -mindepth 1 -maxdepth 1 -type d | wc -l)
+          {
+            echo "feature_extractor_return_code=$feature_rc"
+            echo "sequential_matcher_return_code=$matcher_rc"
+            echo "mapper_return_code=$mapper_rc"
+            echo "submodel_count=$model_count"
+          } | tee /tmp/evidence/colmap-status.txt
+
+          for model_dir in $(find /tmp/sparse -mindepth 1 -maxdepth 1 -type d | sort -V); do
+            model_id=$(basename "$model_dir")
+            mkdir -p "/tmp/models_txt/$model_id"
+            colmap model_analyzer --path "$model_dir" | tee "/tmp/evidence/colmap-model-${model_id}-analyzer.txt"
+            colmap model_converter \
+              --input_path "$model_dir" \
+              --output_path "/tmp/models_txt/$model_id" \
+              --output_type TXT
+          done
+
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          input_record = json.loads(Path('/tmp/evidence/colmap-input.json').read_text())
+          input_names = input_record['frames']
+          models = []
+          for model_dir in sorted(Path('/tmp/models_txt').iterdir(), key=lambda p: int(p.name)) if Path('/tmp/models_txt').exists() else []:
+              images_path = model_dir / 'images.txt'
+              points_path = model_dir / 'points3D.txt'
+              if not images_path.exists():
+                  continue
+              raw_lines = [line for line in images_path.read_text().splitlines() if not line.startswith('#')]
+              registered = []
+              for index in range(0, len(raw_lines), 2):
+                  metadata = raw_lines[index].strip()
+                  if metadata:
+                      registered.append(metadata.split(maxsplit=9)[-1])
+              points = 0
+              if points_path.exists():
+                  points = sum(
+                      1 for line in points_path.read_text().splitlines()
+                      if line.strip() and not line.startswith('#')
+                  )
+              analyzer_path = Path(f'/tmp/evidence/colmap-model-{model_dir.name}-analyzer.txt')
+              analyzer = analyzer_path.read_text() if analyzer_path.exists() else ''
+              error_match = re.search(r'Mean reprojection error:\s*([0-9.eE+-]+)px', analyzer)
+              models.append({
+                  'model_id': int(model_dir.name),
+                  'registered_images': len(registered),
+                  'registration_rate': len(registered) / len(input_names) if input_names else 0.0,
+                  'sparse_points': points,
+                  'mean_reprojection_error_px': float(error_match.group(1)) if error_match else None,
+                  'registered_names': registered,
+              })
+
+          models.sort(key=lambda item: item['registered_images'], reverse=True)
+          dominant = models[0] if models else None
+          summary = {
+              'input_images': len(input_names),
+              'submodel_count': len(models),
+              'models': models,
+              'dominant_registered_images': dominant['registered_images'] if dominant else 0,
+              'dominant_registration_rate': dominant['registration_rate'] if dominant else 0.0,
+              'dominant_sparse_points': dominant['sparse_points'] if dominant else 0,
+              'dominant_mean_reprojection_error_px': dominant['mean_reprojection_error_px'] if dominant else None,
+              'dominant_failed_images': sorted(set(input_names) - set(dominant['registered_names'])) if dominant else input_names,
+          }
+          Path('/tmp/evidence/colmap-models.json').write_text(
+              json.dumps(summary, indent=2) + '\n', encoding='utf-8'
+          )
+          print(json.dumps({
+              'input_images': summary['input_images'],
+              'submodel_count': summary['submodel_count'],
+              'dominant_registered_images': summary['dominant_registered_images'],
+              'dominant_registration_rate': summary['dominant_registration_rate'],
+              'dominant_sparse_points': summary['dominant_sparse_points'],
+              'dominant_mean_reprojection_error_px': summary['dominant_mean_reprojection_error_px'],
+          }, sort_keys=True))
+          PY
+
+          if [ "$feature_rc" -ne 0 ] || [ "$matcher_rc" -ne 0 ] || [ "$mapper_rc" -ne 0 ] || [ "$model_count" -eq 0 ]; then
+            echo 'COLMAP did not produce a sparse model' >&2
+            exit 1
+          fi
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: huejotzingo-single-take-gate
+          name: huejotzingo-colmap-evidence
           path: /tmp/evidence
           if-no-files-found: error
