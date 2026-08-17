@@ -2,106 +2,230 @@
 
 [![Test](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml/badge.svg)](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml)
 
-許諾を確認できる実写画像・動画を入力として、**出典とハッシュを保持したまま画像選別、COLMAPによるcamera pose推定、Nerfstudio SplatfactoによるGaussian Splat学習・PLY exportへ接続する**ためのリポジトリです。
+許諾を確認できる実写画像・動画を入力として、出典とSHA-256を保存し、FFmpeg、COLMAP、Nerfstudio Splatfactoを外部CLIとして実行するリポジトリです。
 
-独自のSfM、3D Gaussian Splatting training、rasterizerは実装しません。既存toolを外部CLIとして使い、入力・version・command・return code・生成物hashを追跡できることを優先します。
+独自のSfM、3D Gaussian Splatting training、rasterizerは実装しません。実行したcommand、tool version、return code、stdout/stderr、入力hash、生成物hashを保存します。
 
-## 現在の到達点
+## 現在の実データ
 
-実装済み:
+対象はメキシコ・Huejotzingoの **Ex Convento de San Miguel Arcángel** です。
 
-- 明示したWebページからの実写画像取得
-- URL、MIME、寸法、SHA-256、取得元を`manifest.json`へ保存
-- 固定長特徴量によるクラスタリングと非破壊画像選別
-- 動画の`ffprobe`情報取得とsource provenance記録
-- FFmpeg用frame抽出command生成
-- scene-change候補抽出
-- blur / near-duplicate frame選別
-- Meshroom / VisualSFM / COLMAPの外部実行
-- Nerfstudio `ns-train splatfacto` / `ns-export gaussian-splat` の外部実行runner
-- Nerfstudio / gsplat version、入力画像SHA-256、command、timestamps、return code、logs、checkpoint、PLY hash/sizeのmanifest化
-- training / export失敗時のfail-closed処理
+使用したWikimedia Commons 1080p transcode:
 
-実データで確認済み:
+https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm
 
-- Huejotzingoの連続ドローン動画から78 frameをCOLMAPへ入力
-- registered images: **78 / 78**
-- registration rate: **100%**
-- submodel: **1**
-- sparse points: **32,782**
-- mean reprojection error: **0.370830 px**
+実際に取得したファイル:
 
-未完了:
+- container: WebM
+- video codec: VP9
+- resolution: 1920 × 1080
+- duration: 232.766 s
+- size: 115,502,605 bytes
+- SHA-256: `c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30`
 
-- 実GPUでのHuejotzingo Splatfacto training
-- 実データからのGaussian Splat `.ply` export
-- source video SHA-256から最終PLY SHA-256までのE2E lineage確認
+COLMAP実測結果:
 
-したがって、現時点では**「実データからGaussian Splat PLYを生成済み」とは主張しません**。CPU CIのmock testは外部CLI契約とmanifest生成を検証するもので、GPU training成功の代替ではありません。
+- input images: 78
+- registered images: 78
+- registration rate: 100%
+- submodels: 1
+- sparse points: 32,782
+- mean reprojection error: 0.370830 px
 
-## 正準パイプライン
+実GPUでのSplatfacto trainingとGaussian Splat PLY exportはまだ未実行です。CPU CIのmock testをGPU training成功とは扱いません。
 
-```text
-licensed real photos / single-take video
-  -> provenance + source SHA-256
-  -> frame extraction / filtering
-  -> COLMAP camera registration
-  -> Nerfstudio dataset
-  -> ns-train splatfacto
-  -> ns-export gaussian-splat
-  -> splat.ply + SHA-256
-```
+## Huejotzingoを再現する
 
-生成AIで作った別角度画像はSfM / 3DGS入力へ混ぜません。見た目が自然でも、同じ実在対象の形状・模様・camera geometryが視点間で一致する保証がないためです。
+Ubuntu 24.04で、repository rootから次を実行します。
 
-## 画像収集
+### 1. Python依存を入れる
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-python main.py \
-  --page-url "https://example.org/licensed-photo-page" \
-  --keyword building \
-  --work-dir work
+sudo apt-get update
+sudo apt-get install -y ffmpeg colmap
 ```
 
-複数ページ・キーワードは引数を繰り返せます。
+### 2. 動画を取得する
 
 ```bash
-python main.py \
-  --page-url "https://example.org/page-a" \
-  --page-url "https://example.org/page-b" \
-  --keyword building \
-  --keyword architecture
+mkdir -p work/huejotzingo
+curl --fail --location --retry 3 \
+  --user-agent 'AutoPhotogrammetry/0.1 (https://github.com/KAFKA2306/AutoPhotogrammetry)' \
+  --output work/huejotzingo/source.webm \
+  'https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm'
 ```
 
-主な出力:
+取得後にhashを確認します。
+
+```bash
+echo 'c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30  work/huejotzingo/source.webm' | sha256sum --check
+```
+
+動画metadataを確認します。
+
+```bash
+ffprobe -v error \
+  -show_entries format=duration,size,format_name:stream=codec_name,width,height \
+  -of json \
+  work/huejotzingo/source.webm
+```
+
+### 3. 3秒間隔で78 frameを抽出する
+
+COLMAP実測時は3秒に1枚へ落とし、幅1024 pxへ縮小しました。
+
+```bash
+mkdir -p work/huejotzingo/frames
+ffmpeg -hide_banner -loglevel error \
+  -i work/huejotzingo/source.webm \
+  -vf 'fps=1/3,scale=1024:-2' \
+  -q:v 2 \
+  work/huejotzingo/frames/frame-%06d.jpg
+```
+
+枚数を確認します。
+
+```bash
+find work/huejotzingo/frames -maxdepth 1 -name 'frame-*.jpg' | wc -l
+```
+
+この入力では `78` が期待値です。
+
+### 4. repositoryのframe選別を実行する
+
+```bash
+mkdir -p work/huejotzingo/selected
+python -c "from pathlib import Path; from video_pipeline import select_video_frames; import json; frames=sorted(Path('work/huejotzingo/frames').glob('frame-*.jpg')); print(json.dumps(select_video_frames(frames, 'work/huejotzingo/selected'), indent=2))"
+```
+
+Huejotzingoの3秒間隔入力では78枚すべてをCOLMAPへ渡した実績があります。
+
+### 5. COLMAPでcamera poseを推定する
+
+```bash
+rm -f work/huejotzingo/colmap.db
+rm -rf work/huejotzingo/sparse
+mkdir -p work/huejotzingo/sparse
+
+colmap feature_extractor \
+  --database_path work/huejotzingo/colmap.db \
+  --image_path work/huejotzingo/selected \
+  --ImageReader.single_camera 1 \
+  --SiftExtraction.use_gpu 0 \
+  --SiftExtraction.max_image_size 1024 \
+  --SiftExtraction.max_num_features 4096
+
+colmap sequential_matcher \
+  --database_path work/huejotzingo/colmap.db \
+  --SiftMatching.use_gpu 0
+
+colmap mapper \
+  --database_path work/huejotzingo/colmap.db \
+  --image_path work/huejotzingo/selected \
+  --output_path work/huejotzingo/sparse
+```
+
+生成されたmodelを解析します。
+
+```bash
+colmap model_analyzer --path work/huejotzingo/sparse/0
+```
+
+2026-08-18時点のGitHub Actions実測値は次です。
 
 ```text
-work/
-├── collected/
-│   ├── <sha256>.jpg
-│   └── manifest.json
-├── clusters.json
-└── selected/
-    └── <sha256>.jpg
+Cameras: 1
+Images: 78
+Registered images: 78
+Points: 32782
+Mean reprojection error: 0.370830px
 ```
 
-## 動画処理
+### 6. Nerfstudioを入れる
 
-`video_pipeline.py`には以下を置いています。
+このrepositoryの`requirements.txt`にはNerfstudioを固定していません。GPU環境でNerfstudioを別途installし、`ns-train`と`ns-export`がPATHから実行できる状態にします。
 
-- `probe_video()` — ffprobe metadata取得
-- `scene_cut_times()` — scene-change候補時刻の抽出
-- `extract_frames_command()` — FFmpeg frame抽出command生成
-- `frame_timestamp_records()` — frameと元動画timestampの対応付け
-- `select_video_frames()` — blur / near-duplicate除去
-- `write_source_manifest()` — source page、media URL、author、license、SHA-256等の保存
+確認command:
 
-動画・抽出frame・checkpoint・PLYのような大容量生成物はGit履歴へcommitしません。
+```bash
+ns-train --help
+ns-export --help
+python -c "from importlib.metadata import version; print('nerfstudio', version('nerfstudio')); print('gsplat', version('gsplat'))"
+```
 
-## 外部フォトグラメトリ
+### 7. Nerfstudio datasetを作る
 
-`photogrammetry.py`はMeshroom、VisualSFM、COLMAPの実行commandを引数配列で構築し、`shell=True`を使用しません。外部softwareを自動インストールせず、実行ファイルが見つからない場合は具体的な設定方法を示して停止します。
+既存COLMAP modelを再利用する場合は、Nerfstudioの`ns-process-data`で`work/huejotzingo/selected`と`work/huejotzingo/sparse/0`を使ってdatasetを作成します。
+
+Nerfstudioのinstalled versionで引数名を確認してから実行してください。
+
+```bash
+ns-process-data images --help
+```
+
+このstepは、repository内でまだHuejotzingo実GPU E2Eとして固定できていません。COLMAPを再計算せず既存modelを使うことを優先します。
+
+### 8. Splatfacto trainingとPLY exportを実行する
+
+Nerfstudio datasetを`work/huejotzingo/nerfstudio-data`へ作成した後、repositoryのrunnerを使います。
+
+```bash
+python -c "from video_pipeline import run_splatfacto_export; import json; result=run_splatfacto_export('work/huejotzingo/nerfstudio-data', 'work/huejotzingo/runs'); print(json.dumps(result, indent=2))"
+```
+
+`run_splatfacto_export()`は内部で実在する`ns-train splatfacto`と`ns-export gaussian-splat`を実行します。成功した場合のみ`status: success`を返します。
+
+run directoryには次を保存します。
+
+- `manifest.json`
+- `train.stdout.log`
+- `train.stderr.log`
+- `export.stdout.log`
+- `export.stderr.log`
+- Nerfstudioが生成した`config.yml`
+- Nerfstudio checkpointへのpath
+- exportされたPLY
+
+`manifest.json`には次を保存します。
+
+- 全入力画像のpath、size、SHA-256
+- Nerfstudio version
+- gsplat version
+- 実行したtraining command
+- 実行したexport command
+- start timestamp
+- end timestamp
+- return code
+- config path
+- checkpoint path
+- PLY path
+- PLY size
+- PLY SHA-256
+- 失敗したphase
+
+## 画像Webページから収集する場合
+
+`main.py`は利用者が明示したHTML pageから画像を取得します。以下は動作確認用の架空URLではなく、利用者自身が利用許諾を確認した実在URLへ置き換えて実行してください。READMEでは未確認URLを実例として掲載しません。
+
+CLI引数は次で確認できます。
+
+```bash
+python main.py --help
+```
+
+`main.py`が保存する主要情報は取得元page URL、image URL、MIME、画像寸法、SHA-256です。取得画像を削除せず、選別結果は別directoryへcopyします。
+
+## 外部フォトグラメトリbackend
+
+`photogrammetry.py`が対応するbackendは次の3つです。
+
+- Meshroom
+- VisualSFM
+- COLMAP
 
 実行ファイルは`BackendConfig(executable=...)`、JSON設定、または次の環境変数で指定します。
 
@@ -109,52 +233,7 @@ work/
 - `AUTOPHOTOGRAMMETRY_VISUALSFM_EXECUTABLE`
 - `AUTOPHOTOGRAMMETRY_COLMAP_EXECUTABLE`
 
-各実行は`<output_root>/<backend>/<run_id>/`へ分離し、`manifest.json`、`stdout.log`、`stderr.log`、生成物一覧を保存します。
-
-## Nerfstudio Splatfacto
-
-Nerfstudioとgsplatはこのrepositoryへvendorせず、実行環境へ別途installします。
-
-Pythonからの実行入口:
-
-```python
-from video_pipeline import run_splatfacto_export
-
-result = run_splatfacto_export(
-    "path/to/nerfstudio-data",
-    "runs",
-)
-print(result["manifest_path"])
-```
-
-runnerは`ns-train`と`ns-export`が存在しない場合に停止します。成功時は1 runごとに少なくとも次を保存します。
-
-```text
-runs/splatfacto/<run-id>/
-├── manifest.json
-├── train.stdout.log
-├── train.stderr.log
-├── export.stdout.log
-├── export.stderr.log
-└── export/
-    └── *.ply
-```
-
-manifestには以下を記録します。
-
-- input image count
-- per-image SHA-256
-- Nerfstudio version
-- gsplat version
-- training / export command
-- start / end timestamp
-- return code
-- config path
-- checkpoint path
-- PLY path
-- PLY size
-- PLY SHA-256
-- failed phase
+外部softwareが存在しない場合は自動installやfallbackを行わず停止します。`subprocess`実行では`shell=True`を使いません。
 
 ## テスト
 
@@ -162,53 +241,41 @@ manifestには以下を記録します。
 python -m unittest discover -s tests -v
 ```
 
-現在の通常CIはCPUだけで実行し、以下を検証します。
+2026-08-18時点で通常CIは16 testsを実行しています。
+
+検証内容:
 
 - 異なる解像度でも特徴量長が一定
-- 異なる解像度同士のSSIM
-- 選別が元画像を削除しない
-- 空入力の安全な処理
+- 異なる解像度同士でSSIMを計算可能
+- 選別時に元画像を削除しない
+- 空入力を処理可能
 - 空白を含むpathを1引数として扱う
-- 外部実行ファイル欠落時のfail-closed
-- backendごとのrun / manifest / log分離
-- Splatfacto training / export command construction
-- training失敗時のmanifest
-- 成功contract時のcheckpoint / PLY metadataとSHA-256
+- 外部実行ファイル欠落時にfail-closed
+- backendごとのmanifest / stdout / stderr分離
+- `ns-train splatfacto` command construction
+- `ns-export gaussian-splat` command construction
+- training failure時にfailed manifestを保存
+- contract testでcheckpoint / PLY metadataとSHA-256を保存
 
-通常CIではGPU trainingを実行しません。実データCOLMAP検証のために使用した一時workflowもroutine CIから削除済みです。
+通常CIではGPU trainingを実行しません。Huejotzingo COLMAP実測用の一時workflowもmainから削除済みです。
 
-## 責務境界
+## repository間の責務
 
-`AutoPhotogrammetry`:
+`KAFKA2306/AutoPhotogrammetry`は実写入力、provenance、frame選別、camera pose、Splatfacto training、Gaussian Splat PLY生成を担当します。
 
-```text
-real images / video
-  -> provenance
-  -> reconstruction / training
-  -> Gaussian Splat PLY + evidence
-```
+`KAFKA2306/vrmine`は生成済みGaussian Splat PLYをWeb、Unity、VRChat側で表示・互換性検証する側です。
 
-`vrmine`:
-
-```text
-Gaussian Splat PLY + evidence
-  -> Web / Unity / VRChat側での表示・互換性検証
-```
-
-training pipelineを両repositoryへ二重実装しません。
+同じtraining pipelineを2 repositoryへ実装しません。
 
 ## 利用条件と限界
 
 - robots.txt、利用規約、著作権licenseを自動判定しません
 - 利用者が明示したHTML pageだけを画像収集対象にします
 - 検索engineの無断scraping機能はありません
-- 同じ対象物、十分なviewpoint overlap、照明条件を自動証明しません
+- 同一対象、十分なviewpoint overlap、照明条件を自動証明しません
 - cluster番号は3D形状やcamera poseを意味しません
-- 外部backendのinstall、license、GPU要件、入力互換性は利用者が確認します
-- SSIMは画像類似度であり、reprojection errorや3D精度の代替ではありません
-- COLMAP registration成功だけではGaussian Splat品質を保証しません
-- GPU実機でPLYを生成するまではE2E 3DGS成功とは扱いません
-
-以前のREADMEにあった「最高品質」「再構成精度90%以上」等の再現不能な表現は使用しません。
+- SSIMは画像類似度であり、reprojection errorや3D精度ではありません
+- COLMAP 100% registrationだけではGaussian Splat品質を保証しません
+- Huejotzingoで実GPU PLYが生成されるまではE2E成功と記載しません
 
 **README最終監査:** 2026-08-18
