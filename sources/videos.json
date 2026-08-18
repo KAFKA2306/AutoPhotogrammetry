@@ -130,9 +130,10 @@
       "title": "Puente de San Ignacio desde un dron 03",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Puente_de_San_Ignacio_desde_un_dron_03.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/9/97/Puente_de_San_Ignacio_desde_un_dron_03.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
-      "duration_seconds": 141,
+      "license": {"name": "CC0 1.0 Universal", "status": "verified", "url": "https://creativecommons.org/publicdomain/zero/1.0/"},
+      "duration_seconds": 140.661,
       "resolution": [3840, 2160],
       "metadata_notes": ["rigid bridge structure", "vegetation may be present"],
       "measurements": {"preflight": null, "colmap": null, "splat": null}

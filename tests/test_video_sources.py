@@ -48,6 +48,26 @@ class VideoSourceRegistryTests(unittest.TestCase):
         )
         self.assertIsNone(source["measurements"]["splat"])
 
+    def test_puente_san_ignacio_03_keeps_verified_source_metadata(self) -> None:
+        source = get_video_source("puente-san-ignacio-03")
+        self.assertEqual(source["author"], "Luisalvaz")
+        self.assertEqual(source["license"]["name"], "CC0 1.0 Universal")
+        self.assertEqual(source["license"]["status"], "verified")
+        self.assertEqual(
+            source["license"]["url"],
+            "https://creativecommons.org/publicdomain/zero/1.0/",
+        )
+        self.assertEqual(source["duration_seconds"], 140.661)
+        self.assertEqual(source["resolution"], [3840, 2160])
+        self.assertEqual(
+            source["media_url"],
+            "https://upload.wikimedia.org/wikipedia/commons/9/97/Puente_de_San_Ignacio_desde_un_dron_03.webm",
+        )
+        self.assertEqual(source["evaluation_stage"], "metadata")
+        self.assertIsNone(source["measurements"]["preflight"])
+        self.assertIsNone(source["measurements"]["colmap"])
+        self.assertIsNone(source["measurements"]["splat"])
+
     def test_ids_and_source_pages_are_unique(self) -> None:
         videos = video_sources()
         self.assertEqual(len({video["id"] for video in videos}), len(videos))
