@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-autophotogrammetry:blackwell}"
+
+build_image() {
+  docker build --pull -t "$IMAGE" "$ROOT"
+}
+
+run_gpu() {
+  docker run --rm --gpus all --shm-size=12g \
+    --user "$(id -u):$(id -g)" \
+    -e HOME=/tmp \
+    -e TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 \
+    -v "$ROOT:/workspace" \
+    -w /workspace \
+    "$IMAGE" "$@"
+}
+
+run_cpu() {
+  docker run --rm \
+    --user "$(id -u):$(id -g)" \
+    -e HOME=/tmp \
+    -v "$ROOT:/workspace" \
+    -w /workspace \
+    "$IMAGE" "$@"
+}
+
+doctor() {
+  build_image
+  run_gpu python -c 'import importlib.metadata as m, shutil, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap >= (12, 0), f"Expected Blackwell sm_120+, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; import gsplat; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
+}
+
+case "${1:-run}" in
+  image)
+    build_image
+    ;;
+  doctor)
+    doctor
+    ;;
+  test)
+    build_image
+    run_cpu python -m unittest discover -s tests -v
+    ;;
+  run)
+    doctor
+    mkdir -p "$ROOT/input" "$ROOT/output"
+    run_gpu python main.py huejotzingo
+    ;;
+  clean)
+    rm -rf "$ROOT/output/huejotzingo"
+    ;;
+  clean-all)
+    rm -rf "$ROOT/output/huejotzingo" "$ROOT/input/huejotzingo"
+    ;;
+  *)
+    echo "usage: ./task {run|doctor|test|image|clean|clean-all}" >&2
+    exit 2
+    ;;
+esac
