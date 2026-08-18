@@ -1,17 +1,59 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "default": "huejotzingo",
-  "ranking_note": "expected_success and score are pre-run heuristics, not measured reconstruction results",
+  "evaluation_policy": {
+    "principle": "Do not assign reconstruction scores from metadata. Rank only from measured results, and compare sources at the same evaluation stage.",
+    "stages": {
+      "metadata": {
+        "purpose": "eligibility gate only",
+        "fields": ["license", "downloadability", "duration_seconds", "resolution"]
+      },
+      "preflight": {
+        "purpose": "measure whether the video itself is suitable for SfM and 3DGS",
+        "fields": [
+          "scene_cut_count",
+          "sharp_frame_ratio",
+          "adjacent_view_overlap",
+          "camera_translation_proxy",
+          "dynamic_pixel_ratio",
+          "exposure_variation"
+        ]
+      },
+      "colmap": {
+        "purpose": "measure camera-pose and sparse-reconstruction stability",
+        "fields": [
+          "registered_images",
+          "input_images",
+          "registration_ratio",
+          "largest_model_ratio",
+          "submodel_count",
+          "sparse_points",
+          "mean_reprojection_error_px",
+          "mean_track_length"
+        ]
+      },
+      "splat": {
+        "purpose": "measure the actual Gaussian Splat result",
+        "fields": [
+          "train_success",
+          "export_success",
+          "holdout_psnr",
+          "holdout_ssim",
+          "holdout_lpips",
+          "ply_sha256",
+          "ply_size_bytes"
+        ]
+      }
+    }
+  },
   "videos": [
     {
       "id": "huejotzingo",
-      "rank": 1,
       "status": "verified",
-      "expected_success": "high",
-      "score": 95,
+      "evaluation_stage": "colmap",
       "title": "Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron",
       "provider": "Wikimedia Commons",
-      "source_page": "https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arcángel,_Huejotzingo,_desde_un_dron.webm",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel,_Huejotzingo,_desde_un_dron.webm",
       "media_url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm",
       "sha256": "c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30",
       "author": "Luisalvaz",
@@ -24,19 +66,25 @@
       "resolution": [3840, 2160],
       "expected_frame_count": 78,
       "target": "Ex Convento de San Miguel Arcángel, Huejotzingo",
-      "reasons": [
-        "rigid architecture",
-        "long continuous drone coverage",
-        "78/78 images already registered by COLMAP"
-      ],
-      "risks": []
+      "measurements": {
+        "preflight": {
+          "scene_continuity_verified": true
+        },
+        "colmap": {
+          "registered_images": 78,
+          "input_images": 78,
+          "registration_ratio": 1.0,
+          "submodel_count": 1,
+          "sparse_points": 32782,
+          "mean_reprojection_error_px": 0.37083
+        },
+        "splat": null
+      }
     },
     {
       "id": "tepotzotlan-virreinato",
-      "rank": 2,
       "status": "candidate",
-      "expected_success": "high",
-      "score": 94,
+      "evaluation_stage": "metadata",
       "title": "Panorámica del Museo Nacional del Virreinato y Templo de San Francisco Javier desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Panorámica_del_Museo_Nacional_del_Virreinato_y_Templo_de_San_Francisco_Javier_desde_un_dron.webm",
@@ -44,15 +92,13 @@
       "license": {"name": "CC0 1.0 Universal", "status": "verified", "url": "https://creativecommons.org/publicdomain/zero/1.0/"},
       "duration_seconds": 254,
       "resolution": [3840, 2160],
-      "reasons": ["rigid architecture", "4m14s duration", "large textured facade and courtyard"],
-      "risks": ["scene continuity not yet machine-verified"]
+      "metadata_notes": ["rigid architecture", "large textured facade and courtyard"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "templo-san-marcos",
-      "rank": 3,
       "status": "candidate",
-      "expected_success": "high",
-      "score": 91,
+      "evaluation_stage": "metadata",
       "title": "Fachada del Templo de San Marcos desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Fachada_del_Templo_de_San_Marcos_desde_un_dron.webm",
@@ -60,15 +106,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 144,
       "resolution": [3840, 2160],
-      "reasons": ["rigid detailed facade", "2m24s duration", "single architectural target"],
-      "risks": ["scene continuity not yet machine-verified"]
+      "metadata_notes": ["rigid detailed facade", "single architectural target"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "calvillo-centro",
-      "rank": 4,
       "status": "candidate",
-      "expected_success": "high",
-      "score": 89,
+      "evaluation_stage": "metadata",
       "title": "Calvillo desde un dron (plaza principal, Santa Cruz, centro)",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Calvillo_desde_un_dron_(plaza_principal,_Santa_Cruz,_centro).webm",
@@ -76,15 +120,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 124,
       "resolution": [3840, 2160],
-      "reasons": ["rigid urban geometry", "2m04s duration", "many textured facades"],
-      "risks": ["moving vehicles or people may reduce usable frames"]
+      "metadata_notes": ["rigid urban geometry", "moving vehicles or people may be present"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "puente-san-ignacio-03",
-      "rank": 5,
       "status": "candidate",
-      "expected_success": "high",
-      "score": 88,
+      "evaluation_stage": "metadata",
       "title": "Puente de San Ignacio desde un dron 03",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Puente_de_San_Ignacio_desde_un_dron_03.webm",
@@ -92,15 +134,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 141,
       "resolution": [3840, 2160],
-      "reasons": ["rigid bridge structure", "2m21s duration", "strong parallax potential"],
-      "risks": ["vegetation may add non-rigid detail"]
+      "metadata_notes": ["rigid bridge structure", "vegetation may be present"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "avenida-gomez-morin",
-      "rank": 6,
       "status": "candidate",
-      "expected_success": "high",
-      "score": 87,
+      "evaluation_stage": "metadata",
       "title": "Avenida Gómez Morín, Museo ferrocarrilero y Complejo Tres centurias desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Avenida_Gómez_Morín,_Museo_ferrocarrilero_y_Complejo_Tres_centurias_desde_un_dron.webm",
@@ -108,15 +148,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 236,
       "resolution": [3840, 2160],
-      "reasons": ["3m56s duration", "large rigid industrial and urban structures", "broad multi-view coverage"],
-      "risks": ["moving traffic may reduce usable frames"]
+      "metadata_notes": ["industrial and urban structures", "moving traffic may be present"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "san-francisco-nayarit-01",
-      "rank": 7,
       "status": "candidate",
-      "expected_success": "high",
-      "score": 84,
+      "evaluation_stage": "metadata",
       "title": "San Francisco, Nayarit, desde un dron 01",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:San_Francisco,_Nayarit,_desde_un_dron_01.webm",
@@ -124,15 +162,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 219,
       "resolution": [3840, 2160],
-      "reasons": ["3m39s duration", "urban geometry", "broad coverage"],
-      "risks": ["vegetation and moving objects"]
+      "metadata_notes": ["urban geometry", "vegetation and moving objects may be present"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "baluarte-san-pedro",
-      "rank": 8,
       "status": "candidate",
-      "expected_success": "high",
-      "score": 84,
+      "evaluation_stage": "metadata",
       "title": "Baluarte de San Pedro",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Baluarte_de_San_Pedro.webm",
@@ -140,15 +176,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 142,
       "resolution": [3840, 2160],
-      "reasons": ["2m22s duration", "rigid masonry structure", "textured surfaces"],
-      "risks": ["license and shot continuity need review"]
+      "metadata_notes": ["rigid masonry structure", "license requires review"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "puente-san-ignacio-01",
-      "rank": 9,
       "status": "candidate",
-      "expected_success": "medium",
-      "score": 82,
+      "evaluation_stage": "metadata",
       "title": "Puente de San Ignacio desde un dron 01",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Puente_de_San_Ignacio_desde_un_dron_01.webm",
@@ -156,15 +190,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 119,
       "resolution": [3840, 2160],
-      "reasons": ["rigid bridge structure", "almost 2 minutes", "strong geometry"],
-      "risks": ["original file is about 1.38 GB", "vegetation"]
+      "metadata_notes": ["rigid bridge structure", "vegetation may be present"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "herstmonceux-castle",
-      "rank": 10,
       "status": "candidate",
-      "expected_success": "medium",
-      "score": 80,
+      "evaluation_stage": "metadata",
       "title": "Aerial video of Herstmonceux Castle",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Aerial_video_of_Herstmonceux_Castle.webm",
@@ -172,15 +204,13 @@
       "license": {"name": "CC BY 3.0", "status": "verified", "url": "https://creativecommons.org/licenses/by/3.0/"},
       "duration_seconds": 180,
       "resolution": [3840, 2026],
-      "reasons": ["3m duration", "rigid castle", "good facade texture"],
-      "risks": ["attribution required", "lawns and trees reduce useful texture"]
+      "metadata_notes": ["rigid castle", "lawns and trees may reduce useful texture", "attribution required"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "fachada-san-francisco-javier",
-      "rank": 11,
       "status": "candidate",
-      "expected_success": "medium",
-      "score": 79,
+      "evaluation_stage": "metadata",
       "title": "Fachada del Templo de San Francisco Javier, Tepotzotlán, desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Fachada_del_Templo_de_San_Francisco_Javier,_Tepotzotlán,_desde_un_dron.webm",
@@ -188,15 +218,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 90,
       "resolution": [3840, 2160],
-      "reasons": ["rigid detailed facade", "single target"],
-      "risks": ["1m30s is shorter than preferred"]
+      "metadata_notes": ["rigid detailed facade", "single architectural target"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "panoramica-puebla-centro",
-      "rank": 12,
       "status": "candidate",
-      "expected_success": "medium",
-      "score": 76,
+      "evaluation_stage": "metadata",
       "title": "Panorámica del centro histórico, catedral y zócalo de Puebla desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Panorámica_del_centro_histórico,_catedral_y_zócalo_de_Puebla_desde_un_dron.webm",
@@ -204,15 +232,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 72,
       "resolution": [3840, 2160],
-      "reasons": ["dense rigid architecture", "strong texture"],
-      "risks": ["1m12s duration", "traffic and people likely"]
+      "metadata_notes": ["dense rigid architecture", "traffic and people may be present"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "centro-aguascalientes",
-      "rank": 13,
       "status": "candidate",
-      "expected_success": "medium",
-      "score": 74,
+      "evaluation_stage": "metadata",
       "title": "Centro de Aguascalientes desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Centro_de_Aguascalientes_desde_un_dron.webm",
@@ -220,15 +246,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 82,
       "resolution": [3840, 2160],
-      "reasons": ["rigid urban geometry", "high texture"],
-      "risks": ["1m22s duration", "large original file", "moving traffic"]
+      "metadata_notes": ["rigid urban geometry", "moving traffic may be present"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "barco-la-pona-01",
-      "rank": 14,
       "status": "candidate",
-      "expected_success": "medium",
-      "score": 68,
+      "evaluation_stage": "metadata",
       "title": "Barco en La Pona desde un dron 01",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Barco_en_La_Pona_desde_un_dron_01.webm",
@@ -236,15 +260,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 269,
       "resolution": [3840, 2160],
-      "reasons": ["4m29s duration", "long camera path"],
-      "risks": ["vegetation dominates", "target may have limited rigid coverage"]
+      "metadata_notes": ["vegetation may dominate", "rigid target coverage is unknown"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "presa-san-blas",
-      "rank": 15,
       "status": "candidate",
-      "expected_success": "low",
-      "score": 60,
+      "evaluation_stage": "metadata",
       "title": "Presa de San Blas, Pabellón de Hidalgo, desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Presa_de_San_Blas,_Pabellón_de_Hidalgo,_desde_un_dron.webm",
@@ -252,15 +274,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 327,
       "resolution": [3840, 2160],
-      "reasons": ["5m27s duration", "long flight"],
-      "risks": ["water and vegetation are poor SfM and 3DGS targets"]
+      "metadata_notes": ["water and vegetation dominate much of the target class"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "playa-guayabitos-region",
-      "rank": 16,
       "status": "candidate",
-      "expected_success": "low",
-      "score": 55,
+      "evaluation_stage": "metadata",
       "title": "Playa de Guayabitos, Rincón de Guayabitos e Islas desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Playa_de_Guayabitos,_Rincón_de_Guayabitos_e_Islas_desde_un_dron.webm",
@@ -268,15 +288,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 120,
       "resolution": [3840, 2160],
-      "reasons": ["2m duration", "stable aerial capture"],
-      "risks": ["water dominates", "shoreline motion", "limited rigid geometry"]
+      "metadata_notes": ["water and shoreline motion may dominate"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "cascadas-agua-azul",
-      "rank": 17,
       "status": "candidate",
-      "expected_success": "low",
-      "score": 50,
+      "evaluation_stage": "metadata",
       "title": "Cascadas de Agua Azul",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Cascadas_de_Agua_Azul.webm",
@@ -284,15 +302,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 222,
       "resolution": [1920, 1080],
-      "reasons": ["3m42s duration"],
-      "risks": ["moving water", "vegetation", "non-rigid scene"]
+      "metadata_notes": ["moving water and vegetation are likely dominant"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "los-cabos-sunset",
-      "rank": 18,
       "status": "candidate",
-      "expected_success": "low",
-      "score": 46,
+      "evaluation_stage": "metadata",
       "title": "Aerial views of Los Cabo, San Lucas, Mexico at sunset including El Arco, Lands End and ocean views",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Aerial_views_of_Los_Cabo,_San_Lucas,_Mexico_at_sunset_including_El_Arco,_Lands_End_and_ocean_views.webm",
@@ -300,15 +316,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 575,
       "resolution": [3840, 2158],
-      "reasons": ["9m35s duration", "large coverage"],
-      "risks": ["ocean dominates", "lighting changes near sunset", "very large file"]
+      "metadata_notes": ["ocean may dominate", "sunset implies possible illumination variation"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "la-pona-fire-2025",
-      "rank": 19,
       "status": "candidate",
-      "expected_success": "low",
-      "score": 35,
+      "evaluation_stage": "metadata",
       "title": "Registro en dron de incendios en La Pona (11 de abril de 2025)",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Registro_en_dron_de_incendios_en_La_Pona_(11_de_abril_de_2025).webm",
@@ -316,15 +330,13 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 262,
       "resolution": [3840, 2160],
-      "reasons": ["4m22s duration"],
-      "risks": ["smoke", "fire", "vegetation", "strong non-rigid content"]
+      "metadata_notes": ["smoke, fire and vegetation are non-rigid content"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     },
     {
       "id": "cadena-humana-la-pona",
-      "rank": 20,
       "status": "candidate",
-      "expected_success": "low",
-      "score": 30,
+      "evaluation_stage": "metadata",
       "title": "Cadena humana por La Pona (video en dron) - 1",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Cadena_humana_por_La_Pona_(video_en_dron)_-_1.webm",
@@ -332,8 +344,8 @@
       "license": {"name": null, "status": "needs_review", "url": null},
       "duration_seconds": 229,
       "resolution": [3840, 2160],
-      "reasons": ["3m49s duration"],
-      "risks": ["many moving people", "vegetation", "not a rigid reconstruction target"]
+      "metadata_notes": ["many moving people and vegetation are likely present"],
+      "measurements": {"preflight": null, "colmap": null, "splat": null}
     }
   ]
 }
