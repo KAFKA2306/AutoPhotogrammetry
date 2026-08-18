@@ -4,7 +4,7 @@
 
 **実写動画 → camera poses → Gaussian Splat PLY** を1タスクで再現します。
 
-## Local responsibility
+## Run
 
 ローカルの責務は **RUNするだけ**です。
 
@@ -20,69 +20,62 @@ cd AutoPhotogrammetry
 ./task run
 ```
 
-環境確認、Docker image build、入力取得、hash検証、3D再構成、training、PLY export、成功判定は `./task run` 側が行います。
+環境確認、Docker image build、入力取得、hash検証、frame抽出、COLMAP、Splatfacto、PLY export、成功判定は `./task run` が行います。
 
 実行入口: [`task`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/task)  
 GPU環境: [`Dockerfile`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/Dockerfile)  
 E2E実装: [`processing/huejotzingo.py`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/processing/huejotzingo.py)
 
-## What runs
+## Pipeline
 
 ```text
-[Wikimedia CC0 video]
+video
   -> SHA-256 verification
-  -> [FFmpeg] frame extraction
+  -> FFmpeg frame extraction
   -> blur / duplicate filtering
-  -> [COLMAP] feature_extractor
-  -> [COLMAP] sequential_matcher
-  -> [COLMAP] mapper
-  -> [Nerfstudio] ns-process-data
-  -> [Nerfstudio Splatfacto] ns-train splatfacto
-  -> [Nerfstudio export] ns-export gaussian-splat
-  -> PLY + manifest
+  -> COLMAP camera poses
+  -> Nerfstudio ns-process-data
+  -> Splatfacto training
+  -> Gaussian Splat PLY
+  -> manifest
 ```
 
-- FFmpeg: https://ffmpeg.org/
-- COLMAP CLI: https://colmap.github.io/cli.html
-- Nerfstudio custom data: https://docs.nerf.studio/quickstart/custom_dataset.html
-- Nerfstudio Splatfacto: https://docs.nerf.studio/nerfology/methods/splat.html
-- Nerfstudio export: https://docs.nerf.studio/reference/cli/ns_export.html
-- gsplat: https://github.com/nerfstudio-project/gsplat
+- [FFmpeg](https://ffmpeg.org/)
+- [COLMAP CLI](https://colmap.github.io/cli.html)
+- [Nerfstudio custom data](https://docs.nerf.studio/quickstart/custom_dataset.html)
+- [Nerfstudio Splatfacto](https://docs.nerf.studio/nerfology/methods/splat.html)
+- [Nerfstudio export](https://docs.nerf.studio/reference/cli/ns_export.html)
+- [gsplat](https://github.com/nerfstudio-project/gsplat)
 
 ## Video candidates
 
-動画候補の正本は [`sources/videos.json`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/sources/videos.json) です。URL、license確認状態、duration、resolution、期待成功度、riskを **20候補**まとめています。
+候補動画の正本は [`sources/videos.json`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/sources/videos.json) です。現在20候補を一元管理しています。
 
-`status: verified` はhashまで固定済み、`status: candidate` は候補段階です。`expected_success` / `score` は実行前のヒューリスティックで、実測結果ではありません。
+**metadataだけでは成功点数を付けません。** 評価は実測で進めます。
 
-上位候補:
+```text
+metadata
+  -> preflight
+     scene cuts / sharpness / overlap / camera translation
+     dynamic pixels / exposure variation
+  -> COLMAP
+     registration / largest model / submodels / sparse points
+     reprojection error / track length
+  -> Splatfacto
+     train / export / PSNR / SSIM / LPIPS / PLY hash
+```
 
-1. **95 / verified** — [Ex Convento de San Miguel Arcángel, Huejotzingo](https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arcángel,_Huejotzingo,_desde_un_dron.webm)
-2. **94 / high** — [Museo Nacional del Virreinato + Templo de San Francisco Javier, Tepotzotlán](https://commons.wikimedia.org/wiki/File:Panorámica_del_Museo_Nacional_del_Virreinato_y_Templo_de_San_Francisco_Javier_desde_un_dron.webm)
-3. **91 / high** — [Templo de San Marcos](https://commons.wikimedia.org/wiki/File:Fachada_del_Templo_de_San_Marcos_desde_un_dron.webm)
-4. **89 / high** — [Calvillo centro](https://commons.wikimedia.org/wiki/File:Calvillo_desde_un_dron_(plaza_principal,_Santa_Cruz,_centro).webm)
-5. **88 / high** — [Puente de San Ignacio 03](https://commons.wikimedia.org/wiki/File:Puente_de_San_Ignacio_desde_un_dron_03.webm)
+現在のdefaultは `huejotzingo`。ここだけCOLMAPまで実測済みです。
 
-探索元: [Wikimedia Commons — Drone videos from Mexico](https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Mexico)
-
-現在の `./task run` はregistryの `default` である `huejotzingo` を使います。
-
-## Input
-
-固定検証データ:
-
-- source: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arcángel,_Huejotzingo,_desde_un_dron.webm)
+- source: [Wikimedia Commons — Ex Convento de San Miguel Arcángel, Huejotzingo](https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel,_Huejotzingo,_desde_un_dron.webm)
 - author: Luisalvaz
 - license: CC0 1.0
-- resolution: 1920×1080 transcode
 - duration: 232.766 s
+- local input: 1920×1080 VP9 transcode
 - SHA-256: `c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30`
+- COLMAP: **78 / 78 registered**, **1 model**, **32,782 sparse points**, **0.370830 px mean reprojection error**
 
-確認済みCOLMAP結果:
-
-- registered: **78 / 78 images**
-- sparse points: **32,782**
-- mean reprojection error: **0.370830 px**
+探索元: [Wikimedia Commons — Drone videos from Mexico](https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Mexico)
 
 ## Output
 
@@ -96,7 +89,7 @@ output/huejotzingo/
 └── manifest.json
 ```
 
-成功条件は `manifest.json` が次を持つことです。
+E2E成功条件:
 
 ```json
 {
