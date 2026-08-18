@@ -26,6 +26,18 @@ cd AutoPhotogrammetry
 GPU環境: [`Dockerfile`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/Dockerfile)  
 E2E実装: [`processing/huejotzingo.py`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/processing/huejotzingo.py)
 
+## 撮影セットを3D化前に監査する
+
+収集済みの写真セットは、既存の非破壊選別を使ってJSON / HTMLの入力監査レポートにできます。
+
+```bash
+python main.py audit --dataset <dataset-id>
+```
+
+このコマンドは元画像を削除せず、`readiness-report.json`、`readiness-report.html`、`selected-manifest.json` と別の `selected/` を生成します。登録画像率、再投影誤差、mesh completenessを未測定のまま3D品質保証には使いません。
+
+博物館・資料館、EC商品制作、メーカー、3D制作会社向けの利用範囲とPoC相談方法は [`docs/business/photogrammetry-input-audit.md`](docs/business/photogrammetry-input-audit.md) を参照してください。
+
 ## 軽量な開発環境
 
 編集はZed、Python環境はuv、GPU処理はDockerに分離しています。ZedのAI機能や常駐エージェントは使わず、通常の編集・診断・テストはホスト上で完結します。
