@@ -2,6 +2,8 @@
 
 [![Test](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml/badge.svg)](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml)
 
+![AutoPhotogrammetry の動作原理](assets/autophotogrammetry-principle.webp)
+
 **実写動画 → camera poses → Gaussian Splat PLY** を1タスクで再現します。
 
 ## Run
