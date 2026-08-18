@@ -4,11 +4,17 @@ import argparse
 import json
 from pathlib import Path
 
+from processing.backend_evaluation import build_dataset_contract, write_comparison
 from processing.collection import collect_images
 from processing.batch import run_all_videos
 from processing.huejotzingo import run_huejotzingo
 from processing.image_selection import select_images
+from processing.provenance import write_json
 from processing.readiness_report import build_readiness_report
+
+
+def _read_json(path: str | Path) -> dict:
+    return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def main() -> None:
@@ -59,6 +65,23 @@ def main() -> None:
     batch_parser.add_argument("--train-iterations", type=int, default=2000)
     batch_parser.add_argument("--fresh", action="store_true")
 
+    dataset_parser = subparsers.add_parser(
+        "evaluation-dataset",
+        help="Freeze one source video and exact train/hold-out frame hashes for backend comparison.",
+    )
+    dataset_parser.add_argument("--source-video", required=True)
+    dataset_parser.add_argument("--frames", required=True)
+    dataset_parser.add_argument("--holdout-count", type=int, required=True)
+    dataset_parser.add_argument("--output", required=True)
+
+    compare_parser = subparsers.add_parser(
+        "evaluation-compare",
+        help="Validate backend result manifests against one dataset contract and write comparison rows.",
+    )
+    compare_parser.add_argument("--dataset", required=True)
+    compare_parser.add_argument("--result", action="append", required=True)
+    compare_parser.add_argument("--output", required=True)
+
     args = parser.parse_args()
 
     if args.command == "collect":
@@ -104,6 +127,19 @@ def main() -> None:
             input_root=args.input_root,
             output_root=args.output_root,
         )
+    elif args.command == "evaluation-dataset":
+        result = build_dataset_contract(
+            args.source_video,
+            args.frames,
+            holdout_count=args.holdout_count,
+        )
+        write_json(args.output, result)
+        result = {**result, "manifest_path": str(Path(args.output))}
+    elif args.command == "evaluation-compare":
+        dataset = _read_json(args.dataset)
+        backend_results = [_read_json(path) for path in args.result]
+        result = write_comparison(args.output, backend_results, dataset)
+        result = {**result, "comparison_path": str(Path(args.output))}
     else:
         result = run_all_videos(
             registry_path=args.registry,
