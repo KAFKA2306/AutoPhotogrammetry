@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import re
 import shutil
 import subprocess
@@ -18,28 +17,22 @@ from processing.provenance import (
     write_source_manifest,
 )
 from processing.video import probe_video
+from processing.video_sources import get_video_source
 
-DATASET = "huejotzingo"
-SOURCE_PAGE = (
-    "https://commons.wikimedia.org/wiki/"
-    "File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel,"
-    "_Huejotzingo,_desde_un_dron.webm"
-)
-MEDIA_URL = (
-    "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/"
-    "Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/"
-    "Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm"
-)
-SOURCE_SHA256 = "c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30"
-EXPECTED_FRAME_COUNT = 78
+SOURCE_CONFIG = get_video_source("huejotzingo")
+DATASET = SOURCE_CONFIG["id"]
+SOURCE_PAGE = SOURCE_CONFIG["source_page"]
+MEDIA_URL = SOURCE_CONFIG["media_url"]
+SOURCE_SHA256 = SOURCE_CONFIG["sha256"]
+EXPECTED_FRAME_COUNT = SOURCE_CONFIG["expected_frame_count"]
 SOURCE = VideoSource(
-    title="Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron",
+    title=SOURCE_CONFIG["title"],
     source_page=SOURCE_PAGE,
     media_url=MEDIA_URL,
-    author="Luisalvaz",
-    license="CC0 1.0 Universal",
-    license_url="https://creativecommons.org/publicdomain/zero/1.0/",
-    target="Ex Convento de San Miguel Arcángel, Huejotzingo",
+    author=SOURCE_CONFIG["author"],
+    license=SOURCE_CONFIG["license"]["name"],
+    license_url=SOURCE_CONFIG["license"]["url"],
+    target=SOURCE_CONFIG["target"],
 )
 
 
@@ -221,6 +214,7 @@ def run_huejotzingo(
         "status": "running",
         "started_at": utc_now(),
         "source": {
+            "source_registry_id": SOURCE_CONFIG["id"],
             "source_page": SOURCE_PAGE,
             "media_url": MEDIA_URL,
             "expected_sha256": SOURCE_SHA256,
