@@ -7,6 +7,7 @@ from pathlib import Path
 from processing.collection import collect_images
 from processing.huejotzingo import run_huejotzingo
 from processing.image_selection import select_images
+from processing.readiness_report import build_readiness_report
 
 
 def main() -> None:
@@ -27,6 +28,16 @@ def main() -> None:
     select_parser.add_argument("--output-root", default="output")
     select_parser.add_argument("--sharpness-threshold", type=float, default=0.0001)
     select_parser.add_argument("--similarity-threshold", type=float, default=0.92)
+
+    audit_parser = subparsers.add_parser(
+        "audit",
+        help="Select a collected image set and generate JSON/HTML input audit reports.",
+    )
+    audit_parser.add_argument("--dataset", required=True)
+    audit_parser.add_argument("--input-root", default="input")
+    audit_parser.add_argument("--output-root", default="output")
+    audit_parser.add_argument("--sharpness-threshold", type=float, default=0.0001)
+    audit_parser.add_argument("--similarity-threshold", type=float, default=0.92)
 
     huejotzingo_parser = subparsers.add_parser(
         "huejotzingo",
@@ -67,6 +78,14 @@ def main() -> None:
             "selected": len(selected),
             "output_dir": str(output_dir),
         }
+    elif args.command == "audit":
+        result = build_readiness_report(
+            args.dataset,
+            input_root=args.input_root,
+            output_root=args.output_root,
+            sharpness_threshold=args.sharpness_threshold,
+            similarity_threshold=args.similarity_threshold,
+        )
     else:
         result = run_huejotzingo(
             input_root=args.input_root,
