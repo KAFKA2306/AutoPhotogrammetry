@@ -1,10 +1,11 @@
 FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG CUDA_ARCH_LIST=8.6
 ENV CUDA_HOME=/usr/local/cuda \
-    TORCH_CUDA_ARCH_LIST=12.0 \
+    TORCH_CUDA_ARCH_LIST=${CUDA_ARCH_LIST} \
     TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 \
-    MAX_JOBS=8 \
+    MAX_JOBS=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \

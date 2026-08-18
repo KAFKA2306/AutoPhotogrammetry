@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from processing.collection import collect_images
+from processing.batch import run_all_videos
 from processing.huejotzingo import run_huejotzingo
 from processing.image_selection import select_images
 from processing.readiness_report import build_readiness_report
@@ -46,6 +47,18 @@ def main() -> None:
     huejotzingo_parser.add_argument("--input-root", default="input")
     huejotzingo_parser.add_argument("--output-root", default="output")
 
+    batch_parser = subparsers.add_parser(
+        "batch",
+        help="Run every registry video through COLMAP and Gaussian Splatting.",
+    )
+    batch_parser.add_argument("--registry", default="sources/videos.json")
+    batch_parser.add_argument("--id", action="append", dest="ids")
+    batch_parser.add_argument("--input-root", default="input")
+    batch_parser.add_argument("--output-root", default="output")
+    batch_parser.add_argument("--timeout", type=float, default=None)
+    batch_parser.add_argument("--train-iterations", type=int, default=2000)
+    batch_parser.add_argument("--fresh", action="store_true")
+
     args = parser.parse_args()
 
     if args.command == "collect":
@@ -86,11 +99,24 @@ def main() -> None:
             sharpness_threshold=args.sharpness_threshold,
             similarity_threshold=args.similarity_threshold,
         )
-    else:
+    elif args.command == "huejotzingo":
         result = run_huejotzingo(
             input_root=args.input_root,
             output_root=args.output_root,
         )
+    else:
+        result = run_all_videos(
+            registry_path=args.registry,
+            input_root=args.input_root,
+            output_root=args.output_root,
+            ids=args.ids,
+            train_iterations=args.train_iterations,
+            timeout=args.timeout,
+            fresh=args.fresh,
+        )
+        if result["status"] != "success":
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            raise SystemExit(1)
 
     print(json.dumps(result, ensure_ascii=False, indent=2))
 

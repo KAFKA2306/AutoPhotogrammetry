@@ -2,10 +2,22 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-autophotogrammetry:blackwell}"
+IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-autophotogrammetry:cuda128}"
+HOST_GPU_ARCH="${AUTOPHOTOGRAMMETRY_CUDA_ARCH:-8.6}"
 
 build_image() {
-  docker build --pull -t "$IMAGE" "$ROOT"
+  docker build --pull --build-arg "CUDA_ARCH_LIST=$HOST_GPU_ARCH" -t "$IMAGE" "$ROOT"
+}
+
+check_host_gpu() {
+  if ! command -v nvidia-smi >/dev/null 2>&1; then
+    return 0
+  fi
+  HOST_GPU_ARCH="$(nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | tr -d '[:space:]')"
+  if ! awk -v capability="$HOST_GPU_ARCH" 'BEGIN { exit !(capability >= 8.6) }'; then
+    echo "Incompatible GPU compute capability: ${HOST_GPU_ARCH:-unknown}; this image requires sm_86+ (8.6 or newer)." >&2
+    return 1
+  fi
 }
 
 run_gpu() {
@@ -28,8 +40,9 @@ run_cpu() {
 }
 
 doctor() {
+  check_host_gpu
   build_image
-  run_gpu python -c 'import importlib.metadata as m, shutil, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap >= (12, 0), f"Expected Blackwell sm_120+, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; import gsplat; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
+  run_gpu python -c 'import importlib.metadata as m, shutil, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap >= (8, 6), f"Expected sm_86+, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; import gsplat; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
 }
 
 case "${1:-run}" in
@@ -48,14 +61,19 @@ case "${1:-run}" in
     mkdir -p "$ROOT/input" "$ROOT/output"
     run_gpu python main.py huejotzingo
     ;;
+  run-all)
+    doctor
+    mkdir -p "$ROOT/input" "$ROOT/output"
+    run_gpu python main.py batch
+    ;;
   clean)
-    rm -rf "$ROOT/output/huejotzingo"
+    find "$ROOT/output" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   clean-all)
-    rm -rf "$ROOT/output/huejotzingo" "$ROOT/input/huejotzingo"
+    find "$ROOT/output" "$ROOT/input" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   *)
-    echo "usage: ./task {run|doctor|test|image|clean|clean-all}" >&2
+    echo "usage: ./task {run|run-all|doctor|test|image|clean|clean-all}" >&2
     exit 2
     ;;
 esac

@@ -1,4 +1,4 @@
-.PHONY: run doctor test image clean clean-all
+.PHONY: run run-all doctor test image clean clean-all
 
-run doctor test image clean clean-all:
+run run-all doctor test image clean clean-all:
 	./task $@
