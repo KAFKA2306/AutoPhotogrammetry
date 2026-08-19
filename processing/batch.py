@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
-import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -15,7 +14,13 @@ from urllib.request import Request, urlopen
 from processing.huejotzingo import _colmap_metrics, _run_recorded, colmap_commands
 from processing.image_selection import select_video_frames
 from processing.nerfstudio import nerfstudio_process_images_command, run_splatfacto_export
-from processing.provenance import VideoSource, sha256_file, utc_now, write_json, write_source_manifest
+from processing.provenance import (
+    VideoSource,
+    sha256_file,
+    utc_now,
+    write_json,
+    write_source_manifest,
+)
 from processing.video import extract_frames_command, probe_video
 from processing.video_sources import load_video_registry
 

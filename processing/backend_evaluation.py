@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
+from typing import Mapping, Sequence
 
 from processing.provenance import image_records, sha256_file, write_json
 

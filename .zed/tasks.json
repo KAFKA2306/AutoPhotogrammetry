@@ -1,0 +1,66 @@
+[
+  {
+    "label": "Host: Sync Python environment",
+    "command": "uv sync",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "none",
+    "reveal": "always",
+    "hide": "never"
+  },
+  {
+    "label": "Host: Run unit tests",
+    "command": "uv run python -m unittest discover -s tests -v",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "all",
+    "reveal": "always",
+    "hide": "never"
+  },
+  {
+    "label": "Host: Compile check",
+    "command": "uv run python -m py_compile main.py processing/*.py tests/*.py",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "all",
+    "reveal": "always",
+    "hide": "never"
+  },
+  {
+    "label": "Host: Ruff check",
+    "command": "uvx ruff check .",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "all",
+    "reveal": "always",
+    "hide": "never"
+  },
+  {
+    "label": "Pipeline: Build GPU image",
+    "command": "./task image",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "none",
+    "reveal": "always",
+    "hide": "never"
+  },
+  {
+    "label": "Pipeline: Doctor (GPU + Docker)",
+    "command": "./task doctor",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "none",
+    "reveal": "always",
+    "hide": "never"
+  },
+  {
+    "label": "Pipeline: Run Huejotzingo",
+    "command": "./task run",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "none",
+    "reveal": "always",
+    "hide": "never"
+  },
+  {
+    "label": "Pipeline: Run all registry videos",
+    "command": "./task run-all",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "save": "none",
+    "reveal": "always",
+    "hide": "never"
+  }
+]

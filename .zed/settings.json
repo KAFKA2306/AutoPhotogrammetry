@@ -1,0 +1,34 @@
+{
+  "disable_ai": true,
+  "format_on_save": "on",
+  "autosave": {
+    "after_delay": {
+      "milliseconds": 1000
+    }
+  },
+  "languages": {
+    "Python": {
+      "language_servers": ["basedpyright", "ruff"],
+      "formatter": "language_server",
+      "format_on_save": "on",
+      "code_actions_on_format": {
+        "source.fixAll.ruff": true,
+        "source.organizeImports.ruff": true
+      },
+      "tab_size": 4,
+      "hard_tabs": false
+    }
+  },
+  "terminal": {
+    "shell": {
+      "with_arguments": {
+        "program": "/bin/bash",
+        "args": ["--login"]
+      }
+    }
+  },
+  "project_panel": {
+    "dock": "left",
+    "git_status": true
+  }
+}

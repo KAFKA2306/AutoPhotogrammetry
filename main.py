@@ -5,8 +5,8 @@ import json
 from pathlib import Path
 
 from processing.backend_evaluation import build_dataset_contract, write_comparison
-from processing.collection import collect_images
 from processing.batch import run_all_videos
+from processing.collection import collect_images
 from processing.huejotzingo import run_huejotzingo
 from processing.image_selection import select_images
 from processing.provenance import write_json
