@@ -57,11 +57,15 @@ check_host_gpu() {
 }
 
 run_gpu() {
+  local image_id
+  image_id="$(docker image inspect --format '{{.Id}}' "$IMAGE" 2>/dev/null || true)"
   mkdir -p "$ROOT/input" "$ROOT/output"
   docker run --rm --gpus all --shm-size=12g \
     --user "$(id -u):$(id -g)" \
     -e HOME=/tmp \
     -e TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 \
+    -e AUTOPHOTOGRAMMETRY_IMAGE_REF="$IMAGE" \
+    -e AUTOPHOTOGRAMMETRY_IMAGE_ID="$image_id" \
     -v "$ROOT/input:/workspace/input" \
     -v "$ROOT/output:/workspace/output" \
     -w /opt/autophotogrammetry \
@@ -118,7 +122,9 @@ case "${1:-run}" in
       echo "Quality execution is intentionally GPU-only and will not rerun download/FFmpeg/COLMAP. Use an existing prepared dataset." >&2
       exit 1
     fi
-    doctor
+    check_docker
+    check_host_gpu
+    ensure_image
     run_gpu python -m processing.quality_sweep \
       --data "/workspace/output/$scene/nerfstudio-data" \
       --output-root "/workspace/output/$scene/quality-sweep" \

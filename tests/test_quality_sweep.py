@@ -23,7 +23,7 @@ class QualitySweepTests(unittest.TestCase):
             ("--pipeline.model.strategy", "mcmc"),
         )
 
-    def test_quality_sweep_records_three_variants_and_ply_metrics(self):
+    def test_quality_sweep_records_three_variants_ply_metrics_and_runtime(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             data = root / "data"
@@ -51,12 +51,23 @@ class QualitySweepTests(unittest.TestCase):
                 "nerfstudio_revision": "revision",
                 "gsplat_version": "1.4.0",
             }
+            runtime = {
+                "gpu_name": "test-gpu",
+                "compute_capability": "12.0",
+                "torch_version": "2.7.1",
+                "torch_cuda_version": "12.8",
+                "container_image_ref": "image",
+                "container_image_id": "sha256:image",
+            }
             metrics = {
                 "primitive_count": 100,
                 "opacity": {"below_0_1_ratio": 0.1},
                 "scale_anisotropy_ratio": {"above_10_ratio": 0.2},
             }
             with patch(
+                "processing.quality_sweep.verify_gpu_runtime",
+                return_value=runtime,
+            ), patch(
                 "processing.quality_sweep.verify_research_environment",
                 return_value=environment,
             ), patch(
@@ -80,6 +91,7 @@ class QualitySweepTests(unittest.TestCase):
             )
             self.assertTrue(Path(result["manifest_path"]).is_file())
             self.assertEqual(result["variants"][0]["ply_metrics"], metrics)
+            self.assertEqual(result["runtime"], runtime)
 
 
 if __name__ == "__main__":

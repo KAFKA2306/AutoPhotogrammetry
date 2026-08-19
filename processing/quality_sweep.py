@@ -2,12 +2,36 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from processing.gaussian_ply import gaussian_ply_metrics
 from processing.mcmc_quality import DEFAULT_NERFSTUDIO_SOURCE, verify_research_environment
 from processing.nerfstudio import run_splatfacto_export
 from processing.provenance import write_json
+
+
+def verify_gpu_runtime() -> dict:
+    """Fail before training unless the single quality container has the expected GPU runtime."""
+    try:
+        import torch
+    except ImportError as exc:
+        raise RuntimeError("PyTorch is not installed in the GPU execution image") from exc
+    if not torch.cuda.is_available():
+        raise RuntimeError("CUDA is not available in the quality container")
+    capability = tuple(torch.cuda.get_device_capability())
+    if capability[0] != 12:
+        raise RuntimeError(
+            f"Expected compute capability 12.x for the pinned sm_120 image, got {capability}"
+        )
+    return {
+        "gpu_name": torch.cuda.get_device_name(),
+        "compute_capability": f"{capability[0]}.{capability[1]}",
+        "torch_version": torch.__version__,
+        "torch_cuda_version": torch.version.cuda,
+        "container_image_ref": os.environ.get("AUTOPHOTOGRAMMETRY_IMAGE_REF"),
+        "container_image_id": os.environ.get("AUTOPHOTOGRAMMETRY_IMAGE_ID"),
+    }
 
 
 def quality_sweep_train_args(*, iterations: int, variant: str) -> tuple[str, ...]:
@@ -48,13 +72,15 @@ def run_quality_sweep(
     data = Path(data_dir).expanduser().resolve()
     if not data.is_dir():
         raise ValueError(f"Nerfstudio data directory does not exist: {data}")
+    runtime = verify_gpu_runtime()
     environment = verify_research_environment(nerfstudio_source)
     root = Path(output_root).expanduser().resolve()
     root.mkdir(parents=True, exist_ok=True)
     summary_path = root / "quality-sweep.json"
     summary = {
-        "schema_version": 1,
+        "schema_version": 2,
         "data_dir": str(data),
+        "runtime": runtime,
         "environment": environment,
         "iterations": iterations,
         "variants": [],
