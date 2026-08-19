@@ -5,6 +5,17 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-autophotogrammetry:cuda128}"
 HOST_GPU_ARCH="${AUTOPHOTOGRAMMETRY_CUDA_ARCH:-8.6}"
 
+check_docker() {
+  if ! command -v docker >/dev/null 2>&1; then
+    echo "Docker CLI unavailable; AutoPhotogrammetry execution is BLOCKED. Install or repair Docker outside this repository task; no host repair is attempted." >&2
+    return 1
+  fi
+  if ! docker info >/dev/null 2>&1; then
+    echo "Docker daemon unavailable; AutoPhotogrammetry execution is BLOCKED. Start or repair Docker outside this repository task; no host repair is attempted." >&2
+    return 1
+  fi
+}
+
 build_image() {
   docker build --pull --build-arg "CUDA_ARCH_LIST=$HOST_GPU_ARCH" -t "$IMAGE" "$ROOT"
 }
@@ -40,6 +51,7 @@ run_cpu() {
 }
 
 doctor() {
+  check_docker
   check_host_gpu
   build_image
   run_gpu python -c 'import importlib.metadata as m, shutil, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap >= (8, 6), f"Expected sm_86+, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; import gsplat; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
@@ -47,12 +59,14 @@ doctor() {
 
 case "${1:-run}" in
   image)
+    check_docker
     build_image
     ;;
   doctor)
     doctor
     ;;
   test)
+    check_docker
     build_image
     run_cpu python -m unittest discover -s tests -v
     ;;
