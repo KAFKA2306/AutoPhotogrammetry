@@ -1,0 +1,44 @@
+name: GPU Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - requirements.txt
+      - main.py
+      - processing/**
+      - sources/**
+      - task
+      - .github/workflows/gpu-image.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/kafka2306/autophotogrammetry:quality-ns50e0e3-sm120-v1
+            ghcr.io/kafka2306/autophotogrammetry:sha-${{ github.sha }}
+          build-args: |
+            CUDA_ARCH_LIST=12.0
+            NERFSTUDIO_REVISION=50e0e3c70c775e89333256213363badbf074f29d
+            GSPLAT_REVISION=v1.4.0
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
