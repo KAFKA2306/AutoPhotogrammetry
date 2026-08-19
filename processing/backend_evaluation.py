@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Mapping, Sequence
 
+from processing.gaussian_ply import gaussian_ply_metrics
 from processing.provenance import image_records, sha256_file, write_json
 
 METRIC_FIELDS = (
@@ -20,6 +21,12 @@ METRIC_FIELDS = (
     "output_size_bytes",
     "primitive_count",
     "camera_pose_available",
+    "low_opacity_primitive_count",
+    "low_opacity_primitive_ratio",
+    "scale_anisotropy_above_10_count",
+    "scale_anisotropy_above_10_ratio",
+    "cleanup_removed_primitive_count",
+    "cleanup_removed_primitive_ratio",
 )
 
 
@@ -92,6 +99,39 @@ def dataset_identity(contract: Mapping) -> str:
 def empty_metrics() -> dict:
     """Return the common metric shape without inventing unmeasured values."""
     return {field: None for field in METRIC_FIELDS}
+
+
+def gaussian_artifact_metrics(path: str | Path) -> dict:
+    """Return direct, representation-level artifact measurements for a Gaussian PLY.
+
+    These values do not classify visual quality. They expose low-opacity primitives and
+    highly anisotropic primitives so those counts can be compared alongside fixed-view
+    renders and image-space quality metrics.
+    """
+    measured = gaussian_ply_metrics(path)
+    return {
+        "primitive_count": measured["primitive_count"],
+        "output_size_bytes": measured["size_bytes"],
+        "low_opacity_primitive_count": measured["opacity"]["below_0_1_count"],
+        "low_opacity_primitive_ratio": measured["opacity"]["below_0_1_ratio"],
+        "scale_anisotropy_above_10_count": measured["scale_anisotropy_ratio"]["above_10_count"],
+        "scale_anisotropy_above_10_ratio": measured["scale_anisotropy_ratio"]["above_10_ratio"],
+    }
+
+
+def cleanup_metrics(before_path: str | Path, after_path: str | Path) -> dict:
+    """Measure primitive removal by cleanup without claiming that removed means improved."""
+    before = gaussian_ply_metrics(before_path)
+    after = gaussian_ply_metrics(after_path)
+    removed = before["primitive_count"] - after["primitive_count"]
+    if removed < 0:
+        raise ValueError(
+            "cleanup output contains more primitives than its input; use backend-specific metrics instead"
+        )
+    return {
+        "cleanup_removed_primitive_count": removed,
+        "cleanup_removed_primitive_ratio": removed / before["primitive_count"],
+    }
 
 
 def artifact_record(path: str | Path, *, format: str) -> dict:
