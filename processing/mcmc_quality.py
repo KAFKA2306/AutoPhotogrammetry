@@ -9,12 +9,13 @@ from pathlib import Path
 from processing.nerfstudio import run_splatfacto_export
 from processing.provenance import write_json
 
-NERFSTUDIO_MCMC_REVISION = "c7bd9539728515eded9cc4ed137ca703f900e28a"
+NERFSTUDIO_MCMC_REVISION = "50e0e3c70c775e89333256213363badbf074f29d"
 GSPLAT_MCMC_VERSION = "1.4.0"
+DEFAULT_NERFSTUDIO_SOURCE = Path("/opt/nerfstudio")
 
 
-def verify_research_environment(nerfstudio_source: str | Path) -> dict:
-    """Verify the exact unreleased Nerfstudio commit that introduced the MCMC strategy."""
+def verify_research_environment(nerfstudio_source: str | Path = DEFAULT_NERFSTUDIO_SOURCE) -> dict:
+    """Verify the exact MCMC-capable Nerfstudio source baked into the GPU image."""
     source = Path(nerfstudio_source).expanduser().resolve()
     if not (source / ".git").exists():
         raise ValueError(f"nerfstudio_source must be a Git checkout: {source}")
@@ -26,13 +27,13 @@ def verify_research_environment(nerfstudio_source: str | Path) -> dict:
     ).stdout.strip()
     if revision != NERFSTUDIO_MCMC_REVISION:
         raise ValueError(
-            "Nerfstudio research checkout revision mismatch: "
+            "Nerfstudio checkout revision mismatch: "
             f"expected {NERFSTUDIO_MCMC_REVISION}, got {revision}"
         )
     try:
         gsplat_version = metadata.version("gsplat")
     except metadata.PackageNotFoundError as exc:
-        raise ValueError("gsplat is not installed in the research environment") from exc
+        raise ValueError("gsplat is not installed in the execution environment") from exc
     if gsplat_version != GSPLAT_MCMC_VERSION:
         raise ValueError(
             f"gsplat version mismatch: expected {GSPLAT_MCMC_VERSION}, got {gsplat_version}"
@@ -63,13 +64,13 @@ def run_mcmc_comparison(
     data_dir: str | Path,
     output_root: str | Path,
     *,
-    nerfstudio_source: str | Path,
+    nerfstudio_source: str | Path = DEFAULT_NERFSTUDIO_SOURCE,
     iterations: int = 30000,
     train_executable: str = "ns-train",
     export_executable: str = "ns-export",
     timeout: float | None = None,
 ) -> dict:
-    """Compare DefaultStrategy vs MCMCStrategy without using the confounded splatfacto-mcmc preset."""
+    """Compare DefaultStrategy vs MCMCStrategy at the pinned production candidate revision."""
     data = Path(data_dir).expanduser().resolve()
     if not data.is_dir():
         raise ValueError(f"Nerfstudio data directory does not exist: {data}")
@@ -78,9 +79,9 @@ def run_mcmc_comparison(
     root.mkdir(parents=True, exist_ok=True)
     summary_path = root / "mcmc-comparison.json"
     summary = {
-        "schema_version": 1,
+        "schema_version": 2,
         "data_dir": str(data),
-        "research_environment": environment,
+        "environment": environment,
         "iterations": iterations,
         "experiments": [],
     }
@@ -115,11 +116,11 @@ def run_mcmc_comparison(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Compare Nerfstudio DefaultStrategy and MCMCStrategy at a pinned upstream commit."
+        description="Compare Nerfstudio DefaultStrategy and MCMCStrategy in the pinned GPU image."
     )
     parser.add_argument("--data", required=True)
     parser.add_argument("--output-root", required=True)
-    parser.add_argument("--nerfstudio-source", required=True)
+    parser.add_argument("--nerfstudio-source", default=str(DEFAULT_NERFSTUDIO_SOURCE))
     parser.add_argument("--iterations", type=int, default=30000)
     parser.add_argument("--ns-train", default="ns-train")
     parser.add_argument("--ns-export", default="ns-export")
