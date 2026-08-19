@@ -1,6 +1,7 @@
 # AutoPhotogrammetry
 
 [![Test](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml/badge.svg)](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/test.yml)
+[![GPU Image](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/gpu-image.yml/badge.svg)](https://github.com/KAFKA2306/AutoPhotogrammetry/actions/workflows/gpu-image.yml)
 
 **実写動画 → camera poses → Gaussian Splat PLY** を1タスクで再現します。
 
@@ -20,13 +21,31 @@ cd AutoPhotogrammetry
 ./task run
 ```
 
-環境確認、Docker image build、入力取得、hash検証、frame抽出、COLMAP、Splatfacto、PLY export、成功判定はtaskが行います。
+GPU用のCUDA / PyTorch / gsplat / Nerfstudio環境はGitHub Actionsでコンテナ化します。通常のGPU実行ではローカルでNerfstudio checkoutやpip installを行いません。`task` がprebuilt imageを取得し、入力・出力だけをhostへmountします。
 
 Docker CLIまたはDocker daemonが利用できない場合、`./task doctor` / `./task run` / `./task run-all` は `BLOCKED` と明示して停止します。このrepositoryのtaskはDocker Desktop、WSL、GPU driver、OS設定、Docker storageを修復・resetしません。host環境の修復はrepository実行とは分離してください。
 
 実行入口: [`task`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/task)  
 GPU環境: [`Dockerfile`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/Dockerfile)  
 E2E実装: [`processing/huejotzingo.py`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/processing/huejotzingo.py)
+
+### GPUだけで品質候補を比較する
+
+既に `output/<scene>/nerfstudio-data/transforms.json` があるsceneは、ローカル側では次の1コマンドだけで品質比較できます。
+
+```bash
+./task quality huejotzingo 30000
+```
+
+このrunは同じprocessed dataset、同じ30,000 iteration budget、同じexact Nerfstudio / gsplat環境で以下を独立実行します。
+
+- upstream default Splatfacto
+- `use_scale_regularization=True`
+- `strategy=mcmc`
+
+各PLYについてSHA-256、size、primitive count、opacity < 0.1、scale anisotropy > 10を自動集計し、`output/<scene>/quality-sweep/quality-sweep.json` に保存します。semantic maskが必要なClean-GSはtraining strategyの比較と混ぜず、別のpost-process実験として扱います。
+
+GPU imageはNerfstudio commit `50e0e3c70c775e89333256213363badbf074f29d`、gsplat `1.4.0`、CUDA 12.8 / PyTorch 2.7.1、`sm_120`を固定します。floating `main` には依存しません。
 
 ## 撮影セットを3D化前に監査する
 
@@ -122,14 +141,8 @@ metadata
 
 各動画は `output/<id>/manifest.json` と独立したGaussian Splat PLYを生成し、全体の
 `output/batch-manifest.json` に20件の成功・失敗とPLY hashを記録します。`run-all` は
-途中生成物を消してから全件を再実行します。個別に再実行したい場合は、例えば次のようにします。
-実証時のSplatfactoは `--max-num-iterations 2000` で実行します。品質重視の再学習では
-`main.py batch --train-iterations 30000` のように増やせます。
-
-```bash
-docker run --rm --gpus all -v "$PWD:/workspace" -w /workspace \
-  autophotogrammetry:cuda128 python main.py batch --id huejotzingo --fresh
-```
+途中生成物を消してから全件を再実行します。個別に再実行したい場合も `task` を入口にします。
+実証時のSplatfactoは `--max-num-iterations 2000` で実行します。品質比較は上記 `./task quality <scene> 30000` を使います。
 
 - source: [Wikimedia Commons — Ex Convento de San Miguel Arcángel, Huejotzingo](https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel,_Huejotzingo,_desde_un_dron.webm)
 - author: Luisalvaz

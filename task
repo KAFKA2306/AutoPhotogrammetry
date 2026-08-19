@@ -2,8 +2,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-autophotogrammetry:cuda128}"
-HOST_GPU_ARCH="${AUTOPHOTOGRAMMETRY_CUDA_ARCH:-8.6}"
+IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:quality-ns50e0e3-sm120-v1}"
+HOST_GPU_ARCH="${AUTOPHOTOGRAMMETRY_CUDA_ARCH:-12.0}"
 
 check_docker() {
   if ! command -v docker >/dev/null 2>&1; then
@@ -20,24 +20,51 @@ build_image() {
   docker build --pull --build-arg "CUDA_ARCH_LIST=$HOST_GPU_ARCH" -t "$IMAGE" "$ROOT"
 }
 
+pull_image() {
+  if docker pull "$IMAGE"; then
+    return 0
+  fi
+
+  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+    local login token
+    login="$(gh api user --jq .login)"
+    token="$(gh auth token)"
+    printf '%s' "$token" | docker login ghcr.io -u "$login" --password-stdin >/dev/null
+    docker pull "$IMAGE"
+    return 0
+  fi
+
+  echo "Prebuilt GPU image is unavailable. The local quality path intentionally does not build dependencies; publish the GPU Image workflow or authenticate gh/docker to GHCR." >&2
+  return 1
+}
+
+ensure_image() {
+  if docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    return 0
+  fi
+  pull_image
+}
+
 check_host_gpu() {
   if ! command -v nvidia-smi >/dev/null 2>&1; then
     return 0
   fi
   HOST_GPU_ARCH="$(nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | tr -d '[:space:]')"
-  if ! awk -v capability="$HOST_GPU_ARCH" 'BEGIN { exit !(capability >= 8.6) }'; then
-    echo "Incompatible GPU compute capability: ${HOST_GPU_ARCH:-unknown}; this image requires sm_86+ (8.6 or newer)." >&2
+  if ! awk -v capability="$HOST_GPU_ARCH" 'BEGIN { exit !(capability >= 12.0 && capability < 13.0) }'; then
+    echo "GPU compute capability ${HOST_GPU_ARCH:-unknown} does not match the prebuilt sm_120 quality image. Override AUTOPHOTOGRAMMETRY_IMAGE/CUDA_ARCH only with another explicitly built image." >&2
     return 1
   fi
 }
 
 run_gpu() {
+  mkdir -p "$ROOT/input" "$ROOT/output"
   docker run --rm --gpus all --shm-size=12g \
     --user "$(id -u):$(id -g)" \
     -e HOME=/tmp \
     -e TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 \
-    -v "$ROOT:/workspace" \
-    -w /workspace \
+    -v "$ROOT/input:/workspace/input" \
+    -v "$ROOT/output:/workspace/output" \
+    -w /opt/autophotogrammetry \
     "$IMAGE" "$@"
 }
 
@@ -45,22 +72,26 @@ run_cpu() {
   docker run --rm \
     --user "$(id -u):$(id -g)" \
     -e HOME=/tmp \
-    -v "$ROOT:/workspace" \
-    -w /workspace \
+    -w /opt/autophotogrammetry \
     "$IMAGE" "$@"
 }
 
 doctor() {
   check_docker
   check_host_gpu
-  build_image
-  run_gpu python -c 'import importlib.metadata as m, shutil, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap >= (8, 6), f"Expected sm_86+, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; import gsplat; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
+  ensure_image
+  run_gpu python -c 'import importlib.metadata as m, shutil, subprocess, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap[0] == 12, f"Expected compute capability 12.x, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; rev=subprocess.run(["git","-C","/opt/nerfstudio","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev == "50e0e3c70c775e89333256213363badbf074f29d", rev; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio_revision": rev, "nerfstudio_package": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
 }
 
 case "${1:-run}" in
   image)
     check_docker
+    check_host_gpu
     build_image
+    ;;
+  pull)
+    check_docker
+    pull_image
     ;;
   doctor)
     doctor
@@ -72,13 +103,26 @@ case "${1:-run}" in
     ;;
   run)
     doctor
-    mkdir -p "$ROOT/input" "$ROOT/output"
-    run_gpu python main.py huejotzingo
+    run_gpu python main.py huejotzingo --input-root /workspace/input --output-root /workspace/output
     ;;
   run-all)
     doctor
-    mkdir -p "$ROOT/input" "$ROOT/output"
-    run_gpu python main.py batch
+    run_gpu python main.py batch --input-root /workspace/input --output-root /workspace/output
+    ;;
+  quality)
+    scene="${2:-huejotzingo}"
+    iterations="${3:-30000}"
+    data="$ROOT/output/$scene/nerfstudio-data"
+    if [[ ! -f "$data/transforms.json" ]]; then
+      echo "Prepared Nerfstudio dataset is missing: $data/transforms.json" >&2
+      echo "Quality execution is intentionally GPU-only and will not rerun download/FFmpeg/COLMAP. Use an existing prepared dataset." >&2
+      exit 1
+    fi
+    doctor
+    run_gpu python -m processing.quality_sweep \
+      --data "/workspace/output/$scene/nerfstudio-data" \
+      --output-root "/workspace/output/$scene/quality-sweep" \
+      --iterations "$iterations"
     ;;
   clean)
     find "$ROOT/output" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
@@ -87,7 +131,7 @@ case "${1:-run}" in
     find "$ROOT/output" "$ROOT/input" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   *)
-    echo "usage: ./task {run|run-all|doctor|test|image|clean|clean-all}" >&2
+    echo "usage: ./task {run|run-all|quality [scene-id] [iterations]|doctor|pull|test|image|clean|clean-all}" >&2
     exit 2
     ;;
 esac
