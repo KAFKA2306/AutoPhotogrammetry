@@ -100,6 +100,20 @@ metadata
      train / export / PSNR / SSIM / LPIPS / PLY hash
 ```
 
+### 現在の実測状態
+
+2026-08-20時点で、commit [`1fa7f35`](https://github.com/KAFKA2306/AutoPhotogrammetry/commit/1fa7f35b1fc9fce669f97d5ec7c7f46ce4601206) に **9件の実Gaussian Splat PLY** が存在します。最終展示要件は20件なので、完成状態ではありません。
+
+- 実PLY: **9 / 20**
+- Huejotzingo PLY: **38,085,465 bytes**
+- Huejotzingo SHA-256: `6dc1d2546ab848eee4587fdaaebe1b60b1f2495f8a9a9b6a58de9356222c4571`
+- 20展示の完成authority: [Issue #33](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/33)
+- 1本のsource-to-PLY lineage完成authority: [Issue #15](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/15)
+
+既存9 PLYの存在・代表PLYのsize/hashは確認済みですが、古いHuejotzingo run directoryにはtraining config/checkpoint/logが残っていないため、その過去runのexact `ns-train` / `ns-export` lineageを後から復元したとは扱いません。現在のrunnerは次回runからtool version、command、return code、config/checkpoint、PLY hash/sizeをmanifestへ保存します。
+
+今後生成する大容量PLYは通常のGit履歴へ追加せず、`output/**/runs/**/export/*.ply` を生成artifactとして扱います。
+
 現在のdefaultは `huejotzingo` です。registryの20本をすべて処理する場合は次を実行します。
 
 ```bash
