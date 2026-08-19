@@ -1,12 +1,17 @@
 FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG CUDA_ARCH_LIST=8.6
+ARG CUDA_ARCH_LIST=12.0
+ARG NERFSTUDIO_REVISION=50e0e3c70c775e89333256213363badbf074f29d
+ARG GSPLAT_REVISION=v1.4.0
 ENV CUDA_HOME=/usr/local/cuda \
     TORCH_CUDA_ARCH_LIST=${CUDA_ARCH_LIST} \
     TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 \
     MAX_JOBS=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
+
+LABEL org.opencontainers.image.source="https://github.com/KAFKA2306/AutoPhotogrammetry" \
+      org.opencontainers.image.description="Pinned AutoPhotogrammetry CUDA environment for Splatfacto quality experiments"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -26,14 +31,21 @@ RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel \
         torch==2.7.1 torchvision==0.22.1 \
         --index-url https://download.pytorch.org/whl/cu128
 
-RUN git clone --depth 1 --branch v1.4.0 --recurse-submodules --shallow-submodules \
+RUN git clone --depth 1 --branch "${GSPLAT_REVISION}" --recurse-submodules --shallow-submodules \
         https://github.com/nerfstudio-project/gsplat.git /tmp/gsplat \
     && python -m pip install --no-cache-dir --no-build-isolation /tmp/gsplat \
-    && rm -rf /tmp/gsplat \
-    && python -m pip install --no-cache-dir nerfstudio==1.1.5
+    && rm -rf /tmp/gsplat
+
+RUN git init /opt/nerfstudio \
+    && git -C /opt/nerfstudio remote add origin https://github.com/nerfstudio-project/nerfstudio.git \
+    && git -C /opt/nerfstudio fetch --depth 1 origin "${NERFSTUDIO_REVISION}" \
+    && git -C /opt/nerfstudio checkout --detach FETCH_HEAD \
+    && test "$(git -C /opt/nerfstudio rev-parse HEAD)" = "${NERFSTUDIO_REVISION}" \
+    && python -m pip install --no-cache-dir /opt/nerfstudio
 
 COPY requirements.txt /tmp/requirements.txt
 RUN python -m pip install --no-cache-dir -r /tmp/requirements.txt \
     && python -m pip check
 
-WORKDIR /workspace
+COPY . /opt/autophotogrammetry
+WORKDIR /opt/autophotogrammetry
