@@ -130,6 +130,20 @@ def dominant_plane(pts, seed, iterations=700, distance_ratio=0.006):
     return normal, center, float(len(inliers) / len(pts)), float(np.sqrt(np.mean(residual ** 2))), threshold
 
 
+def _axis_diagnostics(angles):
+    nearest = min(angles, key=angles.get)
+    return {
+        "axis_angles_deg": angles,
+        "nearest_axis": nearest,
+        "nearest_axis_tilt_deg": angles[nearest],
+        # Raw PLY produced by the pinned Nerfstudio path is a +Z-up model frame.
+        "nerfstudio_z_up_angle_deg": angles["z"],
+        # Retained for comparison with the first diagnostic run. This is NOT a correction angle.
+        "raw_unity_y_axis_angle_deg": angles["y"],
+        "y_up_tilt_deg": angles["y"],
+    }
+
+
 def analyze(path: Path, max_points: int):
     pts, total = sample_xyz(path, max_points)
     pts = robust_core(pts)
@@ -138,23 +152,21 @@ def analyze(path: Path, max_points: int):
     normal, center, inlier_ratio, rms, threshold = dominant_plane(pts, seed)
     pa = axis_angles(normal)
     ga = axis_angles(thin)
-    pn = min(pa, key=pa.get)
-    gn = min(ga, key=ga.get)
     parts = path.parts
     scene = parts[parts.index("output") + 1]
+    plane_diag = _axis_diagnostics(pa)
+    global_diag = _axis_diagnostics(ga)
     return {
         "scene": scene,
         "path": path.as_posix(),
         "vertex_count": total,
         "sample_count": int(len(pts)),
         "dominant_plane": {
-            "normal": normal.tolist(), "center": center.tolist(), "axis_angles_deg": pa,
-            "nearest_axis": pn, "nearest_axis_tilt_deg": pa[pn], "y_up_tilt_deg": pa["y"],
+            "normal": normal.tolist(), "center": center.tolist(), **plane_diag,
             "inlier_ratio": inlier_ratio, "rms_residual": rms, "distance_threshold": threshold,
         },
         "global_pca": {
-            "thin_axis": thin.tolist(), "axis_angles_deg": ga, "nearest_axis": gn,
-            "nearest_axis_tilt_deg": ga[gn], "y_up_tilt_deg": ga["y"], "eigenvalues": evals.tolist(),
+            "thin_axis": thin.tolist(), **global_diag, "eigenvalues": evals.tolist(),
         },
         "plane_vs_global_thin_axis_deg": plane_angle(normal, thin),
     }
@@ -175,8 +187,24 @@ def main():
         r = analyze(path, args.max_points)
         results.append(r)
         p, g = r["dominant_plane"], r["global_pca"]
-        print(f'{r["scene"]}: plane={p["nearest_axis"]}+{p["nearest_axis_tilt_deg"]:.3f}deg Y-up={p["y_up_tilt_deg"]:.3f}deg inliers={p["inlier_ratio"]:.3f}; global={g["nearest_axis"]}+{g["nearest_axis_tilt_deg"]:.3f}deg Y-up={g["y_up_tilt_deg"]:.3f}deg consistency={r["plane_vs_global_thin_axis_deg"]:.3f}deg')
-    payload = {"schema_version": 1, "source_commit": args.source_commit, "method": "uniform-sample+robust-core+RANSAC-plane+global-PCA", "count": len(results), "results": results}
+        print(
+            f'{r["scene"]}: plane={p["nearest_axis"]}+{p["nearest_axis_tilt_deg"]:.3f}deg '
+            f'NS-Z-up={p["nerfstudio_z_up_angle_deg"]:.3f}deg raw-Y={p["raw_unity_y_axis_angle_deg"]:.3f}deg '
+            f'inliers={p["inlier_ratio"]:.3f}; global={g["nearest_axis"]}+{g["nearest_axis_tilt_deg"]:.3f}deg '
+            f'NS-Z-up={g["nerfstudio_z_up_angle_deg"]:.3f}deg consistency={r["plane_vs_global_thin_axis_deg"]:.3f}deg'
+        )
+    payload = {
+        "schema_version": 2,
+        "source_commit": args.source_commit,
+        "method": "uniform-sample+robust-core+RANSAC-plane+global-PCA",
+        "coordinate_interpretation": {
+            "raw_ply_frame": "pinned Nerfstudio model/world frame: +X right, +Y back, +Z up",
+            "nerfstudio_z_up_angle_deg": "geometry diagnostic against raw-frame +Z; semantic ground is not inferred",
+            "raw_unity_y_axis_angle_deg": "legacy direct angle against +Y; not a physical tilt or correction angle",
+        },
+        "count": len(results),
+        "results": results,
+    }
     Path(args.output).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"measured={len(results)} output={args.output}")
 
