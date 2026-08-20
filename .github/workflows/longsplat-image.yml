@@ -1,0 +1,56 @@
+name: LongSplat Image
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile.longsplat
+      - requirements.txt
+      - processing/longsplat_backend.py
+      - processing/external_research.py
+      - .github/workflows/longsplat-image.yml
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile.longsplat
+      - requirements.txt
+      - processing/longsplat_backend.py
+      - processing/external_research.py
+      - .github/workflows/longsplat-image.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.longsplat
+          push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
+          tags: |
+            ghcr.io/kafka2306/autophotogrammetry:longsplat-1975077-sm120-v1
+            ghcr.io/kafka2306/autophotogrammetry:longsplat-sha-${{ github.sha }}
+          build-args: |
+            LONGSPLAT_REVISION=19750775a9d19f30aa05a8333c4c6c231b2d5f4a
+            PYTORCH3D_REVISION=33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Verify research image contract
+        if: github.event_name == 'pull_request'
+        run: |
+          docker run --rm ghcr.io/kafka2306/autophotogrammetry:longsplat-1975077-sm120-v1 \
+            python -c 'import subprocess,torch,torch_scatter,pytorch3d,diff_gaussian_rasterization,fused_ssim; from simple_knn import _C; rev=subprocess.run(["git","-C","/opt/longsplat","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev=="19750775a9d19f30aa05a8333c4c6c231b2d5f4a"; assert torch.__version__.startswith("2.7.1"); print({"revision":rev,"pytorch3d_revision":"33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba","torch":torch.__version__,"cuda":torch.version.cuda})'
