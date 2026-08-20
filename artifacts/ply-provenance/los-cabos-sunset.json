@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "scene_id": "los-cabos-sunset",
+  "status": "success",
+  "generated_at": "2026-08-20T03:00:39.552305+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "source_page": "https://commons.wikimedia.org/wiki/File:Aerial_views_of_Los_Cabo,_San_Lucas,_Mexico_at_sunset_including_El_Arco,_Lands_End_and_ocean_views.webm",
+    "variant": "Wikimedia Commons 1080p VP9 transcode",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/74/Aerial_views_of_Los_Cabo%2C_San_Lucas%2C_Mexico_at_sunset_including_El_Arco%2C_Lands_End_and_ocean_views.webm/Aerial_views_of_Los_Cabo%2C_San_Lucas%2C_Mexico_at_sunset_including_El_Arco%2C_Lands_End_and_ocean_views.webm.1080p.vp9.webm",
+    "original_sha1": "f78f57453e589089a7b135d31a829dabd8cf3549",
+    "original_size_bytes": 1176492467,
+    "sha256": "1087cb78550d097108f1f3a0dc80fc7f4ec834301ad378feba178e597ab84b86",
+    "sha1": "4f532a5ca36dc826a13fc69f1037ebee603ea63f",
+    "size_bytes": 366371319,
+    "frame_count": 192,
+    "selected_frame_count": 191,
+    "registered_images": 20,
+    "registration_ratio": 0.10471204188481675,
+    "sparse_points": 8296,
+    "mean_reprojection_error_px": 0.259116,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/los-cabos-sunset/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T02:59:19.726192+00:00",
+    "finished_at": "2026-08-20T03:00:24.783515+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/los-cabos-sunset/runs/splatfacto/20260820T025919Z-83e79dd5/export/splat.ply",
+    "sha256": "2af0d44ab7aa29d3da8a2538dbd0f4ae511ec247bd8375f72e023e33b4c7c806",
+    "size_bytes": 19791992,
+    "primitive_count": 79800,
+    "low_opacity_primitive_count": 3082,
+    "low_opacity_primitive_ratio": 0.03862155388471178,
+    "scale_anisotropy_above_10_count": 30944,
+    "scale_anisotropy_above_10_ratio": 0.38776942355889726,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
