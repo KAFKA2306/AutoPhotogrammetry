@@ -22,6 +22,21 @@ class ExhibitionManifestTests(unittest.TestCase):
             },
         }
 
+    def _registry(self, sources: list[dict]) -> dict:
+        return {
+            "schema_version": 2,
+            "default": sources[0]["id"],
+            "evaluation_policy": {
+                "stages": {
+                    "metadata": {},
+                    "preflight": {},
+                    "colmap": {},
+                    "splat": {},
+                }
+            },
+            "videos": sources,
+        }
+
     def _write_scene(self, root: Path, source: dict) -> None:
         scene = root / source["id"]
         selected = scene / "selected"
@@ -78,7 +93,7 @@ class ExhibitionManifestTests(unittest.TestCase):
             metrics = {"primitive_count": 123}
             with patch(
                 "processing.exhibition_manifest.load_video_registry",
-                return_value=sources,
+                return_value=self._registry(sources),
             ), patch(
                 "processing.exhibition_manifest.gaussian_ply_metrics",
                 return_value=metrics,
@@ -106,11 +121,19 @@ class ExhibitionManifestTests(unittest.TestCase):
             sources = [self._source(index) for index in range(1, 21)]
             for source in sources:
                 self._write_scene(root, source)
-            missing = root / "scene-20" / "runs" / "splatfacto" / "run" / "export" / "splat.ply"
+            missing = (
+                root
+                / "scene-20"
+                / "runs"
+                / "splatfacto"
+                / "run"
+                / "export"
+                / "splat.ply"
+            )
             missing.unlink()
             with patch(
                 "processing.exhibition_manifest.load_video_registry",
-                return_value=sources,
+                return_value=self._registry(sources),
             ), patch(
                 "processing.exhibition_manifest.gaussian_ply_metrics",
                 return_value={"primitive_count": 1},
@@ -123,7 +146,7 @@ class ExhibitionManifestTests(unittest.TestCase):
         sources = [self._source(index) for index in range(1, 20)]
         with tempfile.TemporaryDirectory() as tmp, patch(
             "processing.exhibition_manifest.load_video_registry",
-            return_value=sources,
+            return_value=self._registry(sources),
         ):
             with self.assertRaisesRegex(ValueError, "exactly 20"):
                 build_final_exhibition_manifest("registry.json", tmp)
@@ -137,7 +160,7 @@ class ExhibitionManifestTests(unittest.TestCase):
                 self._write_scene(root, source)
             with patch(
                 "processing.exhibition_manifest.load_video_registry",
-                return_value=sources,
+                return_value=self._registry(sources),
             ), patch(
                 "processing.exhibition_manifest.gaussian_ply_metrics",
                 return_value={"primitive_count": 1},
