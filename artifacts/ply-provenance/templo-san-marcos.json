@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "scene_id": "templo-san-marcos",
+  "status": "success",
+  "generated_at": "2026-08-20T00:25:06.169838+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "4c7732429b0e7d744d76078f88ac73ea575bc878d76fbf014d0cfa880a7cae68",
+    "sha1": "958dc6fa17eaa7874e8b4a3a3b7f18e6722516dc",
+    "frame_count": 48,
+    "selected_frame_count": 48,
+    "registered_images": 48,
+    "sparse_points": 23225,
+    "mean_reprojection_error_px": 0.37627,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/templo-san-marcos/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T00:23:39.006174+00:00",
+    "finished_at": "2026-08-20T00:24:50.119916+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/templo-san-marcos/runs/splatfacto/20260820T002338Z-818d82fd/export/splat.ply",
+    "sha256": "978dfc0909e5b615aceddcbe238ec9c20bf674dcb64aa7296f21320b4a2bb461",
+    "size_bytes": 35077721,
+    "primitive_count": 141436,
+    "low_opacity_primitive_count": 5854,
+    "low_opacity_primitive_ratio": 0.04138974518510139,
+    "scale_anisotropy_above_10_count": 22238,
+    "scale_anisotropy_above_10_ratio": 0.15723012528634858,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}

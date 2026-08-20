@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scene_id": "fachada-san-francisco-javier",
+  "status": "success",
+  "generated_at": "2026-08-20T01:51:14.425192+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "990cfbfa7e11cfcb6299b6924caaf75af590ac4935a5845839b16d59b8a92bea",
+    "sha1": "f20107b760886a59cc209a9c7194aa41ab4b72f3",
+    "frame_count": 30,
+    "selected_frame_count": 30,
+    "registered_images": 30,
+    "registration_ratio": 1.0,
+    "sparse_points": 11302,
+    "mean_reprojection_error_px": 0.445519,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/fachada-san-francisco-javier/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T01:49:53.513799+00:00",
+    "finished_at": "2026-08-20T01:50:58.332298+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/fachada-san-francisco-javier/runs/splatfacto/20260820T014953Z-43148c7b/export/splat.ply",
+    "sha256": "fa6e8dfa586a5ab584bbccfebbbc865ddaae0337b9f42a4261189cdef8a8bf0b",
+    "size_bytes": 29423073,
+    "primitive_count": 118635,
+    "low_opacity_primitive_count": 8418,
+    "low_opacity_primitive_ratio": 0.07095713743836136,
+    "scale_anisotropy_above_10_count": 21394,
+    "scale_anisotropy_above_10_ratio": 0.18033463986176088,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}

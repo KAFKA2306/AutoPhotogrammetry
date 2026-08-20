@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scene_id": "la-pona-fire-2025",
+  "status": "success",
+  "generated_at": "2026-08-20T03:11:33.715744+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "59e592aab33883fa36390fd245052d305282afc9bea47e0e8d0f6feb5ceff62a",
+    "sha1": "10f2f014b2ee605ee7c213ada942a65097328590",
+    "frame_count": 87,
+    "selected_frame_count": 87,
+    "registered_images": 86,
+    "registration_ratio": 0.9885057471264368,
+    "sparse_points": 42569,
+    "mean_reprojection_error_px": 0.984802,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/la-pona-fire-2025/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T03:10:06.432217+00:00",
+    "finished_at": "2026-08-20T03:11:15.156443+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/la-pona-fire-2025/runs/splatfacto/20260820T031006Z-fa117497/export/splat.ply",
+    "sha256": "ee8b4a6042bb3da497e979c7abdcce8bec57880850225c00a99c040fa6a33723",
+    "size_bytes": 60246249,
+    "primitive_count": 242922,
+    "low_opacity_primitive_count": 19162,
+    "low_opacity_primitive_ratio": 0.07888128699747243,
+    "scale_anisotropy_above_10_count": 12212,
+    "scale_anisotropy_above_10_ratio": 0.050271280493327075,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}

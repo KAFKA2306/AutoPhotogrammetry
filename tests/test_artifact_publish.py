@@ -72,6 +72,18 @@ class ArtifactPublishTest(unittest.TestCase):
             with self.assertRaisesRegex(ArtifactPublishError, "HF_CACHE_HUB_ROOT"):
                 _hf_cache_command(None)
 
+    def test_hf_cache_hub_python_can_be_selected_explicitly(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            script = root / "scripts" / "artifact_manager.py"
+            script.parent.mkdir()
+            script.write_text("# cli", encoding="utf-8")
+            with patch.dict(os.environ, {"HF_CACHE_HUB_PYTHON": "/opt/hf/bin/python"}, clear=True):
+                self.assertEqual(
+                    ["/opt/hf/bin/python", str(script)],
+                    _hf_cache_command(root),
+                )
+
     def test_publish_uses_generation_time_revision_without_git_lookup(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

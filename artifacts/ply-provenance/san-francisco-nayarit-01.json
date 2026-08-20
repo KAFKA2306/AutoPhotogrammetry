@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scene_id": "san-francisco-nayarit-01",
+  "status": "success",
+  "generated_at": "2026-08-20T00:45:15.125312+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "0d9a80047976aca69050701cf60d664cde230f873a86b4d4e7ee264793454922",
+    "sha1": "7cae6b7d1e916914818fc34f90a5ececb97d8ce1",
+    "frame_count": 73,
+    "selected_frame_count": 73,
+    "registered_images": 71,
+    "registration_ratio": 0.9726027397260274,
+    "sparse_points": 13204,
+    "mean_reprojection_error_px": 0.436023,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/san-francisco-nayarit-01/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T00:43:53.582850+00:00",
+    "finished_at": "2026-08-20T00:44:58.854642+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/san-francisco-nayarit-01/runs/splatfacto/20260820T004353Z-1c07f1c9/export/splat.ply",
+    "sha256": "0b236b57a0649f5c07e34ec6469251ccac015519a25817bbf3e60d8b00d56ea8",
+    "size_bytes": 37524737,
+    "primitive_count": 151303,
+    "low_opacity_primitive_count": 7137,
+    "low_opacity_primitive_ratio": 0.04717024778094288,
+    "scale_anisotropy_above_10_count": 35544,
+    "scale_anisotropy_above_10_ratio": 0.23491933405153897,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}

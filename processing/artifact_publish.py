@@ -79,7 +79,8 @@ def _hf_cache_command(hf_cache_hub_root: str | Path | None) -> list[str]:
     script = root / "scripts" / "artifact_manager.py"
     if not script.is_file():
         raise ArtifactPublishError(f"hf-cache-hub artifact CLI not found: {script}")
-    return [sys.executable, str(script)]
+    python_executable = os.environ.get("HF_CACHE_HUB_PYTHON") or sys.executable
+    return [python_executable, str(script)]
 
 
 def build_artifact_manifest(
