@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import subprocess
+import threading
 import uuid
 from datetime import datetime, timezone
 from importlib import metadata
@@ -132,6 +133,162 @@ def _run_recorded_command(
         return subprocess.CompletedProcess(list(command), 124, stdout, stderr)
 
 
+def _descendant_pids(root_pid: int) -> set[int]:
+    """Return a best-effort Linux process-tree snapshot rooted at root_pid."""
+    seen = {root_pid}
+    pending = [root_pid]
+    while pending:
+        pid = pending.pop()
+        children_path = Path(f"/proc/{pid}/task/{pid}/children")
+        try:
+            children = children_path.read_text(encoding="utf-8").split()
+        except OSError:
+            continue
+        for value in children:
+            try:
+                child = int(value)
+            except ValueError:
+                continue
+            if child not in seen:
+                seen.add(child)
+                pending.append(child)
+    return seen
+
+
+def _namespace_visible_pids(pids: set[int]) -> set[int]:
+    """Include outer namespace PIDs so nvidia-smi output can match container processes."""
+    visible = set(pids)
+    for pid in list(pids):
+        status_path = Path(f"/proc/{pid}/status")
+        try:
+            lines = status_path.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            continue
+        for line in lines:
+            if not line.startswith("NSpid:"):
+                continue
+            for value in line.split(":", 1)[1].split():
+                try:
+                    visible.add(int(value))
+                except ValueError:
+                    pass
+            break
+    return visible
+
+
+def _query_process_gpu_memory_bytes(root_pid: int, nvidia_smi: str) -> int | None:
+    """Measure framebuffer memory for the process tree when NVIDIA exposes it.
+
+    NVIDIA documents --query-compute-apps as the selective query for active compute
+    processes. Memory can be unavailable under some driver models, in which case this
+    function returns None rather than inventing a value.
+    """
+    visible_pids = _namespace_visible_pids(_descendant_pids(root_pid))
+    try:
+        result = subprocess.run(
+            [
+                nvidia_smi,
+                "--query-compute-apps=pid,used_gpu_memory",
+                "--format=csv,noheader,nounits",
+            ],
+            shell=False,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=2,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode != 0:
+        return None
+
+    total_mib = 0.0
+    found = False
+    for line in (result.stdout or "").splitlines():
+        fields = [field.strip() for field in line.split(",", 1)]
+        if len(fields) != 2:
+            continue
+        try:
+            pid = int(fields[0])
+        except ValueError:
+            continue
+        if pid not in visible_pids or fields[1].upper() in {"N/A", "[N/A]"}:
+            continue
+        try:
+            total_mib += float(fields[1])
+        except ValueError:
+            continue
+        found = True
+    if not found:
+        return None
+    return int(total_mib * 1024 * 1024)
+
+
+def _run_recorded_command_with_peak_gpu_memory(
+    command: Sequence[str],
+    *,
+    cwd: Path,
+    timeout: float | None,
+    env: Mapping[str, str] | None,
+    poll_seconds: float = 0.2,
+) -> tuple[subprocess.CompletedProcess[str], int | None]:
+    """Run a command and best-effort sample peak process-tree GPU memory.
+
+    If nvidia-smi is unavailable, preserve the normal subprocess.run path and return
+    an unmeasured peak (None). This keeps CPU-only CI deterministic.
+    """
+    nvidia_smi = shutil.which("nvidia-smi")
+    if nvidia_smi is None:
+        return (
+            _run_recorded_command(command, cwd=cwd, timeout=timeout, env=env),
+            None,
+        )
+
+    argv = list(map(str, command))
+    run_env = None if env is None else {**os.environ, **env}
+    process = subprocess.Popen(
+        argv,
+        shell=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        cwd=cwd,
+        env=run_env,
+    )
+    stop = threading.Event()
+    peak_gpu_memory_bytes: int | None = None
+
+    def monitor() -> None:
+        nonlocal peak_gpu_memory_bytes
+        while not stop.is_set():
+            measured = _query_process_gpu_memory_bytes(process.pid, nvidia_smi)
+            if measured is not None:
+                peak_gpu_memory_bytes = max(peak_gpu_memory_bytes or 0, measured)
+            if stop.wait(poll_seconds):
+                break
+
+    thread = threading.Thread(target=monitor, name="gpu-memory-monitor", daemon=True)
+    thread.start()
+    timed_out = False
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        process.kill()
+        stdout, stderr = process.communicate()
+    finally:
+        stop.set()
+        thread.join(timeout=max(1.0, poll_seconds * 4))
+
+    return_code = 124 if timed_out else process.returncode
+    if timed_out:
+        stderr = (stderr or "") + f"\nTimed out after {timeout} seconds."
+    return (
+        subprocess.CompletedProcess(argv, return_code, stdout or "", stderr or ""),
+        peak_gpu_memory_bytes,
+    )
+
+
 def _nerfstudio_input_images(data: Path) -> list[dict]:
     if data.is_dir():
         return image_records(data)
@@ -197,7 +354,7 @@ def run_nerfstudio_eval(
     stdout_path.write_text(completed.stdout or "", encoding="utf-8")
     stderr_path.write_text(completed.stderr or "", encoding="utf-8")
     record = {
-        "schema_version": 1,
+        "schema_version": 2,
         "command": command,
         "started_at": started_at,
         "finished_at": finished_at,
@@ -207,6 +364,7 @@ def run_nerfstudio_eval(
         "metrics_path": metrics_path.name,
         "render_output_path": renders_path.name,
         "metrics": None,
+        "renders": None,
     }
     if completed.returncode != 0:
         record["status"] = "failed"
@@ -235,9 +393,20 @@ def run_nerfstudio_eval(
             if not isinstance(value, (int, float)):
                 raise RuntimeError(f"ns-eval result {key} is not numeric: {value!r}")
             measured[key] = float(value)
+
+    renders = image_records(renders_path) if renders_path.is_dir() else []
+    if not renders:
+        record["status"] = "failed"
+        record["metrics"] = measured
+        record["raw_results"] = results
+        write_json(manifest_path, record)
+        raise RuntimeError("ns-eval succeeded but did not create any hold-out render images")
+
     record["status"] = "success"
     record["metrics"] = measured
     record["raw_results"] = results
+    record["renders"] = renders
+    record["render_count"] = len(renders)
     write_json(manifest_path, record)
     record["manifest_path"] = str(manifest_path)
     return record
@@ -273,8 +442,7 @@ def run_splatfacto_export(
             if version is None
         ]
         raise NerfstudioConfigurationError(
-            "Installed package version could not be resolved for: "
-            + ", ".join(missing)
+            "Installed package version could not be resolved for: " + ", ".join(missing)
         )
 
     run_id = f"{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}-{uuid.uuid4().hex[:8]}"
@@ -288,7 +456,7 @@ def run_splatfacto_export(
     input_images = _nerfstudio_input_images(data)
 
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "run_id": run_id,
         "status": "running",
         "input": {
@@ -311,7 +479,7 @@ def run_splatfacto_export(
         extra_args=train_extra_args,
     )
     train_started = _utc_now()
-    train_result = _run_recorded_command(
+    train_result, peak_gpu_memory_bytes = _run_recorded_command_with_peak_gpu_memory(
         train_command,
         cwd=run_dir,
         timeout=timeout,
@@ -329,6 +497,12 @@ def run_splatfacto_export(
         "stderr_log": train_stderr.name,
         "config_path": None,
         "checkpoint_path": None,
+        "peak_gpu_memory_bytes": peak_gpu_memory_bytes,
+        "gpu_memory_measurement": (
+            "nvidia-smi --query-compute-apps process-tree sampling"
+            if peak_gpu_memory_bytes is not None
+            else None
+        ),
     }
     if train_result.returncode != 0:
         manifest["status"] = "failed"
@@ -345,13 +519,9 @@ def run_splatfacto_export(
     if len(configs) != 1:
         manifest["status"] = "failed"
         manifest["failed_phase"] = "config_discovery"
-        manifest["config_candidates"] = [
-            str(path.relative_to(run_dir)) for path in configs
-        ]
+        manifest["config_candidates"] = [str(path.relative_to(run_dir)) for path in configs]
         write_json(manifest_path, manifest)
-        raise RuntimeError(
-            f"Expected exactly one Nerfstudio config, found {len(configs)}"
-        )
+        raise RuntimeError(f"Expected exactly one Nerfstudio config, found {len(configs)}")
     config_path = configs[0]
 
     checkpoints = sorted(
@@ -362,14 +532,10 @@ def run_splatfacto_export(
         manifest["status"] = "failed"
         manifest["failed_phase"] = "checkpoint_discovery"
         write_json(manifest_path, manifest)
-        raise RuntimeError(
-            "Nerfstudio training succeeded but no checkpoint was found"
-        )
+        raise RuntimeError("Nerfstudio training succeeded but no checkpoint was found")
     checkpoint_path = checkpoints[-1]
     manifest["training"]["config_path"] = str(config_path.relative_to(run_dir))
-    manifest["training"]["checkpoint_path"] = str(
-        checkpoint_path.relative_to(run_dir)
-    )
+    manifest["training"]["checkpoint_path"] = str(checkpoint_path.relative_to(run_dir))
 
     export_dir = run_dir / "export"
     export_dir.mkdir()
@@ -412,13 +578,9 @@ def run_splatfacto_export(
     if len(ply_files) != 1:
         manifest["status"] = "failed"
         manifest["failed_phase"] = "ply_discovery"
-        manifest["ply_candidates"] = [
-            str(path.relative_to(run_dir)) for path in ply_files
-        ]
+        manifest["ply_candidates"] = [str(path.relative_to(run_dir)) for path in ply_files]
         write_json(manifest_path, manifest)
-        raise RuntimeError(
-            f"Expected exactly one exported PLY, found {len(ply_files)}"
-        )
+        raise RuntimeError(f"Expected exactly one exported PLY, found {len(ply_files)}")
 
     ply_path = ply_files[0]
     manifest["status"] = "success"
