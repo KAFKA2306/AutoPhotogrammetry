@@ -2,16 +2,15 @@ import subprocess
 import unittest
 from unittest.mock import patch
 
-from processing.gpu_memory import ComputeMemoryMonitor, MIB, query_compute_memory
+from processing.gpu_memory import MIB, ComputeMemoryMonitor, query_compute_memory
 
 
 class GpuMemoryTests(unittest.TestCase):
     def test_query_compute_memory_sums_process_rows(self):
-        completed = subprocess.CompletedProcess(
-            ["nvidia-smi"], 0, "101, 256\n202, 1024\n", ""
-        )
-        with patch("processing.gpu_memory.shutil.which", return_value="/usr/bin/nvidia-smi"), patch(
-            "processing.gpu_memory.subprocess.run", return_value=completed
+        completed = subprocess.CompletedProcess(["nvidia-smi"], 0, "101, 256\n202, 1024\n", "")
+        with (
+            patch("processing.gpu_memory.shutil.which", return_value="/usr/bin/nvidia-smi"),
+            patch("processing.gpu_memory.subprocess.run", return_value=completed),
         ):
             result = query_compute_memory()
         self.assertEqual(result, {"process_count": 2, "total_bytes": 1280 * MIB})

@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import argparse
@@ -7,9 +6,10 @@ import json
 import re
 import unicodedata
 from collections import deque
+from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Protocol
 from urllib.parse import quote, urlparse
 
 import requests
@@ -86,6 +86,8 @@ def _duration_from_commonmetadata(value: object) -> float | None:
             if name not in {"length", "duration"}:
                 continue
             raw = item.get("value")
+            if not isinstance(raw, (str, int, float)):
+                continue
             try:
                 result = float(raw)
                 if result >= 0:
@@ -97,7 +99,10 @@ def _duration_from_commonmetadata(value: object) -> float | None:
 
 def _license_review_state(categories: Sequence[str], name: str | None, url: str | None) -> str:
     lowered = [category.lower() for category in categories]
-    if any("license review" in category and ("needed" in category or "pending" in category) for category in lowered):
+    if any(
+        "license review" in category and ("needed" in category or "pending" in category)
+        for category in lowered
+    ):
         return "needs_review"
     if name and url:
         return "verified"
@@ -120,7 +125,9 @@ def persist_snapshot(path: str | Path, payload: Mapping[str, Any]) -> bool:
         if _content_without_generated_at(previous) == _content_without_generated_at(incoming):
             return False
     incoming["generated_at"] = utc_now()
-    destination.write_text(json.dumps(incoming, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    destination.write_text(
+        json.dumps(incoming, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     return True
 
 
@@ -161,25 +168,33 @@ def load_seed_config(path: str | Path = DEFAULT_SEEDS) -> dict[str, Any]:
     return payload
 
 
+class CategoryClient(Protocol):
+    def category_members(self, category: str) -> list[dict[str, Any]]: ...
+
+
 class MediaWikiClient:
-    def __init__(self, *, timeout: float = 45.0, user_agent: str = "AutoPhotogrammetry/0.7") -> None:
+    def __init__(
+        self, *, timeout: float = 45.0, user_agent: str = "AutoPhotogrammetry/0.7"
+    ) -> None:
         self.timeout = timeout
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": user_agent})
 
-    def get_json(self, params: Mapping[str, object]) -> dict[str, Any]:
+    def get_json(self, params: Mapping[str, Any]) -> dict[str, Any]:
         response = self.session.get(WIKIMEDIA_API, params=params, timeout=self.timeout)
         response.raise_for_status()
         payload = response.json()
         if not isinstance(payload, dict) or payload.get("error"):
-            raise RuntimeError(f"MediaWiki API error: {payload.get('error') if isinstance(payload, dict) else payload}")
+            raise RuntimeError(
+                f"MediaWiki API error: {payload.get('error') if isinstance(payload, dict) else payload}"
+            )
         return payload
 
     def category_members(self, category: str) -> list[dict[str, Any]]:
         members: list[dict[str, Any]] = []
         continuation: str | None = None
         while True:
-            params: dict[str, object] = {
+            params: dict[str, Any] = {
                 "action": "query",
                 "format": "json",
                 "formatversion": 2,
@@ -230,9 +245,21 @@ class MediaWikiClient:
             if isinstance(item, Mapping) and item.get("title")
         ]
         metadata = info.get("extmetadata") or {}
-        author = _plain_text((metadata.get("Artist") or {}).get("value")) if isinstance(metadata, Mapping) else None
-        license_name = _plain_text((metadata.get("LicenseShortName") or {}).get("value")) if isinstance(metadata, Mapping) else None
-        license_url = _plain_text((metadata.get("LicenseUrl") or {}).get("value")) if isinstance(metadata, Mapping) else None
+        author = (
+            _plain_text((metadata.get("Artist") or {}).get("value"))
+            if isinstance(metadata, Mapping)
+            else None
+        )
+        license_name = (
+            _plain_text((metadata.get("LicenseShortName") or {}).get("value"))
+            if isinstance(metadata, Mapping)
+            else None
+        )
+        license_url = (
+            _plain_text((metadata.get("LicenseUrl") or {}).get("value"))
+            if isinstance(metadata, Mapping)
+            else None
+        )
         duration = _duration_from_commonmetadata(info.get("commonmetadata"))
         rest = {}
         if duration is None or not info.get("width") or not info.get("height"):
@@ -286,7 +313,7 @@ class MediaWikiClient:
 
 
 def enumerate_region_files(
-    client: MediaWikiClient,
+    client: CategoryClient,
     region: Mapping[str, Any],
 ) -> tuple[dict[str, set[str]], list[dict[str, str]], int]:
     files: dict[str, set[str]] = {}
@@ -334,7 +361,9 @@ def enumerate_region_files(
     return files, failures, reachable_seed_count
 
 
-def stage_a_gate(candidate: Mapping[str, Any], *, minimum_duration_seconds: float) -> dict[str, Any]:
+def stage_a_gate(
+    candidate: Mapping[str, Any], *, minimum_duration_seconds: float
+) -> dict[str, Any]:
     license_record = candidate.get("license")
     resolution = candidate.get("resolution")
     checks = {
@@ -378,7 +407,9 @@ def discover(
         files, region_failures, reachable_seed_count = enumerate_region_files(client, region)
         failures.extend(region_failures)
         region_stats[region_id] = {
-            "configured_seed_count": sum(1 for seed in region["seeds"] if seed["state"] == "active"),
+            "configured_seed_count": sum(
+                1 for seed in region["seeds"] if seed["state"] == "active"
+            ),
             "reachable_seed_count": reachable_seed_count,
             "discovered_file_count": len(files),
         }
@@ -409,11 +440,16 @@ def discover(
             )
             continue
 
-        is_video = str(info.get("mime") or "").startswith("video/") or str(info.get("mediatype") or "").upper() == "VIDEO"
+        is_video = (
+            str(info.get("mime") or "").startswith("video/")
+            or str(info.get("mediatype") or "").upper() == "VIDEO"
+        )
         if not is_video:
             continue
         media_url = str(info["media_url"]) if info.get("media_url") else None
-        downloadable = client.is_downloadable(media_url) if check_downloadability and media_url else None
+        downloadable = (
+            client.is_downloadable(media_url) if check_downloadability and media_url else None
+        )
         candidate = {
             "id": _stable_id(str(info["canonical_title"])),
             "status": "discovered",
@@ -457,8 +493,12 @@ def discover(
         "seed_config": str(Path(seed_path).as_posix()),
         "minimum_duration_seconds": minimum_duration,
         "regions": [str(region["id"]) for region in config["regions"]],
-        "candidates": sorted(normalized, key=lambda item: (item["regions"], item["canonical_file_title"])),
-        "discovery_failures": sorted(failures, key=lambda item: (item["region"], item["category"], item["error"])),
+        "candidates": sorted(
+            normalized, key=lambda item: (item["regions"], item["canonical_file_title"])
+        ),
+        "discovery_failures": sorted(
+            failures, key=lambda item: (item["region"], item["category"], item["error"])
+        ),
     }
     coverage = build_coverage(pool, config, region_stats)
     return pool, coverage
@@ -483,7 +523,8 @@ def build_coverage(
         region_failures = [
             failure
             for failure in failures
-            if isinstance(failure, Mapping) and region_id in str(failure.get("region") or "").split(",")
+            if isinstance(failure, Mapping)
+            and region_id in str(failure.get("region") or "").split(",")
         ]
         stats = region_stats.get(region_id, {})
         active_seeds = [seed for seed in region["seeds"] if seed["state"] == "active"]
@@ -509,10 +550,14 @@ def build_coverage(
                 and candidate["license"].get("status") == "verified"
             ),
             "stage_a_pass_count": sum(
-                1 for candidate in region_candidates if (candidate.get("stage_a") or {}).get("eligible_for_preflight")
+                1
+                for candidate in region_candidates
+                if (candidate.get("stage_a") or {}).get("eligible_for_preflight")
             ),
             "stage_a_fail_count": sum(
-                1 for candidate in region_candidates if not (candidate.get("stage_a") or {}).get("eligible_for_preflight")
+                1
+                for candidate in region_candidates
+                if not (candidate.get("stage_a") or {}).get("eligible_for_preflight")
             ),
             "discovery_failure_count": len(region_failures),
             "missing_seed_count": sum(1 for seed in region["seeds"] if seed["state"] == "missing"),
@@ -525,7 +570,9 @@ def build_coverage(
         "totals": {
             "candidate_count": len(candidates),
             "stage_a_pass_count": sum(
-                1 for candidate in candidates if (candidate.get("stage_a") or {}).get("eligible_for_preflight")
+                1
+                for candidate in candidates
+                if (candidate.get("stage_a") or {}).get("eligible_for_preflight")
             ),
             "discovery_failure_count": len(failures),
         },
@@ -621,7 +668,9 @@ def promote_candidate(
             "metadata_evidence",
         ):
             existing[key] = entry[key]
-    registry_file.write_text(json.dumps(registry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    registry_file.write_text(
+        json.dumps(registry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     return entry
 
 
@@ -644,7 +693,9 @@ def materialize_and_preflight(
         source_path,
         url=str(candidate["media_url"]),
         expected_sha1=str(candidate["source_sha1"]) if candidate.get("source_sha1") else None,
-        expected_size=int(candidate["source_size_bytes"]) if candidate.get("source_size_bytes") else None,
+        expected_size=int(candidate["source_size_bytes"])
+        if candidate.get("source_size_bytes")
+        else None,
     )
     registry_file = Path(registry_path)
     registry = json.loads(registry_file.read_text(encoding="utf-8"))
@@ -654,7 +705,9 @@ def materialize_and_preflight(
     evidence["downloaded_size_bytes"] = source_path.stat().st_size
     evidence["sha256_verified_from_downloaded_bytes"] = True
     source["metadata_evidence"] = evidence
-    registry_file.write_text(json.dumps(registry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    registry_file.write_text(
+        json.dumps(registry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
     result_path = Path(output_root) / source_id / "preflight.json"
     result = run_video_preflight(source_path, result_path)
@@ -669,7 +722,9 @@ def materialize_and_preflight(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Discover and gate Nordic Wikimedia video candidates.")
+    parser = argparse.ArgumentParser(
+        description="Discover and gate Nordic Wikimedia video candidates."
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     discover_parser = subparsers.add_parser("discover")
@@ -699,22 +754,65 @@ def main() -> None:
     if args.command == "discover":
         pool, coverage = discover(args.seeds, check_downloadability=not args.skip_download_check)
         if pool["discovery_failures"] and not args.allow_partial:
-            print(json.dumps({"status": "failed", "failure_count": len(pool["discovery_failures"]), "failures": pool["discovery_failures"]}, ensure_ascii=False, indent=2))
+            print(
+                json.dumps(
+                    {
+                        "status": "failed",
+                        "failure_count": len(pool["discovery_failures"]),
+                        "failures": pool["discovery_failures"],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                )
+            )
             raise SystemExit(2)
         pool_changed = persist_snapshot(args.pool, pool)
         coverage_changed = persist_snapshot(args.coverage, coverage)
-        print(json.dumps({"pool_changed": pool_changed, "coverage_changed": coverage_changed, "candidate_count": len(pool["candidates"]), "stage_a_pass_count": coverage["totals"]["stage_a_pass_count"]}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "pool_changed": pool_changed,
+                    "coverage_changed": coverage_changed,
+                    "candidate_count": len(pool["candidates"]),
+                    "stage_a_pass_count": coverage["totals"]["stage_a_pass_count"],
+                },
+                indent=2,
+            )
+        )
     elif args.command == "validate":
         seeds = load_seed_config(args.seeds)
         pool = load_pool(args.pool)
         coverage = build_coverage(pool, seeds)
         if [row["region"] for row in coverage["regions"]] != list(REQUIRED_REGIONS):
             raise SystemExit("Nordic coverage is incomplete")
-        print(json.dumps({"regions": len(coverage["regions"]), "candidates": len(pool["candidates"])}, indent=2))
+        print(
+            json.dumps(
+                {"regions": len(coverage["regions"]), "candidates": len(pool["candidates"])},
+                indent=2,
+            )
+        )
     elif args.command == "promote":
-        print(json.dumps(promote_candidate(args.source_id, pool_path=args.pool, registry_path=args.registry), ensure_ascii=False, indent=2))
+        print(
+            json.dumps(
+                promote_candidate(args.source_id, pool_path=args.pool, registry_path=args.registry),
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
     elif args.command == "preflight":
-        print(json.dumps(materialize_and_preflight(args.source_id, pool_path=args.pool, registry_path=args.registry, input_root=args.input_root, output_root=args.output_root), ensure_ascii=False, indent=2))
+        print(
+            json.dumps(
+                materialize_and_preflight(
+                    args.source_id,
+                    pool_path=args.pool,
+                    registry_path=args.registry,
+                    input_root=args.input_root,
+                    output_root=args.output_root,
+                ),
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
 
 
 if __name__ == "__main__":

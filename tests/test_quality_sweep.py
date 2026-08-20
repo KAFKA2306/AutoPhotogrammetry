@@ -111,15 +111,16 @@ class QualitySweepTests(unittest.TestCase):
                 "scale_anisotropy_above_10_count": 20,
                 "scale_anisotropy_above_10_ratio": 0.2,
             }
-            with patch("processing.quality_sweep.verify_gpu_runtime", return_value=self._runtime()), patch(
-                "processing.quality_sweep.verify_research_environment",
-                return_value=self._environment(),
-            ), patch(
-                "processing.quality_sweep.run_splatfacto_export", side_effect=fake_run
-            ), patch(
-                "processing.quality_sweep.run_nerfstudio_eval", side_effect=fake_eval
-            ), patch(
-                "processing.quality_sweep.gaussian_artifact_metrics", return_value=metrics
+            with (
+                patch("processing.quality_sweep.verify_gpu_runtime", return_value=self._runtime()),
+                patch(
+                    "processing.quality_sweep.verify_research_environment",
+                    return_value=self._environment(),
+                ),
+                patch("processing.gpu_memory.query_compute_memory", return_value=None),
+                patch("processing.quality_sweep.run_splatfacto_export", side_effect=fake_run),
+                patch("processing.quality_sweep.run_nerfstudio_eval", side_effect=fake_eval),
+                patch("processing.quality_sweep.gaussian_artifact_metrics", return_value=metrics),
             ):
                 result = run_quality_sweep(
                     data,
@@ -169,7 +170,10 @@ class QualitySweepTests(unittest.TestCase):
                 manifest.write_text("{}", encoding="utf-8")
                 return {
                     "manifest_path": str(manifest),
-                    "training": {"command": ["ns-train", "splatfacto"], "config_path": "config.yml"},
+                    "training": {
+                        "command": ["ns-train", "splatfacto"],
+                        "config_path": "config.yml",
+                    },
                     "output": {"ply_path": "export/splat.ply", "sha256": "a" * 64, "size_bytes": 3},
                 }
 
@@ -178,7 +182,10 @@ class QualitySweepTests(unittest.TestCase):
                 root.mkdir(parents=True)
                 manifest = root / "eval-manifest.json"
                 manifest.write_text("{}", encoding="utf-8")
-                return {"manifest_path": str(manifest), "metrics": {"psnr": 20.0, "ssim": 0.8, "lpips": 0.2}}
+                return {
+                    "manifest_path": str(manifest),
+                    "metrics": {"psnr": 20.0, "ssim": 0.8, "lpips": 0.2},
+                }
 
             metrics = {
                 "primitive_count": 100,
@@ -188,11 +195,16 @@ class QualitySweepTests(unittest.TestCase):
                 "scale_anisotropy_above_10_count": 20,
                 "scale_anisotropy_above_10_ratio": 0.2,
             }
-            with patch("processing.quality_sweep.verify_gpu_runtime", return_value=self._runtime()), patch(
-                "processing.quality_sweep.verify_research_environment", return_value=self._environment()
-            ), patch("processing.quality_sweep.run_splatfacto_export", side_effect=fake_run), patch(
-                "processing.quality_sweep.run_nerfstudio_eval", side_effect=fake_eval
-            ), patch("processing.quality_sweep.gaussian_artifact_metrics", return_value=metrics):
+            with (
+                patch("processing.quality_sweep.verify_gpu_runtime", return_value=self._runtime()),
+                patch(
+                    "processing.quality_sweep.verify_research_environment",
+                    return_value=self._environment(),
+                ),
+                patch("processing.quality_sweep.run_splatfacto_export", side_effect=fake_run),
+                patch("processing.quality_sweep.run_nerfstudio_eval", side_effect=fake_eval),
+                patch("processing.quality_sweep.gaussian_artifact_metrics", return_value=metrics),
+            ):
                 result = run_quality_sweep(data, source, root / "out", holdout_count=2)
 
             self.assertEqual(len(calls), 3)

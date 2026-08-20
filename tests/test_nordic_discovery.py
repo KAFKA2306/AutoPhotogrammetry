@@ -7,8 +7,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from processing.nordic_discovery import (
-    MediaWikiClient,
     REQUIRED_REGIONS,
+    MediaWikiClient,
     build_coverage,
     enumerate_region_files,
     load_seed_config,

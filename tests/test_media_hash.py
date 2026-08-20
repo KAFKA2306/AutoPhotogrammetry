@@ -6,7 +6,29 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from processing.media_hash import sha256_stream, update_registry_source_hash, update_unhashed_registry_sources
+from processing.media_hash import (
+    sha256_stream,
+    update_registry_source_hash,
+    update_unhashed_registry_sources,
+)
+
+
+def _valid_registry(video: dict) -> dict:
+    video.setdefault("evaluation_stage", "metadata")
+    video.setdefault("measurements", {"preflight": None, "colmap": None, "splat": None})
+    return {
+        "schema_version": 2,
+        "default": "sample",
+        "evaluation_policy": {
+            "stages": {
+                "metadata": {},
+                "preflight": {},
+                "colmap": {},
+                "splat": {},
+            }
+        },
+        "videos": [video],
+    }
 
 
 class MediaHashBatchTests(unittest.TestCase):
@@ -18,15 +40,13 @@ class MediaHashBatchTests(unittest.TestCase):
     def test_update_registry_source_hash_records_downloaded_bytes(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "videos.json"
-            registry = {
-                "videos": [
-                    {
-                        "id": "sample",
-                        "media_url": "https://upload.wikimedia.org/sample.webm",
-                        "metadata_evidence": {"source_size_bytes": 3},
-                    }
-                ]
-            }
+            registry = _valid_registry(
+                {
+                    "id": "sample",
+                    "media_url": "https://upload.wikimedia.org/sample.webm",
+                    "metadata_evidence": {"source_size_bytes": 3},
+                }
+            )
             path.write_text(json.dumps(registry), encoding="utf-8")
             expected = hashlib.sha256(b"abc").hexdigest()
             with patch("processing.media_hash.hash_source_media", return_value=(expected, 3)):
@@ -40,16 +60,14 @@ class MediaHashBatchTests(unittest.TestCase):
     def test_update_registry_source_hash_refuses_existing_identity_drift(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "videos.json"
-            registry = {
-                "videos": [
-                    {
-                        "id": "sample",
-                        "media_url": "https://upload.wikimedia.org/sample.webm",
-                        "sha256": "0" * 64,
-                        "metadata_evidence": {"source_size_bytes": 3},
-                    }
-                ]
-            }
+            registry = _valid_registry(
+                {
+                    "id": "sample",
+                    "media_url": "https://upload.wikimedia.org/sample.webm",
+                    "sha256": "0" * 64,
+                    "metadata_evidence": {"source_size_bytes": 3},
+                }
+            )
             path.write_text(json.dumps(registry), encoding="utf-8")
             with patch(
                 "processing.media_hash.hash_source_media",

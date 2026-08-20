@@ -5,8 +5,8 @@ import json
 import os
 import subprocess
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from processing.backend_evaluation import (
     artifact_record,
@@ -103,7 +103,11 @@ def _failed_result_details(
         if manifest.get("failed_phase") == "export":
             return_code = export.get("return_code")
         if isinstance(return_code, int):
-            return list(map(str, command)), return_code, str(manifest.get("failed_phase") or default_phase)
+            return (
+                list(map(str, command)),
+                return_code,
+                str(manifest.get("failed_phase") or default_phase),
+            )
     if isinstance(exc, subprocess.CalledProcessError):
         command = exc.cmd if isinstance(exc.cmd, (list, tuple)) else [str(exc.cmd)]
         return list(map(str, command)), int(exc.returncode), default_phase
@@ -213,7 +217,11 @@ def run_splatfacto_experiment(
             memory = monitor.measurement()
         else:
             memory = monitor.measurement()
-        elapsed = train_export_seconds if train_export_seconds is not None else time.perf_counter() - started
+        elapsed = (
+            train_export_seconds
+            if train_export_seconds is not None
+            else time.perf_counter() - started
+        )
         command, return_code, failure_phase = _failed_result_details(
             root,
             exc,
@@ -236,13 +244,14 @@ def run_splatfacto_experiment(
         training_manifest_path = None
         if training_result is not None:
             training_manifest_path = training_result.get("manifest_path")
-            try:
-                run_dir = Path(training_manifest_path).parent
-                ply_path = run_dir / training_result["output"]["ply_path"]
-                if ply_path.is_file():
-                    artifact = artifact_record(ply_path, format="ply")
-            except (KeyError, TypeError, ValueError):
-                artifact = None
+            if isinstance(training_manifest_path, str):
+                try:
+                    run_dir = Path(training_manifest_path).parent
+                    ply_path = run_dir / training_result["output"]["ply_path"]
+                    if ply_path.is_file():
+                        artifact = artifact_record(ply_path, format="ply")
+                except (KeyError, TypeError, ValueError):
+                    artifact = None
         backend_result = {
             "schema_version": 1,
             "dataset_id": dataset_id,
@@ -258,7 +267,9 @@ def run_splatfacto_experiment(
             "artifact": artifact,
             "metrics": metrics,
             "training_manifest_path": training_manifest_path,
-            "evaluation_manifest_path": None if evaluation is None else evaluation.get("manifest_path"),
+            "evaluation_manifest_path": None
+            if evaluation is None
+            else evaluation.get("manifest_path"),
             "gpu_memory_measurement": memory.as_dict(),
             "error": f"{type(exc).__name__}: {exc}",
         }

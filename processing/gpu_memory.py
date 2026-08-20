@@ -117,13 +117,15 @@ class ComputeMemoryMonitor:
         while not self._stop.wait(self.interval_seconds):
             self._sample()
 
-    def __enter__(self) -> "ComputeMemoryMonitor":
+    def __enter__(self) -> ComputeMemoryMonitor:
         self._baseline = query_compute_memory()
         if self._baseline is not None:
             self._peak_total = int(self._baseline["total_bytes"])
             self._max_process_count = int(self._baseline["process_count"])
             self._samples = 1
-            self._thread = threading.Thread(target=self._loop, name="gpu-memory-monitor", daemon=True)
+            self._thread = threading.Thread(
+                target=self._loop, name="gpu-memory-monitor", daemon=True
+            )
             self._thread.start()
         else:
             self._query_failed = True
@@ -141,7 +143,9 @@ class ComputeMemoryMonitor:
             return ComputeMemoryMeasurement(
                 status="unavailable",
                 method="nvidia-smi-compute-process-baseline-delta",
-                baseline_bytes=(None if self._baseline is None else int(self._baseline["total_bytes"])),
+                baseline_bytes=(
+                    None if self._baseline is None else int(self._baseline["total_bytes"])
+                ),
                 baseline_process_count=(
                     None if self._baseline is None else int(self._baseline["process_count"])
                 ),
