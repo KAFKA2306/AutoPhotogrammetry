@@ -27,6 +27,8 @@ GPU用のCUDA / PyTorch / gsplat / Nerfstudio環境をbuild/pushする `GPU Imag
 
 Docker CLIまたはDocker daemonが利用できない場合、`./task doctor` / `./task run` / `./task run-all` / `./task quality` は明示的に停止します。このrepositoryのtaskはDocker Desktop、WSL、GPU driver、OS設定、Docker storageを修復・resetしません。host環境の修復はrepository実行とは分離してください。
 
+Docker CLIまたはDocker daemonが利用できない場合、`./task doctor` / `./task run` / `./task run-all` は `BLOCKED` と明示して停止します。このrepositoryのtaskはDocker Desktop、WSL、GPU driver、OS設定、Docker storageを修復・resetしません。host環境の修復はrepository実行とは分離してください。
+
 実行入口: [`task`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/task)  
 GPU環境: [`Dockerfile`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/Dockerfile)  
 E2E実装: [`processing/huejotzingo.py`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/processing/huejotzingo.py)
