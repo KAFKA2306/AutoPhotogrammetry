@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scene_id": "puente-san-ignacio-03",
+  "status": "success",
+  "generated_at": "2026-08-20T00:33:16.892966+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "9bf9fae1b61351b88ac7ebe1f2d9013a1c595909596e558daa31fe46499b7535",
+    "sha1": "f35ee26c3a258c2af690552c207cb322d3103269",
+    "frame_count": 47,
+    "selected_frame_count": 47,
+    "registered_images": 47,
+    "registration_ratio": 1.0,
+    "sparse_points": 16259,
+    "mean_reprojection_error_px": 0.423401,
+    "license_status": "verified"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/puente-san-ignacio-03/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T00:31:51.212643+00:00",
+    "finished_at": "2026-08-20T00:32:58.471079+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/puente-san-ignacio-03/runs/splatfacto/20260820T003151Z-f3ce6569/export/splat.ply",
+    "sha256": "65d9f2d3744e11a6cbbe610fbcdc46407423c9c742292358462844ef8c67161c",
+    "size_bytes": 57474353,
+    "primitive_count": 231745,
+    "low_opacity_primitive_count": 12494,
+    "low_opacity_primitive_ratio": 0.05391270577574489,
+    "scale_anisotropy_above_10_count": 23816,
+    "scale_anisotropy_above_10_ratio": 0.1027681287622171,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
