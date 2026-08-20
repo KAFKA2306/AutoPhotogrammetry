@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scene_id": "panoramica-puebla-centro",
+  "status": "success",
+  "generated_at": "2026-08-20T01:54:26.663497+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "96a378080c2cd3648b8804facc1011646fbebd8c05b5652b780c91bcfb9dcf92",
+    "sha1": "e61a2ab3b72af338dc9d75d0384bfb7675973aa2",
+    "frame_count": 24,
+    "selected_frame_count": 24,
+    "registered_images": 22,
+    "registration_ratio": 0.9166666666666666,
+    "sparse_points": 11248,
+    "mean_reprojection_error_px": 0.386268,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/panoramica-puebla-centro/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T01:53:05.144611+00:00",
+    "finished_at": "2026-08-20T01:54:10.047941+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/panoramica-puebla-centro/runs/splatfacto/20260820T015305Z-aa5bdd4a/export/splat.ply",
+    "sha256": "137ddd848a3ca8c230b57fbb968549a2c266f36f35d38869a35fe951dafb26a7",
+    "size_bytes": 36215793,
+    "primitive_count": 146025,
+    "low_opacity_primitive_count": 6452,
+    "low_opacity_primitive_ratio": 0.044184215031672656,
+    "scale_anisotropy_above_10_count": 60925,
+    "scale_anisotropy_above_10_ratio": 0.4172230782400274,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
