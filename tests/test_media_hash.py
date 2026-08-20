@@ -1,13 +1,81 @@
+import hashlib
+import io
 import json
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from processing.media_hash import update_unhashed_registry_sources
+from processing.media_hash import (
+    sha256_stream,
+    update_registry_source_hash,
+    update_unhashed_registry_sources,
+)
+
+
+def _valid_registry(video: dict) -> dict:
+    video.setdefault("evaluation_stage", "metadata")
+    video.setdefault("measurements", {"preflight": None, "colmap": None, "splat": None})
+    return {
+        "schema_version": 2,
+        "default": "sample",
+        "evaluation_policy": {
+            "stages": {
+                "metadata": {},
+                "preflight": {},
+                "colmap": {},
+                "splat": {},
+            }
+        },
+        "videos": [video],
+    }
 
 
 class MediaHashBatchTests(unittest.TestCase):
+    def test_sha256_stream_hashes_exact_bytes(self):
+        digest, size = sha256_stream(io.BytesIO(b"abc"), chunk_size=2)
+        self.assertEqual(digest, hashlib.sha256(b"abc").hexdigest())
+        self.assertEqual(size, 3)
+
+    def test_update_registry_source_hash_records_downloaded_bytes(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "videos.json"
+            registry = _valid_registry(
+                {
+                    "id": "sample",
+                    "media_url": "https://upload.wikimedia.org/sample.webm",
+                    "metadata_evidence": {"source_size_bytes": 3},
+                }
+            )
+            path.write_text(json.dumps(registry), encoding="utf-8")
+            expected = hashlib.sha256(b"abc").hexdigest()
+            with patch("processing.media_hash.hash_source_media", return_value=(expected, 3)):
+                result = update_registry_source_hash("sample", path)
+            saved = json.loads(path.read_text(encoding="utf-8"))["videos"][0]
+            self.assertEqual(result, {"id": "sample", "sha256": expected, "size_bytes": 3})
+            self.assertEqual(saved["sha256"], expected)
+            self.assertEqual(saved["metadata_evidence"]["downloaded_size_bytes"], 3)
+            self.assertTrue(saved["metadata_evidence"]["sha256_verified_from_downloaded_bytes"])
+
+    def test_update_registry_source_hash_refuses_existing_identity_drift(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "videos.json"
+            registry = _valid_registry(
+                {
+                    "id": "sample",
+                    "media_url": "https://upload.wikimedia.org/sample.webm",
+                    "sha256": "0" * 64,
+                    "metadata_evidence": {"source_size_bytes": 3},
+                }
+            )
+            path.write_text(json.dumps(registry), encoding="utf-8")
+            with patch(
+                "processing.media_hash.hash_source_media",
+                return_value=(hashlib.sha256(b"abc").hexdigest(), 3),
+            ):
+                with self.assertRaisesRegex(ValueError, "does not match downloaded bytes"):
+                    update_registry_source_hash("sample", path)
+
     def test_batch_skips_verified_persists_success_and_isolates_failure(self):
         registry = {
             "videos": [

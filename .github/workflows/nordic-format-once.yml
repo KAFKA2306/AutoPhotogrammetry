@@ -1,0 +1,43 @@
+name: Nordic Format Once
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - run: uv run ruff format processing/nordic_discovery.py tests/test_nordic_discovery.py
+      - name: Commit formatter output to PR head
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/nordic-format/processing /tmp/nordic-format/tests
+          cp processing/nordic_discovery.py /tmp/nordic-format/processing/
+          cp tests/test_nordic_discovery.py /tmp/nordic-format/tests/
+          git fetch origin "$HEAD_REF"
+          git switch -C "$HEAD_REF" "origin/$HEAD_REF"
+          cp /tmp/nordic-format/processing/nordic_discovery.py processing/nordic_discovery.py
+          cp /tmp/nordic-format/tests/test_nordic_discovery.py tests/test_nordic_discovery.py
+          if git diff --quiet -- processing/nordic_discovery.py tests/test_nordic_discovery.py; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add processing/nordic_discovery.py tests/test_nordic_discovery.py
+          git commit -m "Format Nordic discovery code"
+          git push origin HEAD:"$HEAD_REF"
