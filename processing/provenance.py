@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import subprocess
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Mapping
+from typing import Callable, Mapping
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"}
 
@@ -25,6 +27,31 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def source_revision(
+    runner: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+) -> str:
+    """Return the exact AutoPhotogrammetry revision executing this run."""
+    revision = os.environ.get("AUTOPHOTOGRAMMETRY_SOURCE_REVISION", "").strip()
+    if not revision:
+        try:
+            completed = runner(
+                ["git", "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise RuntimeError(
+                "AUTOPHOTOGRAMMETRY_SOURCE_REVISION is required when the runtime does not contain .git"
+            ) from exc
+        revision = completed.stdout.strip()
+    if len(revision) != 40 or any(char not in "0123456789abcdef" for char in revision):
+        raise RuntimeError(
+            "AutoPhotogrammetry source revision must be a full lowercase 40-character Git commit SHA"
+        )
+    return revision
+
+
 def sha256_file(path: str | Path) -> str:
     digest = hashlib.sha256()
     with Path(path).open("rb") as handle:
@@ -34,6 +61,15 @@ def sha256_file(path: str | Path) -> str:
 
 
 def write_json(path: str | Path, value: Mapping | list) -> None:
+    # Reconstruction run manifests share these fields. Attach the source revision
+    # before the manifest leaves the generation process so later publication never
+    # has to infer provenance from a newer checkout.
+    if (
+        isinstance(value, dict)
+        and {"dataset", "commands", "started_at", "status"}.issubset(value)
+        and "source_revision" not in value
+    ):
+        value["source_revision"] = source_revision()
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(
