@@ -1,0 +1,54 @@
+name: Source SHA-256 batch
+
+on:
+  push:
+    branches: [evidence/source-sha256-batch]
+
+concurrency:
+  group: source-sha256-batch
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  hash-sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: evidence/source-sha256-batch
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - name: Stream and hash all unresolved exact media URLs
+        id: hash
+        shell: bash
+        run: |
+          set +e
+          uv run python -m processing.media_hash \
+            --all-unhashed \
+            --registry sources/videos.json \
+            --timeout-seconds 900 \
+            | tee sources/media-hash-batch-summary.json
+          status=${PIPESTATUS[0]}
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Preserve all successful evidence even on partial failure
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sources/videos.json sources/media-hash-batch-summary.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Evidence: freeze streamed source SHA-256 batch"
+            git fetch origin evidence/source-sha256-batch
+            git rebase origin/evidence/source-sha256-batch
+            git push origin HEAD:evidence/source-sha256-batch
+          fi
+      - name: Fail if any source remains unresolved in this attempt
+        if: steps.hash.outputs.status != '0'
+        run: exit 1
