@@ -24,7 +24,11 @@ class PhysicalUpContractError(RuntimeError):
 
 
 def _finite(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(float(value))
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+    )
 
 
 def _vector3(value: object, label: str) -> Vector:
@@ -186,7 +190,9 @@ def load_physical_up_evidence(path: str | Path) -> dict:
         or len(authority_sha) != 64
         or any(character not in "0123456789abcdef" for character in authority_sha)
     ):
-        raise PhysicalUpContractError("authority_source_sha256 must be a lowercase SHA-256 hex digest")
+        raise PhysicalUpContractError(
+            "authority_source_sha256 must be a lowercase SHA-256 hex digest"
+        )
 
     semantics = payload.get("vector_semantics")
     if semantics not in ALLOWED_VECTOR_SEMANTICS:
@@ -194,13 +200,17 @@ def load_physical_up_evidence(path: str | Path) -> dict:
     source_frame = payload.get("source_frame")
     if not isinstance(source_frame, str) or not source_frame.strip():
         raise PhysicalUpContractError("source_frame must be a non-empty string")
-    source_vector = _normalize(_vector3(payload.get("source_vector"), "source_vector"), "source_vector")
+    source_vector = _normalize(
+        _vector3(payload.get("source_vector"), "source_vector"), "source_vector"
+    )
     if semantics == "gravity_down":
         source_up = tuple(-component for component in source_vector)
     else:
         source_up = source_vector
 
-    source_to_model = _matrix3(payload.get("source_to_model_matrix3x3"), "source_to_model_matrix3x3")
+    source_to_model = _matrix3(
+        payload.get("source_to_model_matrix3x3"), "source_to_model_matrix3x3"
+    )
     _validate_rotation_matrix(source_to_model, "source_to_model_matrix3x3")
     model_up = _normalize(_mat_vec(source_to_model, source_up), "model up vector")
     correction_matrix, correction_quaternion = rotation_from_to(model_up, (0.0, 0.0, 1.0))
