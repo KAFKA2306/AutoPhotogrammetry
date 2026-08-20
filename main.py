@@ -47,6 +47,10 @@ def main() -> None:
     audit_parser.add_argument("--output-root", default="output")
     audit_parser.add_argument("--sharpness-threshold", type=float, default=0.0001)
     audit_parser.add_argument("--similarity-threshold", type=float, default=0.92)
+    audit_parser.add_argument(
+        "--backend-run-manifest",
+        help="Optional existing backend run manifest to link by path and SHA-256.",
+    )
 
     huejotzingo_parser = subparsers.add_parser(
         "huejotzingo",
@@ -135,6 +139,7 @@ def main() -> None:
             output_root=args.output_root,
             sharpness_threshold=args.sharpness_threshold,
             similarity_threshold=args.similarity_threshold,
+            backend_run_manifest=args.backend_run_manifest,
         )
     elif args.command == "huejotzingo":
         result = run_huejotzingo(

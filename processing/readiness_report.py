@@ -27,6 +27,55 @@ def _read_manifest(path: Path) -> list[dict]:
     return payload
 
 
+def _backend_evidence(dataset: str, manifest_path: str | Path | None) -> dict:
+    if manifest_path is None:
+        return {
+            "asset_id": dataset,
+            "status": "not_run",
+            "run_manifest_path": None,
+            "run_manifest_sha256": None,
+            "return_code": None,
+        }
+
+    path = Path(manifest_path)
+    if not path.is_file():
+        raise FileNotFoundError(f"Backend run manifest does not exist: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Backend run manifest must be a JSON object: {path}")
+
+    identity_fields = ("asset_id", "dataset", "scene", "source_id")
+    identities = {
+        field: str(payload[field])
+        for field in identity_fields
+        if payload.get(field) not in (None, "")
+    }
+    mismatches = {field: value for field, value in identities.items() if value != dataset}
+    if mismatches:
+        raise ValueError(
+            f"Backend run manifest identity does not match asset_id {dataset!r}: {mismatches}"
+        )
+
+    return_code = payload.get("return_code")
+    declared_status = payload.get("status")
+    if isinstance(declared_status, str) and declared_status:
+        status = declared_status
+    elif return_code == 0:
+        status = "success"
+    elif isinstance(return_code, int):
+        status = "failed"
+    else:
+        status = "recorded"
+
+    return {
+        "asset_id": dataset,
+        "status": status,
+        "run_manifest_path": str(path),
+        "run_manifest_sha256": sha256_file(path),
+        "return_code": return_code if isinstance(return_code, int) else None,
+    }
+
+
 def _render_html(report: dict) -> str:
     reason_counts = report["selection"]["reason_counts"]
     dimensions = report["dimensions"]
@@ -43,6 +92,7 @@ def _render_html(report: dict) -> str:
         ),
         ("Distinct image sizes", dimensions["distinct_size_count"]),
         ("Backend execution", report["backend"]["status"]),
+        ("Backend manifest", report["backend"]["run_manifest_path"] or "not recorded"),
     ]
     table = "\n".join(
         f"<tr><th>{html.escape(str(label))}</th><td>{html.escape(str(value))}</td></tr>"
@@ -81,6 +131,7 @@ def build_readiness_report(
     output_root: str | Path = "output",
     sharpness_threshold: float = 0.0001,
     similarity_threshold: float = 0.92,
+    backend_run_manifest: str | Path | None = None,
 ) -> dict:
     image_dir = Path(input_root) / dataset / "images"
     if not image_dir.is_dir():
@@ -139,6 +190,7 @@ def build_readiness_report(
 
     missing_provenance = len(image_paths) - covered
     distinct_sizes = sorted(set(dimensions))
+    backend = _backend_evidence(dataset, backend_run_manifest)
     report = {
         "schema_version": 1,
         "asset_id": dataset,
@@ -168,10 +220,7 @@ def build_readiness_report(
             "sizes": [[width, height] for width, height in distinct_sizes],
             "content_types": dict(sorted(content_types.items())),
         },
-        "backend": {
-            "status": "not_run",
-            "run_manifest_path": None,
-        },
+        "backend": backend,
         "quality_measurements": {
             "registration_rate": None,
             "reprojection_error": None,
@@ -185,6 +234,7 @@ def build_readiness_report(
         "asset_id": dataset,
         "generated_views_used": False,
         "source_manifest": str(source_manifest_path),
+        "backend_run_manifest": backend["run_manifest_path"],
         "images": [
             {
                 "filename": path.name,
