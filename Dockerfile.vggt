@@ -61,11 +61,13 @@ RUN python -m pip install --no-cache-dir \
         pydantic==2.10.6 \
         pycolmap==3.10.0 \
         pyceres==2.3 \
+        kornia==0.7.4 \
     && python -m pip install --no-cache-dir --no-deps /opt/lightglue \
     && python -m pip install --no-cache-dir --no-deps /opt/vggt
 
 COPY requirements.txt /tmp/autophotogrammetry-requirements.txt
-RUN python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt
+RUN python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
+    && python -m pip check
 
 COPY . /opt/autophotogrammetry
 WORKDIR /opt/autophotogrammetry
