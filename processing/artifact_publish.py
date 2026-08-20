@@ -40,6 +40,31 @@ def _hf_cache_command(hf_cache_hub_root: str | Path | None) -> list[str]:
     return [sys.executable, str(script)]
 
 
+def _resolve_local_ply_path(run_manifest_path: Path, declared_path: str | Path) -> Path:
+    """Resolve a PLY path recorded inside a Docker-produced run manifest.
+
+    The pipeline records container paths such as ``/workspace/output/...``.
+    ``publish-splat`` runs on the host, so map that container output suffix to
+    the output root adjacent to the host-side run manifest when necessary.
+    """
+    candidate = Path(declared_path)
+    if candidate.is_file():
+        return candidate
+    if not candidate.is_absolute():
+        raise ArtifactPublishError(f"Gaussian Splat PLY is missing: {candidate}")
+
+    try:
+        output_index = candidate.parts.index("output")
+    except ValueError as exc:
+        raise ArtifactPublishError(f"Gaussian Splat PLY is missing: {candidate}") from exc
+
+    host_output_root = run_manifest_path.parent.parent
+    mapped = host_output_root.joinpath(*candidate.parts[output_index + 1 :])
+    if mapped.is_file():
+        return mapped
+    raise ArtifactPublishError(f"Gaussian Splat PLY is missing: {candidate} (mapped to {mapped})")
+
+
 def build_artifact_manifest(
     *,
     dataset: str,
@@ -94,7 +119,7 @@ def publish_run_splat(
         raise ArtifactPublishError("run manifest is not a successful local reconstruction")
     try:
         splat = run_manifest["splatfacto"]
-        ply_path = Path(splat["ply_path"])
+        ply_path = _resolve_local_ply_path(run_manifest_path, splat["ply_path"])
         expected_sha = splat["ply_sha256"]
         expected_size = splat["ply_size_bytes"]
     except KeyError as exc:

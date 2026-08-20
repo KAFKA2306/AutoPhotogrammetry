@@ -15,7 +15,7 @@ from processing.artifact_publish import ArtifactPublishError, _hf_cache_command,
 
 
 class ArtifactPublishTest(unittest.TestCase):
-    def _fixture(self, root: Path):
+    def _fixture(self, root: Path, *, declared_ply_path: str | None = None):
         ply = root / "output" / "demo" / "runs" / "r1" / "export" / "splat.ply"
         ply.parent.mkdir(parents=True)
         payload = b"ply\nsynthetic"
@@ -33,7 +33,7 @@ class ArtifactPublishTest(unittest.TestCase):
                 "license": {"url": "https://creativecommons.org/publicdomain/zero/1.0/"},
             },
             "splatfacto": {
-                "ply_path": str(ply),
+                "ply_path": declared_ply_path or str(ply),
                 "ply_sha256": sha,
                 "ply_size_bytes": len(payload),
             },
@@ -90,6 +90,39 @@ class ArtifactPublishTest(unittest.TestCase):
             self.assertEqual("success", updated["status"])
             self.assertEqual("published", updated["artifact_publish"]["status"])
             self.assertTrue(ply.exists())
+
+    def test_publish_resolves_docker_output_path_on_host(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, ply, sha, hf_root = self._fixture(
+                root,
+                declared_ply_path="/workspace/output/demo/runs/r1/export/splat.ply",
+            )
+
+            def runner(command, **kwargs):
+                if command[:3] == ["git", "rev-parse", "HEAD"]:
+                    return subprocess.CompletedProcess(command, 0, stdout="d" * 40 + "\n", stderr="")
+                return subprocess.CompletedProcess(
+                    command,
+                    0,
+                    stdout=json.dumps({
+                        "status": "PUBLISHED",
+                        "remote_verified": True,
+                        "remote_uri": "hf://buckets/k4fka/artifacts/demo.ply",
+                        "sha256": sha,
+                        "size_bytes": ply.stat().st_size,
+                    }),
+                    stderr="",
+                )
+
+            result = publish_run_splat(
+                manifest,
+                bucket="k4fka/artifacts",
+                hf_cache_hub_root=hf_root,
+                runner=runner,
+            )
+            self.assertEqual("published", result["status"])
+            self.assertEqual(sha, result["sha256"])
 
     def test_publish_failure_preserves_local_run_for_retry(self):
         with tempfile.TemporaryDirectory() as d:
