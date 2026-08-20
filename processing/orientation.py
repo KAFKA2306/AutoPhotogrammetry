@@ -51,8 +51,7 @@ def _mat_vec(matrix: Matrix, vector: Vector) -> Vector:
 
 def _mat_mul(left: Matrix, right: Matrix) -> Matrix:
     return tuple(
-        tuple(sum(left[r][k] * right[k][c] for k in range(3)) for c in range(3))
-        for r in range(3)
+        tuple(sum(left[r][k] * right[k][c] for k in range(3)) for c in range(3)) for r in range(3)
     )
 
 
@@ -199,11 +198,17 @@ def validate_orientation_evidence(evidence: dict, *, expected_ply_sha256: str) -
             f"orientation basis evidence is not accepted: {evidence.get('status')} ({evidence.get('reason')})"
         )
     if evidence.get("scope") != "coordinate_basis_only":
-        raise OrientationContractError("orientation evidence must explicitly declare coordinate_basis_only scope")
+        raise OrientationContractError(
+            "orientation evidence must explicitly declare coordinate_basis_only scope"
+        )
     if evidence.get("nerfstudio_revision") != PINNED_NERFSTUDIO_REVISION:
-        raise OrientationContractError("orientation evidence Nerfstudio revision is stale or unsupported")
+        raise OrientationContractError(
+            "orientation evidence Nerfstudio revision is stale or unsupported"
+        )
     if evidence.get("algorithm_version") != ALGORITHM_VERSION:
-        raise OrientationContractError("orientation evidence algorithm_version is stale or unsupported")
+        raise OrientationContractError(
+            "orientation evidence algorithm_version is stale or unsupported"
+        )
     if evidence.get("canonical_frame", {}).get("name") != "unity-basis-y-up":
         raise OrientationContractError("orientation evidence canonical frame is unsupported")
     if evidence.get("physical_up", {}).get("status") not in {
