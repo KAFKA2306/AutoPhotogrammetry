@@ -7,10 +7,21 @@ dependencies = [
   "beautifulsoup4>=4.12,<5",
   "numpy>=1.24,<3",
   "Pillow>=10,<12",
+  "pydantic>=2.10,<3",
   "PyYAML>=6,<7",
   "requests>=2.31,<3",
   "scikit-image>=0.22,<1",
 ]
+
+[dependency-groups]
+dev = [
+  "prek",
+  "pyrefly",
+  "ruff",
+]
+
+[tool.uv]
+package = false
 
 [tool.ruff]
 target-version = "py310"
@@ -18,10 +29,14 @@ line-length = 100
 exclude = ["input", "output", ".venv"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B"]
+select = ["E", "F", "I", "B", "UP"]
 ignore = ["E501"]
 
-[tool.basedpyright]
-include = ["main.py", "processing", "tests"]
-exclude = ["input", "output", ".venv"]
-typeCheckingMode = "standard"
+[tool.pyrefly]
+project-includes = ["main.py", "processing/**/*.py", "tests/**/*.py"]
+project-excludes = ["input/**", "output/**", ".venv/**"]
+search-path = ["."]
+python-version = "3.12"
+python-platform = "linux"
+preset = "default"
+baseline = ".pyrefly-baseline.json"
