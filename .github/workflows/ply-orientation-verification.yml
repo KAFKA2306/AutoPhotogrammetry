@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   historical-real-ply:
@@ -37,6 +37,19 @@ jobs:
             --output orientation-results.json
       - name: Print machine-readable evidence
         run: cat orientation-results.json
+      - name: Persist evidence on main
+        run: |
+          mkdir -p docs/verification
+          cp orientation-results.json docs/verification/historical-ply-orientation.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/verification/historical-ply-orientation.json
+          if git diff --cached --quiet; then
+            echo "orientation evidence unchanged"
+          else
+            git commit -m "Record historical PLY orientation evidence"
+            git push
+          fi
       - name: Upload evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
