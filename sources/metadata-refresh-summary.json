@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "registry": "sources/videos.json",
+  "source_count": 20,
+  "verified_license_count": 20,
+  "direct_media_url_count": 20,
+  "author_count": 20,
+  "failure_count": 0,
+  "failures": []
+}

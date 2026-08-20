@@ -47,6 +47,10 @@ def main() -> None:
     audit_parser.add_argument("--output-root", default="output")
     audit_parser.add_argument("--sharpness-threshold", type=float, default=0.0001)
     audit_parser.add_argument("--similarity-threshold", type=float, default=0.92)
+    audit_parser.add_argument(
+        "--backend-run-manifest",
+        help="Optional existing backend run manifest to link by path and SHA-256.",
+    )
 
     huejotzingo_parser = subparsers.add_parser(
         "huejotzingo",
@@ -74,6 +78,10 @@ def main() -> None:
     publish_parser.add_argument("--run-manifest", required=True)
     publish_parser.add_argument("--bucket", default=os.environ.get("HF_ARTIFACT_BUCKET"))
     publish_parser.add_argument("--hf-cache-hub-root", default=os.environ.get("HF_CACHE_HUB_ROOT"))
+    publish_parser.add_argument(
+        "--source-revision",
+        help="Explicit generation revision for audited legacy manifests that do not record source_revision.",
+    )
 
     dataset_parser = subparsers.add_parser(
         "evaluation-dataset",
@@ -131,6 +139,7 @@ def main() -> None:
             output_root=args.output_root,
             sharpness_threshold=args.sharpness_threshold,
             similarity_threshold=args.similarity_threshold,
+            backend_run_manifest=args.backend_run_manifest,
         )
     elif args.command == "huejotzingo":
         result = run_huejotzingo(
@@ -145,6 +154,7 @@ def main() -> None:
                 args.run_manifest,
                 bucket=args.bucket,
                 hf_cache_hub_root=args.hf_cache_hub_root,
+                source_revision=args.source_revision,
             )
         except ArtifactPublishError as exc:
             print(json.dumps({"status": "failed", "error": str(exc)}, ensure_ascii=False, indent=2))

@@ -4,8 +4,8 @@ import json
 import os
 import subprocess
 import sys
-from pathlib import Path
-from typing import Callable, Sequence
+from collections.abc import Callable, Sequence
+from pathlib import Path, PurePosixPath
 
 import yaml
 
@@ -16,17 +16,59 @@ class ArtifactPublishError(RuntimeError):
     pass
 
 
-def git_revision(runner: Callable[..., subprocess.CompletedProcess] = subprocess.run) -> str:
-    result = runner(
-        ["git", "rev-parse", "HEAD"],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    revision = result.stdout.strip()
+def _validate_revision(value: str, label: str) -> str:
+    revision = value.strip()
     if len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
-        raise ArtifactPublishError(f"git rev-parse did not return a full lowercase commit SHA: {revision!r}")
+        raise ArtifactPublishError(f"{label} must be a full lowercase 40-character Git commit SHA")
     return revision
+
+
+def _recorded_revision(run_manifest: dict, explicit_revision: str | None) -> str:
+    recorded = run_manifest.get("source_revision")
+    if recorded is not None:
+        revision = _validate_revision(str(recorded), "run manifest source_revision")
+        if explicit_revision is not None:
+            explicit = _validate_revision(explicit_revision, "explicit source_revision")
+            if explicit != revision:
+                raise ArtifactPublishError(
+                    "explicit source_revision does not match the generation-time revision recorded in the run manifest"
+                )
+        return revision
+    if explicit_revision is None:
+        raise ArtifactPublishError(
+            "run manifest has no generation-time source_revision; provide --source-revision only for an audited legacy run"
+        )
+    return _validate_revision(explicit_revision, "explicit source_revision")
+
+
+def _resolve_run_artifact_path(run_manifest_path: Path, raw_path: str) -> Path:
+    """Resolve host and container paths without changing the recorded artifact identity."""
+    run_manifest_path = run_manifest_path.expanduser().resolve()
+    raw = Path(raw_path)
+    if raw.is_absolute() and raw.is_file():
+        return raw
+
+    output_root = run_manifest_path.parent.parent
+    repo_root = output_root.parent
+    candidates: list[Path] = []
+    if raw.is_absolute():
+        posix = PurePosixPath(raw_path)
+        workspace_output = PurePosixPath("/workspace/output")
+        try:
+            relative = posix.relative_to(workspace_output)
+        except ValueError:
+            relative = None
+        if relative is not None:
+            candidates.append(output_root.joinpath(*relative.parts))
+    else:
+        candidates.extend((run_manifest_path.parent / raw, repo_root / raw))
+
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate.resolve()
+    raise ArtifactPublishError(
+        f"Gaussian Splat PLY cannot be resolved from run manifest path: {raw_path}"
+    )
 
 
 def _hf_cache_command(hf_cache_hub_root: str | Path | None) -> list[str]:
@@ -39,31 +81,6 @@ def _hf_cache_command(hf_cache_hub_root: str | Path | None) -> list[str]:
         raise ArtifactPublishError(f"hf-cache-hub artifact CLI not found: {script}")
     python_executable = os.environ.get("HF_CACHE_HUB_PYTHON") or sys.executable
     return [python_executable, str(script)]
-
-
-def _resolve_local_ply_path(run_manifest_path: Path, declared_path: str | Path) -> Path:
-    """Resolve a PLY path recorded inside a Docker-produced run manifest.
-
-    The pipeline records container paths such as ``/workspace/output/...``.
-    ``publish-splat`` runs on the host, so map that container output suffix to
-    the output root adjacent to the host-side run manifest when necessary.
-    """
-    candidate = Path(declared_path)
-    if candidate.is_file():
-        return candidate
-    if not candidate.is_absolute():
-        raise ArtifactPublishError(f"Gaussian Splat PLY is missing: {candidate}")
-
-    try:
-        output_index = candidate.parts.index("output")
-    except ValueError as exc:
-        raise ArtifactPublishError(f"Gaussian Splat PLY is missing: {candidate}") from exc
-
-    host_output_root = run_manifest_path.parent.parent
-    mapped = host_output_root.joinpath(*candidate.parts[output_index + 1 :])
-    if mapped.is_file():
-        return mapped
-    raise ArtifactPublishError(f"Gaussian Splat PLY is missing: {candidate} (mapped to {mapped})")
 
 
 def build_artifact_manifest(
@@ -95,7 +112,6 @@ def build_artifact_manifest(
         "provenance": {
             "repository": "KAFKA2306/AutoPhotogrammetry",
             "revision": source_revision,
-            "source_path": str(ply_path),
             "run_id": run_id,
         },
     }
@@ -114,24 +130,26 @@ def publish_run_splat(
     source_revision: str | None = None,
     runner: Callable[..., subprocess.CompletedProcess] = subprocess.run,
 ) -> dict:
-    run_manifest_path = Path(run_manifest_path)
+    run_manifest_path = Path(run_manifest_path).expanduser().resolve()
     run_manifest = json.loads(run_manifest_path.read_text(encoding="utf-8"))
     if run_manifest.get("status") != "success":
         raise ArtifactPublishError("run manifest is not a successful local reconstruction")
     try:
         splat = run_manifest["splatfacto"]
-        ply_path = _resolve_local_ply_path(run_manifest_path, splat["ply_path"])
+        ply_path = _resolve_run_artifact_path(run_manifest_path, str(splat["ply_path"]))
         expected_sha = splat["ply_sha256"]
         expected_size = splat["ply_size_bytes"]
     except KeyError as exc:
-        raise ArtifactPublishError(f"run manifest is missing Gaussian Splat metadata: {exc}") from exc
+        raise ArtifactPublishError(
+            f"run manifest is missing Gaussian Splat metadata: {exc}"
+        ) from exc
 
     actual_sha = sha256_file(ply_path)
     actual_size = ply_path.stat().st_size
     if actual_sha != expected_sha or actual_size != expected_size:
         raise ArtifactPublishError("local PLY no longer matches the successful run manifest")
 
-    revision = source_revision or git_revision(runner)
+    revision = _recorded_revision(run_manifest, source_revision)
     registry = run_manifest.get("registry", {})
     license_info = registry.get("license") or {}
     source_url = registry.get("source_page")

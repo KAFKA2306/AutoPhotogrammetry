@@ -4,9 +4,9 @@ import hashlib
 import json
 import shutil
 import time
+from collections.abc import Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Mapping, Sequence
 from urllib.error import HTTPError
 from urllib.parse import quote, unquote, urlparse
 from urllib.request import Request, urlopen
@@ -80,7 +80,9 @@ def resolve_media_url(source: Mapping) -> dict:
                 raise
             retry_after = exc.headers.get("Retry-After")
             try:
-                delay = max(2.0, min(30.0, float(retry_after))) if retry_after else 2.0 ** (attempt + 1)
+                delay = (
+                    max(2.0, min(30.0, float(retry_after))) if retry_after else 2.0 ** (attempt + 1)
+                )
             except (TypeError, ValueError):
                 delay = 2.0 ** (attempt + 1)
             time.sleep(delay)
@@ -147,7 +149,9 @@ def ensure_source(
         if expected_sha256:
             actual = sha256_file(candidate)
             if actual != expected_sha256:
-                raise RuntimeError(f"Existing source hash mismatch: expected {expected_sha256}, got {actual}: {path}")
+                raise RuntimeError(
+                    f"Existing source hash mismatch: expected {expected_sha256}, got {actual}: {path}"
+                )
         if expected_sha1:
             actual_sha1 = _sha1_file(candidate)
             if actual_sha1 != expected_sha1:
@@ -219,9 +223,7 @@ def ensure_source(
                                     handle.write(chunk)
                                     received += len(chunk)
                             if received == 0:
-                                raise RuntimeError(
-                                    f"Empty range download for bytes {cursor}-{end}"
-                                )
+                                raise RuntimeError(f"Empty range download for bytes {cursor}-{end}")
                             cursor += received
 
                 with ThreadPoolExecutor(max_workers=2) as executor:
@@ -349,7 +351,12 @@ def run_video(
         phase = "probe"
         probe = probe_video(source_path)
         manifest["probe"] = probe
-        write_source_manifest(source_path, _video_source(source, resolved), probe, dataset_output / "source-manifest.json")
+        write_source_manifest(
+            source_path,
+            _video_source(source, resolved),
+            probe,
+            dataset_output / "source-manifest.json",
+        )
 
         phase = "frames"
         frames_dir = dataset_output / "frames"
@@ -402,7 +409,9 @@ def run_video(
                 str(sparse_model.resolve()),
             ),
         )
-        _run_recorded(process_command, name="nerfstudio-process-data", log_dir=log_dir, records=records)
+        _run_recorded(
+            process_command, name="nerfstudio-process-data", log_dir=log_dir, records=records
+        )
         if not (nerfstudio_data / "transforms.json").is_file():
             raise RuntimeError("Nerfstudio did not generate transforms.json")
 
@@ -483,21 +492,27 @@ def run_all_videos(
                 timeout=timeout,
                 fresh=fresh,
             )
-            batch["results"].append({
-                "id": source["id"],
-                "status": result["status"],
-                "manifest_path": result.get("manifest_path", str(output_root / source["id"] / "manifest.json")),
-                "ply_path": result.get("splatfacto", {}).get("ply_path"),
-                "ply_sha256": result.get("splatfacto", {}).get("ply_sha256"),
-            })
+            batch["results"].append(
+                {
+                    "id": source["id"],
+                    "status": result["status"],
+                    "manifest_path": result.get(
+                        "manifest_path", str(output_root / source["id"] / "manifest.json")
+                    ),
+                    "ply_path": result.get("splatfacto", {}).get("ply_path"),
+                    "ply_sha256": result.get("splatfacto", {}).get("ply_sha256"),
+                }
+            )
         except Exception as exc:
             manifest_path = output_root / source["id"] / "manifest.json"
-            batch["results"].append({
-                "id": source["id"],
-                "status": "failed",
-                "manifest_path": str(manifest_path),
-                "error": f"{type(exc).__name__}: {exc}",
-            })
+            batch["results"].append(
+                {
+                    "id": source["id"],
+                    "status": "failed",
+                    "manifest_path": str(manifest_path),
+                    "error": f"{type(exc).__name__}: {exc}",
+                }
+            )
         batch["succeeded"] = sum(item["status"] == "success" for item in batch["results"])
         batch["failed"] = sum(item["status"] == "failed" for item in batch["results"])
         write_json(batch_path, batch)

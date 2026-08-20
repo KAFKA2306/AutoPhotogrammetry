@@ -3,9 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+from collections.abc import Sequence
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Sequence
 
 from processing.gaussian_ply import gaussian_ply_metrics
 from processing.provenance import sha256_file, write_json
@@ -13,9 +13,7 @@ from processing.provenance import sha256_file, write_json
 CLEAN_GS_REPOSITORY = "https://github.com/smlab-niser/clean-gs"
 CLEAN_GS_REVISION = "ba5c2fa97e9e4bec0510e25aee9f79f6bc8fa822"
 CLEAN_GS_LICENSE = "MIT"
-CLEAN_GS_LICENSE_URL = (
-    f"{CLEAN_GS_REPOSITORY}/blob/{CLEAN_GS_REVISION}/LICENSE"
-)
+CLEAN_GS_LICENSE_URL = f"{CLEAN_GS_REPOSITORY}/blob/{CLEAN_GS_REVISION}/LICENSE"
 
 
 def clean_gs_command(
@@ -56,7 +54,9 @@ def _utc_now() -> str:
 
 
 def _mask_records(masks_dir: Path) -> list[dict]:
-    masks = sorted(path for path in masks_dir.iterdir() if path.is_file() and path.suffix.lower() == ".png")
+    masks = sorted(
+        path for path in masks_dir.iterdir() if path.is_file() and path.suffix.lower() == ".png"
+    )
     if not masks:
         raise ValueError(f"no PNG semantic masks found: {masks_dir}")
     return [
@@ -81,7 +81,9 @@ def _git_checkout_revision(script: Path, requested_revision: str) -> dict:
                 text=True,
             )
         except (OSError, subprocess.CalledProcessError) as exc:
-            raise ValueError(f"Clean-GS script is not in a readable Git checkout: {script}") from exc
+            raise ValueError(
+                f"Clean-GS script is not in a readable Git checkout: {script}"
+            ) from exc
         return completed.stdout.strip()
 
     checkout_root = git("rev-parse", "--show-toplevel")
@@ -89,7 +91,9 @@ def _git_checkout_revision(script: Path, requested_revision: str) -> dict:
     try:
         requested_commit = git("rev-parse", "--verify", f"{requested}^{{commit}}")
     except ValueError as exc:
-        raise ValueError(f"upstream_revision cannot be resolved in Clean-GS checkout: {requested}") from exc
+        raise ValueError(
+            f"upstream_revision cannot be resolved in Clean-GS checkout: {requested}"
+        ) from exc
     if requested_commit != head_revision:
         raise ValueError(
             "Clean-GS checkout HEAD does not match upstream_revision: "
@@ -207,7 +211,9 @@ def run_clean_gs(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run pinned official Clean-GS with auditable input/output lineage.")
+    parser = argparse.ArgumentParser(
+        description="Run pinned official Clean-GS with auditable input/output lineage."
+    )
     parser.add_argument("--script", required=True)
     parser.add_argument("--upstream-revision", default=CLEAN_GS_REVISION)
     parser.add_argument("--scene", required=True)

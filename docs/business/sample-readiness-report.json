@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "sample_kind": "illustrative_synthetic_no_customer_data",
+  "asset_id": "sample-synthetic-object",
+  "generated_views_used": false,
+  "input": {
+    "count": 24,
+    "source_manifest": "sample/source-manifest.json"
+  },
+  "selection": {
+    "selected_count": 16,
+    "selected_dir": "sample/selected",
+    "reason_counts": {
+      "LOW_SHARPNESS": 3,
+      "NEAR_DUPLICATE": 5,
+      "EXACT_DUPLICATE": 2,
+      "PROVENANCE_MISSING": 0,
+      "DECODE_ERROR": 0,
+      "UNSUPPORTED_CONTENT_TYPE": 0,
+      "REVIEW_VIEW_COVERAGE": 1
+    }
+  },
+  "provenance": {
+    "covered_count": 24,
+    "coverage_ratio": 1.0
+  },
+  "backend": {
+    "status": "not_run",
+    "run_manifest_path": null
+  },
+  "quality_measurements": {
+    "registration_rate": null,
+    "reprojection_error": null,
+    "mesh_completeness": null,
+    "quality_guarantee": false
+  },
+  "notice": "Illustrative synthetic sample only. Counts are examples for the report format and are not customer results or reconstruction-performance evidence."
+}

@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 
 def run(command: Sequence[str]) -> subprocess.CompletedProcess[str]:
@@ -18,13 +18,18 @@ def run(command: Sequence[str]) -> subprocess.CompletedProcess[str]:
 
 
 def probe_video(path: str | Path, ffprobe: str = "ffprobe") -> dict:
-    completed = run([
-        ffprobe,
-        "-v", "error",
-        "-show_entries", "format=duration,size,format_name:stream=codec_name,width,height",
-        "-of", "json",
-        str(Path(path)),
-    ])
+    completed = run(
+        [
+            ffprobe,
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration,size,format_name:stream=codec_name,width,height",
+            "-of",
+            "json",
+            str(Path(path)),
+        ]
+    )
     return json.loads(completed.stdout)
 
 
@@ -36,15 +41,20 @@ def scene_cut_times(
 ) -> list[float]:
     if not 0 < threshold < 1:
         raise ValueError("threshold must be between 0 and 1")
-    completed = run([
-        ffmpeg,
-        "-hide_banner",
-        "-i", str(Path(path)),
-        "-filter:v", f"select='gt(scene,{threshold})',showinfo",
-        "-an",
-        "-f", "null",
-        "-",
-    ])
+    completed = run(
+        [
+            ffmpeg,
+            "-hide_banner",
+            "-i",
+            str(Path(path)),
+            "-filter:v",
+            f"select='gt(scene,{threshold})',showinfo",
+            "-an",
+            "-f",
+            "null",
+            "-",
+        ]
+    )
     return [float(value) for value in re.findall(r"pts_time:([0-9.]+)", completed.stderr)]
 
 
@@ -68,9 +78,12 @@ def extract_frames_command(
         ffmpeg,
         "-hide_banner",
         "-y",
-        "-i", str(Path(video_path)),
-        "-vf", ",".join(filters),
-        "-q:v", "2",
+        "-i",
+        str(Path(video_path)),
+        "-vf",
+        ",".join(filters),
+        "-q:v",
+        "2",
         str(output / "frame-%06d.jpg"),
     ]
 

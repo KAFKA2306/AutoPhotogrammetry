@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from io import BytesIO
 from pathlib import Path
-from typing import Sequence
 from urllib.parse import urljoin, urlparse
 
 import requests
@@ -46,9 +46,7 @@ def _response_bytes(response: requests.Response, max_bytes: int) -> bytes:
         except ValueError:
             size = None
         if size is not None and size > max_bytes:
-            raise ValueError(
-                f"Image is larger than the configured limit: {declared_length} bytes"
-            )
+            raise ValueError(f"Image is larger than the configured limit: {declared_length} bytes")
 
     chunks: list[bytes] = []
     total = 0
@@ -57,9 +55,7 @@ def _response_bytes(response: requests.Response, max_bytes: int) -> bytes:
             continue
         total += len(chunk)
         if total > max_bytes:
-            raise ValueError(
-                f"Downloaded image exceeded the configured limit: {max_bytes} bytes"
-            )
+            raise ValueError(f"Downloaded image exceeded the configured limit: {max_bytes} bytes")
         chunks.append(chunk)
     return b"".join(chunks)
 

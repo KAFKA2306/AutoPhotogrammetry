@@ -1,5 +1,6 @@
 .venv/
 .ruff_cache/
+.cache/
 __pycache__/
 *.py[cod]
 .DS_Store

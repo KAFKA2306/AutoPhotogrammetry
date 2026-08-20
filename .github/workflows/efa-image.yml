@@ -1,0 +1,55 @@
+name: EFA Image
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile.efa
+      - requirements.txt
+      - processing/efa_gs_backend.py
+      - processing/external_research.py
+      - .github/workflows/efa-image.yml
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile.efa
+      - requirements.txt
+      - processing/efa_gs_backend.py
+      - processing/external_research.py
+      - .github/workflows/efa-image.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.efa
+          push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
+          tags: |
+            ghcr.io/kafka2306/autophotogrammetry:efa-57f330f-sm120-v1
+            ghcr.io/kafka2306/autophotogrammetry:efa-sha-${{ github.sha }}
+          build-args: |
+            EFA_REVISION=57f330f6f9b12d2684c6df0f0359ffec8f60976d
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Verify research image contract
+        if: github.event_name == 'pull_request'
+        run: |
+          docker run --rm ghcr.io/kafka2306/autophotogrammetry:efa-57f330f-sm120-v1 \
+            python -c 'import subprocess,torch,diff_gaussian_rasterization; from simple_knn import _C; rev=subprocess.run(["git","-C","/opt/efa-gs","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev=="57f330f6f9b12d2684c6df0f0359ffec8f60976d"; assert torch.__version__.startswith("2.7.1"); print({"revision":rev,"torch":torch.__version__,"cuda":torch.version.cuda})'

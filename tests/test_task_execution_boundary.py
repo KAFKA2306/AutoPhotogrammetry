@@ -1,10 +1,9 @@
 import os
-from pathlib import Path
 import stat
 import subprocess
 import tempfile
 import unittest
-
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TASK = ROOT / "task"
@@ -37,7 +36,7 @@ class TaskExecutionBoundaryTests(unittest.TestCase):
             docker = Path(temp_dir) / "docker"
             docker.write_text(
                 "#!/bin/sh\n"
-                "if [ \"${1:-}\" = info ]; then exit 1; fi\n"
+                'if [ "${1:-}" = info ]; then exit 1; fi\n'
                 "echo unexpected-docker-command >&2\n"
                 "exit 99\n",
                 encoding="utf-8",

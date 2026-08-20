@@ -1,0 +1,68 @@
+name: Nordic Wikimedia Discovery
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: nordic-wikimedia-discovery
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - name: Verify repository before discovery
+        run: bash scripts/check
+      - name: Refresh Nordic pool and coverage
+        run: uv run python -m processing.nordic_pool refresh
+      - name: Validate refreshed snapshots
+        run: |
+          uv run python -m processing.nordic_pool validate
+          uv run python -m unittest tests.test_nordic_pool tests.test_wikimedia_discovery -v
+      - name: Open a reviewable data pull request when content changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          paths=(
+            sources/discovery/nordic-wikimedia.json
+            sources/discovery/nordic-coverage.json
+          )
+          if git diff --quiet -- "${paths[@]}"; then
+            echo "No discovery content change."
+            exit 0
+          fi
+
+          branch="automation/nordic-wikimedia-discovery"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "refs/heads/${branch}:refs/remotes/origin/${branch}" || true
+          git switch -c "${branch}"
+          git add "${paths[@]}"
+          git commit -m "Data: refresh Nordic Wikimedia discovery"
+          git push --force-with-lease origin "HEAD:refs/heads/${branch}"
+
+          existing="$(gh pr list --head "${branch}" --base main --state open --json number --jq '.[0].number // empty')"
+          if [[ -z "${existing}" ]]; then
+            gh pr create \
+              --base main \
+              --head "${branch}" \
+              --title "Data: refresh Nordic Wikimedia discovery" \
+              --body "Automated Wikimedia Commons discovery refresh. Review source identity, license metadata, Stage A state, and eight-region coverage before merging. No media blobs or final-20 changes are included."
+          fi

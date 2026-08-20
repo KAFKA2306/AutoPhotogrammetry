@@ -3,8 +3,8 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 from urllib.request import Request, urlopen
 
 from processing.image_selection import select_video_frames
@@ -12,6 +12,7 @@ from processing.nerfstudio import nerfstudio_process_images_command, run_splatfa
 from processing.provenance import (
     VideoSource,
     sha256_file,
+    source_revision,
     utc_now,
     write_json,
     write_source_manifest,
@@ -213,6 +214,7 @@ def run_huejotzingo(
         "dataset": DATASET,
         "status": "running",
         "started_at": utc_now(),
+        "source_revision": source_revision(),
         "source": {
             "source_registry_id": SOURCE_CONFIG["id"],
             "source_page": SOURCE_PAGE,

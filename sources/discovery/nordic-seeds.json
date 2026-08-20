@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "authority": "Wikimedia Commons category pages confirmed in issue #84",
+  "regions": [
+    {
+      "id": "norway",
+      "display_name": "Norway",
+      "status": "configured",
+      "seeds": [
+        {
+          "category_title": "Category:Drone videos from Norway",
+          "seed_type": "drone",
+          "enabled": true,
+          "source_url": "https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Norway"
+        }
+      ]
+    },
+    {
+      "id": "sweden",
+      "display_name": "Sweden",
+      "status": "configured",
+      "seeds": [
+        {
+          "category_title": "Category:Drone videos from Sweden",
+          "seed_type": "drone",
+          "enabled": true,
+          "source_url": "https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Sweden"
+        }
+      ]
+    },
+    {
+      "id": "finland",
+      "display_name": "Finland",
+      "status": "configured",
+      "seeds": [
+        {
+          "category_title": "Category:Drone videos from Finland",
+          "seed_type": "drone",
+          "enabled": true,
+          "source_url": "https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Finland"
+        }
+      ]
+    },
+    {
+      "id": "denmark",
+      "display_name": "Denmark",
+      "status": "configured",
+      "seeds": [
+        {
+          "category_title": "Category:Drone videos from Denmark",
+          "seed_type": "drone",
+          "enabled": true,
+          "source_url": "https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Denmark"
+        },
+        {
+          "category_title": "Category:Aerial videos from Denmark",
+          "seed_type": "aerial",
+          "enabled": true,
+          "source_url": "https://commons.wikimedia.org/wiki/Category:Aerial_videos_from_Denmark"
+        }
+      ]
+    },
+    {
+      "id": "iceland",
+      "display_name": "Iceland",
+      "status": "configured",
+      "seeds": [
+        {
+          "category_title": "Category:Drone videos from Iceland",
+          "seed_type": "drone",
+          "enabled": true,
+          "source_url": "https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Iceland"
+        }
+      ]
+    },
+    {
+      "id": "greenland",
+      "display_name": "Greenland",
+      "status": "configured",
+      "seeds": [
+        {
+          "category_title": "Category:Drone videos from Greenland",
+          "seed_type": "drone",
+          "enabled": true,
+          "source_url": "https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Greenland"
+        }
+      ]
+    },
+    {
+      "id": "faroe-islands",
+      "display_name": "Faroe Islands",
+      "status": "configured",
+      "seeds": [
+        {
+          "category_title": "Category:Videos from the Faroe Islands",
+          "seed_type": "general-video",
+          "enabled": true,
+          "source_url": "https://commons.wikimedia.org/wiki/Category:Videos_from_the_Faroe_Islands"
+        }
+      ]
+    },
+    {
+      "id": "aland",
+      "display_name": "Åland",
+      "status": "missing",
+      "missing_reason": "No confirmed long-form drone/aerial video category authority was identified in issue #84; do not synthesize a category name.",
+      "seeds": []
+    }
+  ]
+}

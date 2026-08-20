@@ -2,11 +2,15 @@
   "schema_version": 2,
   "default": "huejotzingo",
   "evaluation_policy": {
-    "principle": "Do not assign reconstruction scores from metadata. Rank only from measured results, and compare sources at the same evaluation stage.",
     "stages": {
       "metadata": {
         "purpose": "eligibility gate only",
-        "fields": ["license", "downloadability", "duration_seconds", "resolution"]
+        "fields": [
+          "license",
+          "downloadability",
+          "duration_seconds",
+          "resolution"
+        ]
       },
       "preflight": {
         "purpose": "measure whether the video itself is suitable for SfM and 3DGS",
@@ -44,28 +48,13 @@
           "ply_size_bytes"
         ]
       }
-    }
+    },
+    "principle": "Do not assign reconstruction scores from metadata. Rank only from measured results, and compare sources at the same evaluation stage."
   },
   "videos": [
     {
       "id": "huejotzingo",
-      "status": "verified",
       "evaluation_stage": "colmap",
-      "title": "Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron",
-      "provider": "Wikimedia Commons",
-      "source_page": "https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel,_Huejotzingo,_desde_un_dron.webm",
-      "media_url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm",
-      "sha256": "c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30",
-      "author": "Luisalvaz",
-      "license": {
-        "name": "CC0 1.0 Universal",
-        "status": "verified",
-        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
-      },
-      "duration_seconds": 232.766,
-      "resolution": [3840, 2160],
-      "expected_frame_count": 78,
-      "target": "Ex Convento de San Miguel Arcángel, Huejotzingo",
       "measurements": {
         "preflight": {
           "scene_continuity_verified": true
@@ -79,274 +68,812 @@
           "mean_reprojection_error_px": 0.37083
         },
         "splat": null
+      },
+      "status": "verified",
+      "title": "Vista del Ex Convento de San Miguel Arcángel, Huejotzingo, desde un dron",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel,_Huejotzingo,_desde_un_dron.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/34/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm/Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel%2C_Huejotzingo%2C_desde_un_dron.webm.1080p.vp9.webm",
+      "sha256": "c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30",
+      "author": "Luisalvaz",
+      "license": {
+        "name": "CC0 1.0 Universal",
+        "status": "verified",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "duration_seconds": 232.766,
+      "resolution": [
+        3840,
+        2160
+      ],
+      "expected_frame_count": 78,
+      "target": "Ex Convento de San Miguel Arcángel, Huejotzingo",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "registry-verified",
+        "source_sha1": null,
+        "source_size_bytes": null,
+        "mime": null,
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 115502605,
+        "sha256_verified_from_downloaded_bytes": true
       }
     },
     {
       "id": "tepotzotlan-virreinato",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Panorámica del Museo Nacional del Virreinato y Templo de San Francisco Javier desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Panorámica_del_Museo_Nacional_del_Virreinato_y_Templo_de_San_Francisco_Javier_desde_un_dron.webm",
       "author": "Luisalvaz",
-      "license": {"name": "CC0 1.0 Universal", "status": "verified", "url": "https://creativecommons.org/publicdomain/zero/1.0/"},
+      "license": {
+        "name": "CC0 1.0 Universal",
+        "status": "verified",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
       "duration_seconds": 254,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["rigid architecture", "large textured facade and courtyard"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "rigid architecture",
+        "large textured facade and courtyard"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/5/57/Panor%C3%A1mica_del_Museo_Nacional_del_Virreinato_y_Templo_de_San_Francisco_Javier_desde_un_dron.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "20ba2ec1df8aaa75088821ef7871ad7b1acc2dab",
+        "source_size_bytes": 637163317,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 637163317,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "cd3efb3825dc1e5ead895ef64df80728c777a4cece790471c35a1dae3372c07e"
     },
     {
       "id": "templo-san-marcos",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Fachada del Templo de San Marcos desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Fachada_del_Templo_de_San_Marcos_desde_un_dron.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 144,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["rigid detailed facade", "single architectural target"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "rigid detailed facade",
+        "single architectural target"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Fachada_del_Templo_de_San_Marcos_desde_un_dron.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "958dc6fa17eaa7874e8b4a3a3b7f18e6722516dc",
+        "source_size_bytes": 153163113,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 153163113,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "4c7732429b0e7d744d76078f88ac73ea575bc878d76fbf014d0cfa880a7cae68"
     },
     {
       "id": "calvillo-centro",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Calvillo desde un dron (plaza principal, Santa Cruz, centro)",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Calvillo_desde_un_dron_(plaza_principal,_Santa_Cruz,_centro).webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 124,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["rigid urban geometry", "moving vehicles or people may be present"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "rigid urban geometry",
+        "moving vehicles or people may be present"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Calvillo_desde_un_dron_%28plaza_principal%2C_Santa_Cruz%2C_centro%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "633e703ca2fcc24c7b40569c3e48d578bd713441",
+        "source_size_bytes": 157326279,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 157326279,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "482c2a82d061ba4a4f4e88b17e5329b2a9c8d435373218a462d94b02d2d2957b"
     },
     {
       "id": "puente-san-ignacio-03",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Puente de San Ignacio desde un dron 03",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Puente_de_San_Ignacio_desde_un_dron_03.webm",
       "media_url": "https://upload.wikimedia.org/wikipedia/commons/9/97/Puente_de_San_Ignacio_desde_un_dron_03.webm",
       "author": "Luisalvaz",
-      "license": {"name": "CC0 1.0 Universal", "status": "verified", "url": "https://creativecommons.org/publicdomain/zero/1.0/"},
+      "license": {
+        "name": "CC0 1.0 Universal",
+        "status": "verified",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
       "duration_seconds": 140.661,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["rigid bridge structure", "vegetation may be present"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "rigid bridge structure",
+        "vegetation may be present"
+      ],
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "registry-verified",
+        "source_sha1": null,
+        "source_size_bytes": null,
+        "mime": null,
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 275977256,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "9bf9fae1b61351b88ac7ebe1f2d9013a1c595909596e558daa31fe46499b7535"
     },
     {
       "id": "avenida-gomez-morin",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Avenida Gómez Morín, Museo ferrocarrilero y Complejo Tres centurias desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Avenida_Gómez_Morín,_Museo_ferrocarrilero_y_Complejo_Tres_centurias_desde_un_dron.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 236,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["industrial and urban structures", "moving traffic may be present"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "industrial and urban structures",
+        "moving traffic may be present"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/Avenida_G%C3%B3mez_Mor%C3%ADn%2C_Museo_ferrocarrilero_y_Complejo_Tres_centurias_desde_un_dron.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "4ef956c93606451550fd5fee1787645f9fa8c46d",
+        "source_size_bytes": 137277062,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 137277062,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "c326a9c75ba16907b5e483fda9bd58e2f85cd72055bc1c6b36e97ebde9afb2e3"
     },
     {
       "id": "san-francisco-nayarit-01",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "San Francisco, Nayarit, desde un dron 01",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:San_Francisco,_Nayarit,_desde_un_dron_01.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 219,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["urban geometry", "vegetation and moving objects may be present"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "urban geometry",
+        "vegetation and moving objects may be present"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/4/47/San_Francisco%2C_Nayarit%2C_desde_un_dron_01.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "7cae6b7d1e916914818fc34f90a5ececb97d8ce1",
+        "source_size_bytes": 538667417,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 538667417,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "0d9a80047976aca69050701cf60d664cde230f873a86b4d4e7ee264793454922"
     },
     {
       "id": "baluarte-san-pedro",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Baluarte de San Pedro",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Baluarte_de_San_Pedro.webm",
-      "author": null,
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "author": "ProtoplasmaKid",
+      "license": {
+        "name": "CC BY 4.0",
+        "status": "verified",
+        "url": "https://creativecommons.org/licenses/by/4.0"
+      },
       "duration_seconds": 142,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["rigid masonry structure", "license requires review"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "rigid masonry structure",
+        "license requires review"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Baluarte_de_San_Pedro.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "471e91783e91fb1b09d4a3951fc8bd58a1230bb8",
+        "source_size_bytes": 344322146,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 344322146,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "882f55dd415558a4dc3758e22a1c86e98cd04f86c14ed7e49f3023329cfac66f"
     },
     {
       "id": "puente-san-ignacio-01",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Puente de San Ignacio desde un dron 01",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Puente_de_San_Ignacio_desde_un_dron_01.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 119,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["rigid bridge structure", "vegetation may be present"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "rigid bridge structure",
+        "vegetation may be present"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Puente_de_San_Ignacio_desde_un_dron_01.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "4b5c55c17fe0870e53774c0e84e6ba7bebe5d742",
+        "source_size_bytes": 1484818221,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 1484818221,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "ee01f189c6882f47dd426698f9ce2f3df3fd4375da913034d177e8045219b48d"
     },
     {
       "id": "herstmonceux-castle",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Aerial video of Herstmonceux Castle",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Aerial_video_of_Herstmonceux_Castle.webm",
       "author": "Beautiful Landmarks",
-      "license": {"name": "CC BY 3.0", "status": "verified", "url": "https://creativecommons.org/licenses/by/3.0/"},
+      "license": {
+        "name": "CC BY 3.0",
+        "status": "verified",
+        "url": "https://creativecommons.org/licenses/by/3.0/"
+      },
       "duration_seconds": 180,
-      "resolution": [3840, 2026],
-      "metadata_notes": ["rigid castle", "lawns and trees may reduce useful texture", "attribution required"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2026
+      ],
+      "metadata_notes": [
+        "rigid castle",
+        "lawns and trees may reduce useful texture",
+        "attribution required"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Aerial_video_of_Herstmonceux_Castle.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "b6e7d066fc5c831761854a88f297077d933e2756",
+        "source_size_bytes": 376232654,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 376232654,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "dd9a9789744ddd23dddc9b5fa6de85031f9c2de75baee194a5a1f686a0d96623"
     },
     {
       "id": "fachada-san-francisco-javier",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Fachada del Templo de San Francisco Javier, Tepotzotlán, desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Fachada_del_Templo_de_San_Francisco_Javier,_Tepotzotlán,_desde_un_dron.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 90,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["rigid detailed facade", "single architectural target"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "rigid detailed facade",
+        "single architectural target"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/7/72/Fachada_del_Templo_de_San_Francisco_Javier%2C_Tepotzotl%C3%A1n%2C_desde_un_dron.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "f20107b760886a59cc209a9c7194aa41ab4b72f3",
+        "source_size_bytes": 227806512,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 227806512,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "990cfbfa7e11cfcb6299b6924caaf75af590ac4935a5845839b16d59b8a92bea"
     },
     {
       "id": "panoramica-puebla-centro",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Panorámica del centro histórico, catedral y zócalo de Puebla desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Panorámica_del_centro_histórico,_catedral_y_zócalo_de_Puebla_desde_un_dron.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 72,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["dense rigid architecture", "traffic and people may be present"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "dense rigid architecture",
+        "traffic and people may be present"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Panor%C3%A1mica_del_centro_hist%C3%B3rico%2C_catedral_y_z%C3%B3calo_de_Puebla_desde_un_dron.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "e61a2ab3b72af338dc9d75d0384bfb7675973aa2",
+        "source_size_bytes": 179886458,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 179886458,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "96a378080c2cd3648b8804facc1011646fbebd8c05b5652b780c91bcfb9dcf92"
     },
     {
       "id": "centro-aguascalientes",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Centro de Aguascalientes desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Centro_de_Aguascalientes_desde_un_dron.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 82,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["rigid urban geometry", "moving traffic may be present"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "rigid urban geometry",
+        "moving traffic may be present"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/5/55/Centro_de_Aguascalientes_desde_un_dron.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "021bb75d892de6f3ce5869f08548e4e6bc171a6a",
+        "source_size_bytes": 951086461,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 951086461,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "5f5558a898a83e92e3a6556d9375836f1d3c198f3a1af0121ab9feb6887af9ea"
     },
     {
       "id": "barco-la-pona-01",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Barco en La Pona desde un dron 01",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Barco_en_La_Pona_desde_un_dron_01.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 269,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["vegetation may dominate", "rigid target coverage is unknown"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "vegetation may dominate",
+        "rigid target coverage is unknown"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Barco_en_La_Pona_desde_un_dron_01.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "54113609d7bd7d0fd673c69c1ecd67db904deede",
+        "source_size_bytes": 699016970,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 699016970,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "7cf3d9f9e9bcb14dbf3588875b6459a3862f18af3b15b6370a6e3eb92612328a"
     },
     {
       "id": "presa-san-blas",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Presa de San Blas, Pabellón de Hidalgo, desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Presa_de_San_Blas,_Pabellón_de_Hidalgo,_desde_un_dron.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 327,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["water and vegetation dominate much of the target class"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "water and vegetation dominate much of the target class"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Presa_de_San_Blas%2C_Pabell%C3%B3n_de_Hidalgo%2C_desde_un_dron.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "b86652bc72e1438260dd347fdcf84eb3b03a1ecc",
+        "source_size_bytes": 622167530,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 622167530,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "92b70b5d6a0f26602a0cd8de927c971c92e6179482634689e0d41b293f9212fa"
     },
     {
       "id": "playa-guayabitos-region",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Playa de Guayabitos, Rincón de Guayabitos e Islas desde un dron",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Playa_de_Guayabitos,_Rincón_de_Guayabitos_e_Islas_desde_un_dron.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 120,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["water and shoreline motion may dominate"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "water and shoreline motion may dominate"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Playa_de_Guayabitos%2C_Rinc%C3%B3n_de_Guayabitos_e_Islas_desde_un_dron.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "29fd69a2e0e6a2606a6f61acdc65977d78053b5c",
+        "source_size_bytes": 282502715,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 282502715,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "51eb81e247df60eae5df304f0f9bf937a0545769887f7efbec810f6cf1fb9d2b"
     },
     {
       "id": "cascadas-agua-azul",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Cascadas de Agua Azul",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Cascadas_de_Agua_Azul.webm",
-      "author": null,
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "author": "Own work",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "status": "verified",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0"
+      },
       "duration_seconds": 222,
-      "resolution": [1920, 1080],
-      "metadata_notes": ["moving water and vegetation are likely dominant"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        1920,
+        1080
+      ],
+      "metadata_notes": [
+        "moving water and vegetation are likely dominant"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Cascadas_de_Agua_Azul.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "d2ed2c4b089cd1a683ab7b79f785a10fbe40eee9",
+        "source_size_bytes": 708674740,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 708674740,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "cbabc653827b6d7a695498654077004e27216b9f115ec92e5bb1f6b5bba51bb6"
     },
     {
       "id": "los-cabos-sunset",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Aerial views of Los Cabo, San Lucas, Mexico at sunset including El Arco, Lands End and ocean views",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Aerial_views_of_Los_Cabo,_San_Lucas,_Mexico_at_sunset_including_El_Arco,_Lands_End_and_ocean_views.webm",
-      "author": null,
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "author": "the Dronalist",
+      "license": {
+        "name": "CC BY 3.0",
+        "status": "verified",
+        "url": "https://creativecommons.org/licenses/by/3.0"
+      },
       "duration_seconds": 575,
-      "resolution": [3840, 2158],
-      "metadata_notes": ["ocean may dominate", "sunset implies possible illumination variation"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2158
+      ],
+      "metadata_notes": [
+        "ocean may dominate",
+        "sunset implies possible illumination variation"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Aerial_views_of_Los_Cabo%2C_San_Lucas%2C_Mexico_at_sunset_including_El_Arco%2C_Lands_End_and_ocean_views.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "f78f57453e589089a7b135d31a829dabd8cf3549",
+        "source_size_bytes": 1176492467,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 1176492467,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "abbd8fa511827ed416be4273478941f856380a0fec0e9f0ec71fa4226ec5787a"
     },
     {
       "id": "la-pona-fire-2025",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Registro en dron de incendios en La Pona (11 de abril de 2025)",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Registro_en_dron_de_incendios_en_La_Pona_(11_de_abril_de_2025).webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 262,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["smoke, fire and vegetation are non-rigid content"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "smoke, fire and vegetation are non-rigid content"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Registro_en_dron_de_incendios_en_La_Pona_%2811_de_abril_de_2025%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "10f2f014b2ee605ee7c213ada942a65097328590",
+        "source_size_bytes": 242227766,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 242227766,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "59e592aab33883fa36390fd245052d305282afc9bea47e0e8d0f6feb5ceff62a"
     },
     {
       "id": "cadena-humana-la-pona",
-      "status": "candidate",
       "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "status": "candidate",
       "title": "Cadena humana por La Pona (video en dron) - 1",
       "provider": "Wikimedia Commons",
       "source_page": "https://commons.wikimedia.org/wiki/File:Cadena_humana_por_La_Pona_(video_en_dron)_-_1.webm",
       "author": "Luisalvaz",
-      "license": {"name": null, "status": "needs_review", "url": null},
+      "license": {
+        "name": "CC0",
+        "status": "verified",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+      },
       "duration_seconds": 229,
-      "resolution": [3840, 2160],
-      "metadata_notes": ["many moving people and vegetation are likely present"],
-      "measurements": {"preflight": null, "colmap": null, "splat": null}
+      "resolution": [
+        3840,
+        2160
+      ],
+      "metadata_notes": [
+        "many moving people and vegetation are likely present"
+      ],
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/Cadena_humana_por_La_Pona_%28video_en_dron%29_-_1.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "metadata_evidence": {
+        "authority": "Wikimedia Commons imageinfo/extmetadata",
+        "resolved_via": "wikimedia-api",
+        "source_sha1": "6596bc203e50faa31bb58addd299d48403354f6a",
+        "source_size_bytes": 245718701,
+        "mime": "video/webm",
+        "download_url_available": true,
+        "license_verified": true,
+        "downloaded_size_bytes": 245718701,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "4a99eb36e7a20297c4ef29bb99ecaca80458d6e31599a3c0ea3d15bbc1f1f2fd"
     }
   ]
 }

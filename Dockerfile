@@ -4,14 +4,17 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG CUDA_ARCH_LIST=12.0
 ARG NERFSTUDIO_REVISION=50e0e3c70c775e89333256213363badbf074f29d
 ARG GSPLAT_REVISION=v1.4.0
+ARG AUTOPHOTOGRAMMETRY_REVISION
 ENV CUDA_HOME=/usr/local/cuda \
     TORCH_CUDA_ARCH_LIST=${CUDA_ARCH_LIST} \
     TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 \
     MAX_JOBS=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    AUTOPHOTOGRAMMETRY_SOURCE_REVISION=${AUTOPHOTOGRAMMETRY_REVISION}
 
 LABEL org.opencontainers.image.source="https://github.com/KAFKA2306/AutoPhotogrammetry" \
-      org.opencontainers.image.description="Pinned AutoPhotogrammetry CUDA environment for Splatfacto quality experiments"
+      org.opencontainers.image.description="Pinned AutoPhotogrammetry CUDA environment for Splatfacto quality experiments" \
+      org.opencontainers.image.revision="${AUTOPHOTOGRAMMETRY_REVISION}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import shutil
+from collections.abc import Callable, Iterable, Sequence
 from pathlib import Path
-from typing import Callable, Iterable, Sequence
 
 import numpy as np
 from PIL import Image
