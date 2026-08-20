@@ -1,0 +1,46 @@
+name: Nordic Type Fix Once
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.pull_request.head.ref == 'feat/nordic-pool-stagea-automation'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: feat/nordic-pool-stagea-automation
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Narrow JSON queue candidate types
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("processing/nordic_pool.py")
+          text = path.read_text(encoding="utf-8")
+          old = '''    validate_queue(queue)\n    existing = next(\n        (item for item in queue["candidates"] if item.get("id") == candidate_id),\n        None,\n    )\n    if existing is not None:\n        if existing.get("source_sha1") != candidate.get("source_sha1"):\n            raise ValueError(f"{candidate_id}: queued Commons SHA-1 changed; reselect explicitly")\n        if existing.get("media_url") != candidate.get("media_url"):\n            raise ValueError(f"{candidate_id}: queued media URL changed; reselect explicitly")\n        return dict(existing)\n    queue["candidates"].append(candidate)\n    queue["candidates"].sort(key=lambda item: item["id"])\n    validate_queue(queue, pool)\n'''
+          new = '''    validate_queue(queue)\n    raw_candidates = queue.get("candidates")\n    if not isinstance(raw_candidates, list):\n        raise ValueError("Nordic preflight queue requires candidates")\n    queue_candidates: list[dict[str, Any]] = []\n    for item in raw_candidates:\n        if not isinstance(item, dict):\n            raise ValueError("Nordic preflight queue candidate must be an object")\n        queue_candidates.append(item)\n    existing = next(\n        (item for item in queue_candidates if item.get("id") == candidate_id),\n        None,\n    )\n    if existing is not None:\n        if existing.get("source_sha1") != candidate.get("source_sha1"):\n            raise ValueError(f"{candidate_id}: queued Commons SHA-1 changed; reselect explicitly")\n        if existing.get("media_url") != candidate.get("media_url"):\n            raise ValueError(f"{candidate_id}: queued media URL changed; reselect explicitly")\n        return dict(existing)\n    queue_candidates.append(candidate)\n    queue_candidates.sort(key=lambda item: item["id"])\n    queue["candidates"] = queue_candidates\n    validate_queue(queue, pool)\n'''
+          if old not in text:
+              raise SystemExit("expected queue block not found")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - run: uv run ruff format processing/nordic_pool.py
+      - name: Commit type fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add processing/nordic_pool.py
+          git commit -m "Narrow Nordic queue candidate types"
+          git push origin HEAD:feat/nordic-pool-stagea-automation
