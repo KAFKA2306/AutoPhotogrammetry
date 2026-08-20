@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "scene_id": "tepotzotlan-virreinato",
+  "status": "success",
+  "generated_at": "2026-08-20T00:20:58.991740+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "cd3efb3825dc1e5ead895ef64df80728c777a4cece790471c35a1dae3372c07e",
+    "sha1": "20ba2ec1df8aaa75088821ef7871ad7b1acc2dab",
+    "frame_count": 85,
+    "selected_frame_count": 85,
+    "registered_images": 84,
+    "sparse_points": 39840,
+    "mean_reprojection_error_px": 0.433774
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/tepotzotlan-virreinato/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T00:19:32.719996+00:00",
+    "finished_at": "2026-08-20T00:20:42.187744+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/tepotzotlan-virreinato/runs/splatfacto/20260820T001932Z-34f5f41e/export/splat.ply",
+    "sha256": "d9635fe47a2af9f70c9e9a6e8500d10186f1bacc2bce872f2e0070579185c862",
+    "size_bytes": 39604217,
+    "primitive_count": 159688,
+    "low_opacity_primitive_count": 6987,
+    "low_opacity_primitive_ratio": 0.04375407043735284,
+    "scale_anisotropy_above_10_count": 18221,
+    "scale_anisotropy_above_10_ratio": 0.11410375231701819,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
