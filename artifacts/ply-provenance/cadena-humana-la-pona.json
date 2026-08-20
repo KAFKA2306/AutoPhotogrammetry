@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "scene_id": "cadena-humana-la-pona",
+  "status": "success",
+  "generated_at": "2026-08-20T03:17:24.630728+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "4a99eb36e7a20297c4ef29bb99ecaca80458d6e31599a3c0ea3d15bbc1f1f2fd",
+    "sha1": "6596bc203e50faa31bb58addd299d48403354f6a",
+    "size_bytes": 245718701,
+    "frame_count": 76,
+    "selected_frame_count": 76,
+    "registered_images": 76,
+    "registration_ratio": 1.0,
+    "sparse_points": 31081,
+    "mean_reprojection_error_px": 0.400305,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/cadena-humana-la-pona/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T03:15:30.671027+00:00",
+    "finished_at": "2026-08-20T03:16:38.975825+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/cadena-humana-la-pona/runs/splatfacto/20260820T031530Z-2497f993/export/splat.ply",
+    "sha256": "d9e3e4a15eba0dc4a3d790f14625a2c9854add42b73ca26bc4b744e38ecc35ef",
+    "size_bytes": 77351305,
+    "primitive_count": 311894,
+    "low_opacity_primitive_count": 16262,
+    "low_opacity_primitive_ratio": 0.05213950893572816,
+    "scale_anisotropy_above_10_count": 19896,
+    "scale_anisotropy_above_10_ratio": 0.0637909033197176,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
