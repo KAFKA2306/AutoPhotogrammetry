@@ -1,0 +1,45 @@
+name: PLY orientation verification
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/measure_ply_orientation.py"
+      - ".github/workflows/ply-orientation-verification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  historical-real-ply:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out current diagnostics
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out historical real PLY exports
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: 1fa7f35b1fc9fce669f97d5ec7c7f46ce4601206
+          path: .historical-ply
+      - name: Prove historical PLY set exists
+        run: |
+          find .historical-ply/output -name splat.ply -type f -print
+          test "$(find .historical-ply/output -name splat.ply -type f | wc -l)" -eq 9
+      - name: Install numeric dependency
+        run: python -m pip install "numpy>=2.0,<3"
+      - name: Measure real PLY orientation
+        run: |
+          python scripts/measure_ply_orientation.py \
+            --root .historical-ply/output \
+            --source-commit 1fa7f35b1fc9fce669f97d5ec7c7f46ce4601206 \
+            --output orientation-results.json
+      - name: Print machine-readable evidence
+        run: cat orientation-results.json
+      - name: Upload evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: real-ply-orientation
+          path: orientation-results.json
+          if-no-files-found: error
