@@ -186,6 +186,7 @@ class WikimediaDiscoveryTests(unittest.TestCase):
         self.assertTrue(normalized["confirmed_video"])
         self.assertEqual(normalized["author"], "Example Author")
         self.assertEqual(normalized["duration_seconds"], 180.5)
+        self.assertEqual(normalized["duration_authority"], "Wikimedia Commons videoinfo")
         self.assertEqual(normalized["license"]["status"], "needs_review")
         self.assertEqual(normalized["source_sha1"], "abc123")
 
@@ -226,7 +227,14 @@ class WikimediaDiscoveryTests(unittest.TestCase):
                 }
             }
 
-        result = normalize_discovery(discovery, request_json=fake_request)
+        def fail_if_rest_called(_title):
+            raise AssertionError("REST fallback must not run for non-video files")
+
+        result = normalize_discovery(
+            discovery,
+            request_json=fake_request,
+            request_file_json=fail_if_rest_called,
+        )
         self.assertEqual(result["candidates"], [])
         self.assertEqual(result["metadata_failures"], [])
 
@@ -262,6 +270,7 @@ class WikimediaDiscoveryTests(unittest.TestCase):
                                 {
                                     "url": f"https://upload.wikimedia.org/{title}.webm",
                                     "size": 100,
+                                    "duration": 60,
                                     "sha1": "shared-sha1",
                                     "mime": "video/webm",
                                     "mediatype": "VIDEO",
@@ -286,6 +295,112 @@ class WikimediaDiscoveryTests(unittest.TestCase):
             result["candidates"][0]["discovered_categories"],
             ["Category:A", "Category:B"],
         )
+
+    def test_rest_file_information_supplies_missing_duration(self) -> None:
+        discovery = {
+            "schema_version": 1,
+            "candidates": [
+                {
+                    "canonical_title": "File:No Duration.webm",
+                    "regions": ["iceland"],
+                    "discovered_categories": ["Category:Videos from Iceland"],
+                    "discovery_paths": [["Category:Videos from Iceland"]],
+                }
+            ],
+            "failures": [],
+        }
+
+        def fake_request(params):
+            return {
+                "query": {
+                    "pages": [
+                        {
+                            "title": params["titles"],
+                            "categories": [],
+                            "videoinfo": [
+                                {
+                                    "url": "https://upload.wikimedia.org/no-duration.webm",
+                                    "size": 100,
+                                    "sha1": "rest-duration",
+                                    "mime": "video/webm",
+                                    "mediatype": "VIDEO",
+                                    "extmetadata": {},
+                                }
+                            ],
+                        }
+                    ]
+                }
+            }
+
+        rest_calls = []
+
+        def fake_file_request(title):
+            rest_calls.append(title)
+            return {
+                "preferred": {"duration": 120},
+                "original": {"duration": 144},
+            }
+
+        result = normalize_discovery(
+            discovery,
+            request_json=fake_request,
+            request_file_json=fake_file_request,
+        )
+        self.assertEqual(rest_calls, ["File:No Duration.webm"])
+        self.assertEqual(result["metadata_failures"], [])
+        self.assertEqual(result["candidates"][0]["duration_seconds"], 144.0)
+        self.assertEqual(
+            result["candidates"][0]["duration_authority"],
+            "MediaWiki REST API file information",
+        )
+
+    def test_rest_failure_is_not_converted_to_candidate_success(self) -> None:
+        discovery = {
+            "schema_version": 1,
+            "candidates": [
+                {
+                    "canonical_title": "File:REST Failure.webm",
+                    "regions": ["norway"],
+                    "discovered_categories": ["Category:Videos"],
+                    "discovery_paths": [["Category:Videos"]],
+                }
+            ],
+            "failures": [],
+        }
+
+        def fake_request(params):
+            return {
+                "query": {
+                    "pages": [
+                        {
+                            "title": params["titles"],
+                            "categories": [],
+                            "videoinfo": [
+                                {
+                                    "url": "https://upload.wikimedia.org/rest-failure.webm",
+                                    "size": 100,
+                                    "sha1": "rest-failure",
+                                    "mime": "video/webm",
+                                    "mediatype": "VIDEO",
+                                    "extmetadata": {},
+                                }
+                            ],
+                        }
+                    ]
+                }
+            }
+
+        def failing_file_request(_title):
+            raise RuntimeError("fixture REST failure")
+
+        result = normalize_discovery(
+            discovery,
+            request_json=fake_request,
+            request_file_json=failing_file_request,
+        )
+        self.assertEqual(result["candidates"], [])
+        self.assertEqual(len(result["metadata_failures"]), 1)
+        self.assertIn("REST file information", result["metadata_failures"][0]["error"])
 
 
 if __name__ == "__main__":
