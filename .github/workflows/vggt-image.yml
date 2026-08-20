@@ -1,0 +1,43 @@
+name: VGGT Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile.vggt
+      - requirements.txt
+      - processing/vggt_backend.py
+      - processing/backend_evaluation.py
+      - processing/provenance.py
+      - task
+      - .github/workflows/vggt-image.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.vggt
+          push: true
+          tags: |
+            ghcr.io/kafka2306/autophotogrammetry:vggt-a288dd0-sm120-v1
+            ghcr.io/kafka2306/autophotogrammetry:vggt-sha-${{ github.sha }}
+          build-args: |
+            VGGT_REVISION=a288dd0f14786c93483e45524328726ab7b1b4ce
+            LIGHTGLUE_REVISION=746fac2c042e05d1865315b1413419f1c1e7ba55
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
