@@ -296,7 +296,9 @@ class ArtifactPublishTest(unittest.TestCase):
             body = json.loads(manifest.read_text(encoding="utf-8"))
             body["physical_up_evidence_path"] = "missing-physical-up.json"
             manifest.write_text(json.dumps(body), encoding="utf-8")
-            with self.assertRaisesRegex(ArtifactPublishError, "physical-up evidence file is missing"):
+            with self.assertRaisesRegex(
+                ArtifactPublishError, "physical-up evidence file is missing"
+            ):
                 publish_run_splat(
                     manifest,
                     bucket="k4fka/artifacts",
@@ -308,7 +310,9 @@ class ArtifactPublishTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             manifest, _, _, hf_root = self._fixture(root, orientation_override="pca")
-            with self.assertRaisesRegex(ArtifactPublishError, "only accepted orientation basis evidence"):
+            with self.assertRaisesRegex(
+                ArtifactPublishError, "only accepted orientation basis evidence"
+            ):
                 publish_run_splat(
                     manifest,
                     bucket="k4fka/artifacts",
