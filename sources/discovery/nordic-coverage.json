@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "regions": [
+    {"region":"norway","configured_seed_count":1,"reachable_seed_count":0,"discovered_file_count":7,"confirmed_video_count":7,"metadata_complete_count":0,"verified_license_count":0,"stage_a_pass_count":0,"stage_a_fail_count":7,"discovery_failure_count":0,"missing_seed_count":0,"failure_reasons":[]},
+    {"region":"sweden","configured_seed_count":2,"reachable_seed_count":0,"discovered_file_count":2,"confirmed_video_count":2,"metadata_complete_count":0,"verified_license_count":0,"stage_a_pass_count":0,"stage_a_fail_count":2,"discovery_failure_count":0,"missing_seed_count":0,"failure_reasons":[]},
+    {"region":"finland","configured_seed_count":1,"reachable_seed_count":0,"discovered_file_count":1,"confirmed_video_count":1,"metadata_complete_count":0,"verified_license_count":0,"stage_a_pass_count":0,"stage_a_fail_count":1,"discovery_failure_count":0,"missing_seed_count":0,"failure_reasons":[]},
+    {"region":"denmark","configured_seed_count":1,"reachable_seed_count":0,"discovered_file_count":0,"confirmed_video_count":0,"metadata_complete_count":0,"verified_license_count":0,"stage_a_pass_count":0,"stage_a_fail_count":0,"discovery_failure_count":0,"missing_seed_count":0,"failure_reasons":[]},
+    {"region":"iceland","configured_seed_count":1,"reachable_seed_count":0,"discovered_file_count":1,"confirmed_video_count":1,"metadata_complete_count":0,"verified_license_count":0,"stage_a_pass_count":0,"stage_a_fail_count":1,"discovery_failure_count":0,"missing_seed_count":0,"failure_reasons":[]},
+    {"region":"greenland","configured_seed_count":1,"reachable_seed_count":0,"discovered_file_count":3,"confirmed_video_count":3,"metadata_complete_count":0,"verified_license_count":0,"stage_a_pass_count":0,"stage_a_fail_count":3,"discovery_failure_count":0,"missing_seed_count":0,"failure_reasons":[]},
+    {"region":"faroe-islands","configured_seed_count":1,"reachable_seed_count":0,"discovered_file_count":1,"confirmed_video_count":1,"metadata_complete_count":0,"verified_license_count":0,"stage_a_pass_count":0,"stage_a_fail_count":1,"discovery_failure_count":0,"missing_seed_count":0,"failure_reasons":[]},
+    {"region":"aland","configured_seed_count":0,"reachable_seed_count":0,"discovered_file_count":0,"confirmed_video_count":0,"metadata_complete_count":0,"verified_license_count":0,"stage_a_pass_count":0,"stage_a_fail_count":0,"discovery_failure_count":0,"missing_seed_count":1,"failure_reasons":[]}
+  ],
+  "totals": {"candidate_count":15,"stage_a_pass_count":0,"discovery_failure_count":0}
+}
