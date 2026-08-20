@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "measurement_window_days": 60,
+  "launch_date": null,
+  "window_end_date": null,
+  "status": "not_started",
+  "privacy": {
+    "allow_personal_data": false,
+    "allow_customer_image_bytes": false,
+    "allow_confidential_issue_text": false
+  },
+  "events": {
+    "service_page_viewed": {
+      "count": null,
+      "evidence": null
+    },
+    "sample_report_opened": {
+      "count": null,
+      "evidence": null
+    },
+    "audit_inquiry_started": {
+      "count": null,
+      "evidence": null
+    },
+    "qualified_inquiry": {
+      "count": null,
+      "evidence": null
+    },
+    "pilot_booked": {
+      "count": null,
+      "evidence": null
+    },
+    "paid_pilot": {
+      "count": null,
+      "evidence": null
+    }
+  },
+  "business_kpis": {
+    "sample_report_views": {
+      "target": 150,
+      "actual": null,
+      "evidence": null
+    },
+    "direct_proposals": {
+      "target": 10,
+      "actual": null,
+      "evidence": null
+    },
+    "qualified_inquiries": {
+      "target": 3,
+      "actual": null,
+      "evidence": null
+    },
+    "customer_dataset_audit_demos": {
+      "target": 2,
+      "actual": null,
+      "evidence": null
+    },
+    "paid_pilots": {
+      "target": 1,
+      "actual": null,
+      "evidence": null
+    },
+    "batch_or_continuation_requests_10_plus_objects": {
+      "target": 1,
+      "actual": null,
+      "evidence": null
+    }
+  },
+  "notes": "Null means not measured. Do not replace missing external evidence with zero or a repository action."
+}
