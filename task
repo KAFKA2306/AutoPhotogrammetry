@@ -117,9 +117,15 @@ case "${1:-run}" in
     scene="${2:-huejotzingo}"
     iterations="${3:-30000}"
     data="$ROOT/output/$scene/nerfstudio-data"
+    source="$ROOT/input/$scene/source.webm"
     if [[ ! -f "$data/transforms.json" ]]; then
       echo "Prepared Nerfstudio dataset is missing: $data/transforms.json" >&2
       echo "Quality execution is intentionally GPU-only and will not rerun download/FFmpeg/COLMAP. Use an existing prepared dataset." >&2
+      exit 1
+    fi
+    if [[ ! -f "$source" ]]; then
+      echo "Source video required for deterministic evaluation identity is missing: $source" >&2
+      echo "Quality execution does not redownload source media; run the canonical production path that prepared this dataset." >&2
       exit 1
     fi
     check_docker
@@ -127,6 +133,7 @@ case "${1:-run}" in
     ensure_image
     run_gpu python -m processing.quality_sweep \
       --data "/workspace/output/$scene/nerfstudio-data" \
+      --source-video "/workspace/input/$scene/source.webm" \
       --output-root "/workspace/output/$scene/quality-sweep" \
       --iterations "$iterations"
     ;;
