@@ -5,8 +5,8 @@ import json
 import shutil
 import subprocess
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from processing.backend_evaluation import (
     artifact_record,
@@ -44,9 +44,7 @@ def verify_vggt_checkout(checkout: str | Path) -> dict:
         raise ValueError(f"VGGT checkout does not exist: {root}")
     revision = _git_head(root)
     if revision != VGGT_REVISION:
-        raise ValueError(
-            f"VGGT revision mismatch: expected {VGGT_REVISION}, got {revision}"
-        )
+        raise ValueError(f"VGGT revision mismatch: expected {VGGT_REVISION}, got {revision}")
     demo = root / "demo_colmap.py"
     if not demo.is_file():
         raise ValueError(f"pinned VGGT checkout is missing demo_colmap.py: {demo}")
@@ -94,7 +92,9 @@ def _frame_sources(transforms_json: Path) -> dict[str, Path]:
         if not declared:
             raise ValueError("Nerfstudio frame is missing file_path")
         candidate = Path(str(declared))
-        source = (candidate if candidate.is_absolute() else transforms_json.parent / candidate).resolve()
+        source = (
+            candidate if candidate.is_absolute() else transforms_json.parent / candidate
+        ).resolve()
         if not source.is_file():
             raise ValueError(f"Nerfstudio frame does not exist: {source}")
         digest = sha256_file(source)
@@ -118,10 +118,7 @@ def materialize_vggt_scene(
     images = scene / "images"
     images.mkdir(parents=True)
 
-    expected = {
-        str(record["sha256"]): dict(record)
-        for record in dataset.get("frames") or []
-    }
+    expected = {str(record["sha256"]): dict(record) for record in dataset.get("frames") or []}
     if not expected:
         raise ValueError("dataset contract has no frames")
     if set(expected) != set(sources):

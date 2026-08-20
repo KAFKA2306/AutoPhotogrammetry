@@ -39,7 +39,7 @@ def _render_html(report: dict) -> str:
         ("Missing provenance", reason_counts["PROVENANCE_MISSING"]),
         (
             "Provenance coverage",
-            f'{report["provenance"]["covered_count"]}/{report["input"]["count"]}',
+            f"{report['provenance']['covered_count']}/{report['input']['count']}",
         ),
         ("Distinct image sizes", dimensions["distinct_size_count"]),
         ("Backend execution", report["backend"]["status"]),
@@ -53,7 +53,7 @@ def _render_html(report: dict) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Photogrammetry input audit — {html.escape(report['asset_id'])}</title>
+  <title>Photogrammetry input audit — {html.escape(report["asset_id"])}</title>
   <style>
     body {{ font-family: system-ui, sans-serif; max-width: 880px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }}
     table {{ border-collapse: collapse; width: 100%; }}
@@ -63,7 +63,7 @@ def _render_html(report: dict) -> str:
 </head>
 <body>
   <h1>Photogrammetry input audit</h1>
-  <p><strong>Asset:</strong> {html.escape(report['asset_id'])}</p>
+  <p><strong>Asset:</strong> {html.escape(report["asset_id"])}</p>
   <table><tbody>{table}</tbody></table>
   <div class="notice">
     <p>This report describes input selection and provenance only.</p>
@@ -114,11 +114,7 @@ def build_readiness_report(
         else:
             near_duplicate += 1
 
-    hashes = [
-        str(record.get("sha256", ""))
-        for record in source_records
-        if record.get("sha256")
-    ]
+    hashes = [str(record.get("sha256", "")) for record in source_records if record.get("sha256")]
     exact_duplicates = len(hashes) - len(set(hashes))
     records_by_name = {
         Path(str(record.get("local_path", ""))).name: record for record in source_records
@@ -135,12 +131,7 @@ def build_readiness_report(
         if record:
             width = record.get("width")
             height = record.get("height")
-            if (
-                isinstance(width, int)
-                and width > 0
-                and isinstance(height, int)
-                and height > 0
-            ):
+            if isinstance(width, int) and width > 0 and isinstance(height, int) and height > 0:
                 dimensions.append((width, height))
             content_type = record.get("content_type")
             if isinstance(content_type, str) and content_type:

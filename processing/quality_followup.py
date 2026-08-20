@@ -4,8 +4,8 @@ import argparse
 import json
 import subprocess
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from processing.backend_evaluation import (
     artifact_record,
@@ -238,9 +238,7 @@ def _run_experiment(
 
         if isinstance(exc, subprocess.CalledProcessError):
             command = (
-                list(map(str, exc.cmd))
-                if isinstance(exc.cmd, (list, tuple))
-                else [str(exc.cmd)]
+                list(map(str, exc.cmd)) if isinstance(exc.cmd, (list, tuple)) else [str(exc.cmd)]
             )
             return_code = int(exc.returncode)
         else:

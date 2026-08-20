@@ -5,9 +5,9 @@ import json
 import math
 import subprocess
 import tempfile
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from statistics import median
-from typing import Mapping, Sequence
 
 import numpy as np
 from PIL import Image
@@ -120,9 +120,7 @@ def measure_frames(
 
     mean_exposure = float(np.mean(exposures))
     exposure_variation = (
-        None
-        if mean_exposure <= 1e-12
-        else float(np.std(exposures, ddof=0) / mean_exposure)
+        None if mean_exposure <= 1e-12 else float(np.std(exposures, ddof=0) / mean_exposure)
     )
     metrics = {
         "scene_cut_count": int(sum(score < scene_ssim_threshold for score in pair_ssim)),

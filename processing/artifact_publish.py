@@ -4,8 +4,8 @@ import json
 import os
 import subprocess
 import sys
+from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Callable, Sequence
 
 import yaml
 
@@ -25,7 +25,9 @@ def git_revision(runner: Callable[..., subprocess.CompletedProcess] = subprocess
     )
     revision = result.stdout.strip()
     if len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
-        raise ArtifactPublishError(f"git rev-parse did not return a full lowercase commit SHA: {revision!r}")
+        raise ArtifactPublishError(
+            f"git rev-parse did not return a full lowercase commit SHA: {revision!r}"
+        )
     return revision
 
 
@@ -98,7 +100,9 @@ def publish_run_splat(
         expected_sha = splat["ply_sha256"]
         expected_size = splat["ply_size_bytes"]
     except KeyError as exc:
-        raise ArtifactPublishError(f"run manifest is missing Gaussian Splat metadata: {exc}") from exc
+        raise ArtifactPublishError(
+            f"run manifest is missing Gaussian Splat metadata: {exc}"
+        ) from exc
 
     actual_sha = sha256_file(ply_path)
     actual_size = ply_path.stat().st_size

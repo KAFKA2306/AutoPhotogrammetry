@@ -23,21 +23,26 @@ class ArtifactPublishTest(unittest.TestCase):
         sha = hashlib.sha256(payload).hexdigest()
         manifest = root / "output" / "demo" / "manifest.json"
         manifest.parent.mkdir(parents=True, exist_ok=True)
-        manifest.write_text(json.dumps({
-            "schema_version": 2,
-            "dataset": "demo",
-            "status": "success",
-            "started_at": "2026-08-20T00:00:00Z",
-            "registry": {
-                "source_page": "https://commons.wikimedia.org/wiki/File:Demo.webm",
-                "license": {"url": "https://creativecommons.org/publicdomain/zero/1.0/"},
-            },
-            "splatfacto": {
-                "ply_path": str(ply),
-                "ply_sha256": sha,
-                "ply_size_bytes": len(payload),
-            },
-        }), encoding="utf-8")
+        manifest.write_text(
+            json.dumps(
+                {
+                    "schema_version": 2,
+                    "dataset": "demo",
+                    "status": "success",
+                    "started_at": "2026-08-20T00:00:00Z",
+                    "registry": {
+                        "source_page": "https://commons.wikimedia.org/wiki/File:Demo.webm",
+                        "license": {"url": "https://creativecommons.org/publicdomain/zero/1.0/"},
+                    },
+                    "splatfacto": {
+                        "ply_path": str(ply),
+                        "ply_sha256": sha,
+                        "ply_size_bytes": len(payload),
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
         hf_root = root / "hf-cache-hub"
         (hf_root / "scripts").mkdir(parents=True)
         (hf_root / "scripts" / "artifact_manager.py").write_text("# cli", encoding="utf-8")
@@ -57,9 +62,13 @@ class ArtifactPublishTest(unittest.TestCase):
             def runner(command, **kwargs):
                 calls.append(command)
                 if command[:3] == ["git", "rev-parse", "HEAD"]:
-                    return subprocess.CompletedProcess(command, 0, stdout="a" * 40 + "\n", stderr="")
+                    return subprocess.CompletedProcess(
+                        command, 0, stdout="a" * 40 + "\n", stderr=""
+                    )
                 artifact_manifest = Path(command[command.index("--manifest") + 1])
-                declared = yaml.safe_load(artifact_manifest.read_text(encoding="utf-8"))["artifacts"][0]
+                declared = yaml.safe_load(artifact_manifest.read_text(encoding="utf-8"))[
+                    "artifacts"
+                ][0]
                 result = {
                     "status": "PUBLISHED",
                     "remote_verified": True,
@@ -79,7 +88,9 @@ class ArtifactPublishTest(unittest.TestCase):
             self.assertTrue(result["remote_verified"])
             self.assertEqual(sha, result["sha256"])
             self.assertEqual("a" * 40, result["source_revision"])
-            artifact_manifest = yaml.safe_load((manifest.parent / "artifact-manifest.yaml").read_text(encoding="utf-8"))
+            artifact_manifest = yaml.safe_load(
+                (manifest.parent / "artifact-manifest.yaml").read_text(encoding="utf-8")
+            )
             artifact = artifact_manifest["artifacts"][0]
             self.assertEqual("gaussian-splat", artifact["kind"])
             self.assertEqual("ply", artifact["format"])
@@ -98,11 +109,17 @@ class ArtifactPublishTest(unittest.TestCase):
 
             def runner(command, **kwargs):
                 if command[:3] == ["git", "rev-parse", "HEAD"]:
-                    return subprocess.CompletedProcess(command, 0, stdout="b" * 40 + "\n", stderr="")
-                return subprocess.CompletedProcess(command, 1, stdout=json.dumps({"status": "FAILED"}), stderr="")
+                    return subprocess.CompletedProcess(
+                        command, 0, stdout="b" * 40 + "\n", stderr=""
+                    )
+                return subprocess.CompletedProcess(
+                    command, 1, stdout=json.dumps({"status": "FAILED"}), stderr=""
+                )
 
             with self.assertRaises(ArtifactPublishError):
-                publish_run_splat(manifest, bucket="k4fka/artifacts", hf_cache_hub_root=hf_root, runner=runner)
+                publish_run_splat(
+                    manifest, bucket="k4fka/artifacts", hf_cache_hub_root=hf_root, runner=runner
+                )
             updated = json.loads(manifest.read_text(encoding="utf-8"))
             self.assertEqual("success", updated["status"])
             self.assertEqual("failed", updated["artifact_publish"]["status"])

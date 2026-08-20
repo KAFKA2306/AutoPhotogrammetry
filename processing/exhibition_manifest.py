@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 from processing.gaussian_ply import gaussian_ply_metrics
 from processing.provenance import image_records, sha256_file, write_json

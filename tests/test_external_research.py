@@ -48,7 +48,9 @@ class ExternalResearchTests(unittest.TestCase):
             root = Path(tmp)
             (root / "train.py").write_text("", encoding="utf-8")
             with patch("processing.external_research.git_head", return_value="abc"):
-                result = verify_checkout(root, expected_revision="abc", required_paths=("train.py",))
+                result = verify_checkout(
+                    root, expected_revision="abc", required_paths=("train.py",)
+                )
             self.assertEqual(result["revision"], "abc")
             with patch("processing.external_research.git_head", return_value="wrong"):
                 with self.assertRaisesRegex(ValueError, "revision mismatch"):

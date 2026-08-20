@@ -90,7 +90,9 @@ def gaussian_ply_metrics(path: str | Path) -> dict:
         vertices = np.fromfile(handle, dtype=dtype, count=vertex_count)
 
     if len(vertices) != vertex_count:
-        raise ValueError(f"PLY vertex payload is truncated: expected {vertex_count}, got {len(vertices)}")
+        raise ValueError(
+            f"PLY vertex payload is truncated: expected {vertex_count}, got {len(vertices)}"
+        )
     if vertex_count == 0:
         raise ValueError("PLY has zero Gaussian primitives")
 
@@ -142,7 +144,9 @@ def gaussian_ply_metrics(path: str | Path) -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Measure Gaussian PLY primitive/opacity/scale statistics.")
+    parser = argparse.ArgumentParser(
+        description="Measure Gaussian PLY primitive/opacity/scale statistics."
+    )
     parser.add_argument("ply")
     parser.add_argument("--output")
     args = parser.parse_args()

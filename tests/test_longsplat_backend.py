@@ -80,10 +80,12 @@ class LongSplatBackendTests(unittest.TestCase):
                 "scale_anisotropy_above_10_count": 2,
                 "scale_anisotropy_above_10_ratio": 0.2,
             }
-            with patch("processing.external_research.git_head", return_value=LONGSPLAT_REVISION), patch(
-                "processing.longsplat_backend.run_recorded_gpu_step", side_effect=fake_step
-            ), patch(
-                "processing.longsplat_backend.gaussian_artifact_metrics", return_value=metrics
+            with (
+                patch("processing.external_research.git_head", return_value=LONGSPLAT_REVISION),
+                patch("processing.longsplat_backend.run_recorded_gpu_step", side_effect=fake_step),
+                patch(
+                    "processing.longsplat_backend.gaussian_artifact_metrics", return_value=metrics
+                ),
             ):
                 result = run_longsplat(
                     dataset_path,
