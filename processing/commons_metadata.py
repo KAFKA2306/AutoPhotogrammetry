@@ -3,8 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from bs4 import BeautifulSoup
 
@@ -67,9 +68,7 @@ def refresh_source_metadata(source: Mapping[str, Any]) -> dict[str, Any]:
         resolved = {
             "media_url": source["media_url"],
             "source_sha1": (source.get("metadata_evidence") or {}).get("source_sha1"),
-            "source_size_bytes": (source.get("metadata_evidence") or {}).get(
-                "source_size_bytes"
-            ),
+            "source_size_bytes": (source.get("metadata_evidence") or {}).get("source_size_bytes"),
             "mime": (source.get("metadata_evidence") or {}).get("mime"),
             "author": source.get("author"),
             "license": current_license.get("name"),
@@ -135,9 +134,7 @@ def refresh_registry(
         "registry": registry_ref.as_posix(),
         "source_count": len(refreshed),
         "verified_license_count": sum(
-            1
-            for source in refreshed
-            if (source.get("license") or {}).get("status") == "verified"
+            1 for source in refreshed if (source.get("license") or {}).get("status") == "verified"
         ),
         "direct_media_url_count": sum(1 for source in refreshed if source.get("media_url")),
         "author_count": sum(1 for source in refreshed if source.get("author")),
