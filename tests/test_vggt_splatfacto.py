@@ -183,28 +183,35 @@ class VggtSplatfactoTests(unittest.TestCase):
                 "scale_anisotropy_above_10_count": 2,
                 "scale_anisotropy_above_10_ratio": 0.2,
             }
-            with patch(
-                "processing.vggt_splatfacto.prepare_vggt_nerfstudio_data",
-                return_value={
-                    "transforms_path": str(prepared_transforms),
-                    "command": ["ns-process-data"],
-                    "return_code": 0,
-                },
-            ), patch(
-                "processing.vggt_splatfacto.verify_gpu_runtime",
-                return_value={"gpu": "test"},
-            ), patch(
-                "processing.vggt_splatfacto.verify_research_environment",
-                return_value={"nerfstudio_revision": "ns-rev"},
-            ), patch(
-                "processing.vggt_splatfacto.run_splatfacto_export",
-                side_effect=fake_train,
-            ), patch(
-                "processing.vggt_splatfacto.run_nerfstudio_eval",
-                side_effect=fake_eval,
-            ), patch(
-                "processing.vggt_splatfacto.gaussian_artifact_metrics",
-                return_value=artifact_metrics,
+            with (
+                patch(
+                    "processing.vggt_splatfacto.prepare_vggt_nerfstudio_data",
+                    return_value={
+                        "transforms_path": str(prepared_transforms),
+                        "command": ["ns-process-data"],
+                        "return_code": 0,
+                    },
+                ),
+                patch(
+                    "processing.vggt_splatfacto.verify_gpu_runtime",
+                    return_value={"gpu": "test"},
+                ),
+                patch(
+                    "processing.vggt_splatfacto.verify_research_environment",
+                    return_value={"nerfstudio_revision": "ns-rev"},
+                ),
+                patch(
+                    "processing.vggt_splatfacto.run_splatfacto_export",
+                    side_effect=fake_train,
+                ),
+                patch(
+                    "processing.vggt_splatfacto.run_nerfstudio_eval",
+                    side_effect=fake_eval,
+                ),
+                patch(
+                    "processing.vggt_splatfacto.gaussian_artifact_metrics",
+                    return_value=artifact_metrics,
+                ),
             ):
                 result = run_vggt_splatfacto(
                     dataset_path,
@@ -218,9 +225,7 @@ class VggtSplatfactoTests(unittest.TestCase):
             self.assertEqual(result["dataset_id"], dataset_identity(dataset))
             self.assertEqual(result["metrics"]["psnr"], 24.0)
             self.assertEqual(result["metrics"]["peak_gpu_memory_bytes"], 123)
-            comparison = json.loads(
-                Path(result["comparison_path"]).read_text(encoding="utf-8")
-            )
+            comparison = json.loads(Path(result["comparison_path"]).read_text(encoding="utf-8"))
             self.assertEqual(len(comparison["results"]), 2)
             self.assertEqual(
                 [row["backend"] for row in comparison["results"]],
@@ -254,18 +259,19 @@ class VggtSplatfactoTests(unittest.TestCase):
                 json.dumps({"frames": changed_frames}),
                 encoding="utf-8",
             )
-            with patch(
-                "processing.vggt_splatfacto.prepare_vggt_nerfstudio_data",
-                return_value={"transforms_path": str(transforms)},
-            ), patch(
-                "processing.vggt_splatfacto.verify_gpu_runtime", return_value={}
-            ), patch(
-                "processing.vggt_splatfacto.verify_research_environment",
-                return_value={"nerfstudio_revision": "ns-rev"},
-            ), patch("processing.vggt_splatfacto.run_splatfacto_export") as train:
-                with self.assertRaisesRegex(
-                    RuntimeError, "changed the frozen dataset identity"
-                ):
+            with (
+                patch(
+                    "processing.vggt_splatfacto.prepare_vggt_nerfstudio_data",
+                    return_value={"transforms_path": str(transforms)},
+                ),
+                patch("processing.vggt_splatfacto.verify_gpu_runtime", return_value={}),
+                patch(
+                    "processing.vggt_splatfacto.verify_research_environment",
+                    return_value={"nerfstudio_revision": "ns-rev"},
+                ),
+                patch("processing.vggt_splatfacto.run_splatfacto_export") as train,
+            ):
+                with self.assertRaisesRegex(RuntimeError, "changed the frozen dataset identity"):
                     run_vggt_splatfacto(dataset_path, source, scene, root / "out")
                 train.assert_not_called()
 

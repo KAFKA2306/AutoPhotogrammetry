@@ -28,7 +28,9 @@ class HuejotzingoTests(unittest.TestCase):
         commands = dict(colmap_commands("selected images", "output/colmap"))
         self.assertEqual(commands["colmap-feature-extractor"][0:2], ["colmap", "feature_extractor"])
         self.assertIn("selected images", commands["colmap-feature-extractor"])
-        self.assertEqual(commands["colmap-sequential-matcher"][0:2], ["colmap", "sequential_matcher"])
+        self.assertEqual(
+            commands["colmap-sequential-matcher"][0:2], ["colmap", "sequential_matcher"]
+        )
         self.assertEqual(commands["colmap-mapper"][-2:], ["--output_path", "output/colmap/sparse"])
 
     def test_colmap_metrics_parse_analyzer_output(self):

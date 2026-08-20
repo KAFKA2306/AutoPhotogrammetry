@@ -63,9 +63,7 @@ class VideoTests(unittest.TestCase):
 
     @patch("processing.video.run")
     def test_scene_cut_times_parses_showinfo(self, mocked_run):
-        mocked_run.return_value.stderr = (
-            "x pts_time:12.5 y\nx pts_time:88.25 y\n"
-        )
+        mocked_run.return_value.stderr = "x pts_time:12.5 y\nx pts_time:88.25 y\n"
         self.assertEqual(scene_cut_times("source.webm"), [12.5, 88.25])
 
 

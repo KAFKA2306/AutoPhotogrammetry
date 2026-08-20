@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from processing.gaussian_ply import gaussian_ply_metrics
 from processing.provenance import image_records, sha256_file, write_json
@@ -132,7 +132,9 @@ def build_nerfstudio_dataset_contract(
         if not declared:
             raise ValueError("Nerfstudio frame is missing file_path")
         declared_path = Path(str(declared))
-        resolved = declared_path if declared_path.is_absolute() else transforms.parent / declared_path
+        resolved = (
+            declared_path if declared_path.is_absolute() else transforms.parent / declared_path
+        )
         resolved = resolved.resolve()
         if not resolved.is_file():
             raise ValueError(f"Nerfstudio frame does not exist: {resolved}")

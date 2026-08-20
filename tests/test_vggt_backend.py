@@ -93,8 +93,9 @@ class VggtBackendTests(unittest.TestCase):
                 (sparse / "points.ply").write_bytes(b"ply")
                 return subprocess.CompletedProcess(command, 0, "ok", "")
 
-            with patch("processing.vggt_backend._git_head", return_value=VGGT_REVISION), patch(
-                "processing.vggt_backend._run_command", side_effect=fake_run
+            with (
+                patch("processing.vggt_backend._git_head", return_value=VGGT_REVISION),
+                patch("processing.vggt_backend._run_command", side_effect=fake_run),
             ):
                 result = run_vggt_colmap(
                     dataset_path,
@@ -109,7 +110,9 @@ class VggtBackendTests(unittest.TestCase):
             self.assertFalse(result["config"]["production_eligible"])
             self.assertEqual(
                 result["dataset_id"],
-                __import__("processing.backend_evaluation", fromlist=["dataset_identity"]).dataset_identity(dataset),
+                __import__(
+                    "processing.backend_evaluation", fromlist=["dataset_identity"]
+                ).dataset_identity(dataset),
             )
             self.assertTrue(Path(result["manifest_path"]).is_file())
 
@@ -118,8 +121,9 @@ class VggtBackendTests(unittest.TestCase):
             root = Path(tmp)
             _, dataset_path, transforms, checkout = self._fixture(root)
             failed = subprocess.CompletedProcess(["python"], 9, "", "gpu failed")
-            with patch("processing.vggt_backend._git_head", return_value=VGGT_REVISION), patch(
-                "processing.vggt_backend._run_command", return_value=failed
+            with (
+                patch("processing.vggt_backend._git_head", return_value=VGGT_REVISION),
+                patch("processing.vggt_backend._run_command", return_value=failed),
             ):
                 result = run_vggt_colmap(
                     dataset_path,

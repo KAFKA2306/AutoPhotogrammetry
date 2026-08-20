@@ -87,18 +87,23 @@ class NerfstudioTests(unittest.TestCase):
                     return subprocess.CompletedProcess(command, 0, "exported\n", "")
                 raise AssertionError(command)
 
-            with patch(
-                "processing.nerfstudio._resolve_cli",
-                side_effect=lambda name: Path("/fake") / name,
-            ), patch(
-                "processing.nerfstudio._package_version",
-                side_effect=lambda name: {"nerfstudio": "1.2.3", "gsplat": "1.5.0"}[name],
-            ), patch(
-                "processing.nerfstudio.subprocess.run",
-                side_effect=fake_run,
-            ), patch(
-                "processing.nerfstudio.shutil.which",
-                return_value=None,
+            with (
+                patch(
+                    "processing.nerfstudio._resolve_cli",
+                    side_effect=lambda name: Path("/fake") / name,
+                ),
+                patch(
+                    "processing.nerfstudio._package_version",
+                    side_effect=lambda name: {"nerfstudio": "1.2.3", "gsplat": "1.5.0"}[name],
+                ),
+                patch(
+                    "processing.nerfstudio.subprocess.run",
+                    side_effect=fake_run,
+                ),
+                patch(
+                    "processing.nerfstudio.shutil.which",
+                    return_value=None,
+                ),
             ):
                 result = run_splatfacto_export(data.parent, root / "runs")
 
@@ -125,7 +130,12 @@ class NerfstudioTests(unittest.TestCase):
                         "frames": [
                             {
                                 "file_path": image.as_posix(),
-                                "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                                "transform_matrix": [
+                                    [1, 0, 0, 0],
+                                    [0, 1, 0, 0],
+                                    [0, 0, 1, 0],
+                                    [0, 0, 0, 1],
+                                ],
                             }
                         ]
                     }
@@ -133,18 +143,23 @@ class NerfstudioTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            with patch(
-                "processing.nerfstudio._resolve_cli",
-                side_effect=lambda name: Path("/fake") / name,
-            ), patch(
-                "processing.nerfstudio._package_version",
-                return_value="1.0",
-            ), patch(
-                "processing.nerfstudio.subprocess.run",
-                return_value=subprocess.CompletedProcess(["ns-train"], 2, "", "stop"),
-            ), patch(
-                "processing.nerfstudio.shutil.which",
-                return_value=None,
+            with (
+                patch(
+                    "processing.nerfstudio._resolve_cli",
+                    side_effect=lambda name: Path("/fake") / name,
+                ),
+                patch(
+                    "processing.nerfstudio._package_version",
+                    return_value="1.0",
+                ),
+                patch(
+                    "processing.nerfstudio.subprocess.run",
+                    return_value=subprocess.CompletedProcess(["ns-train"], 2, "", "stop"),
+                ),
+                patch(
+                    "processing.nerfstudio.shutil.which",
+                    return_value=None,
+                ),
             ):
                 with self.assertRaises(subprocess.CalledProcessError):
                     run_splatfacto_export(dataset, root / "runs")
@@ -178,12 +193,15 @@ class NerfstudioTests(unittest.TestCase):
                 (renders / "00000.png").write_bytes(b"render")
                 return subprocess.CompletedProcess(command, 0, "evaluated", "")
 
-            with patch(
-                "processing.nerfstudio._resolve_cli",
-                return_value=Path("/fake/ns-eval"),
-            ), patch(
-                "processing.nerfstudio.subprocess.run",
-                side_effect=fake_run,
+            with (
+                patch(
+                    "processing.nerfstudio._resolve_cli",
+                    return_value=Path("/fake/ns-eval"),
+                ),
+                patch(
+                    "processing.nerfstudio.subprocess.run",
+                    side_effect=fake_run,
+                ),
             ):
                 result = run_nerfstudio_eval(config, root / "evaluation")
 
@@ -207,12 +225,15 @@ class NerfstudioTests(unittest.TestCase):
                 metrics.write_text(json.dumps({"results": {"psnr": 1.0}}), encoding="utf-8")
                 return subprocess.CompletedProcess(command, 0, "evaluated", "")
 
-            with patch(
-                "processing.nerfstudio._resolve_cli",
-                return_value=Path("/fake/ns-eval"),
-            ), patch(
-                "processing.nerfstudio.subprocess.run",
-                side_effect=fake_run,
+            with (
+                patch(
+                    "processing.nerfstudio._resolve_cli",
+                    return_value=Path("/fake/ns-eval"),
+                ),
+                patch(
+                    "processing.nerfstudio.subprocess.run",
+                    side_effect=fake_run,
+                ),
             ):
                 with self.assertRaisesRegex(RuntimeError, "hold-out render"):
                     run_nerfstudio_eval(config, root / "evaluation")
@@ -224,18 +245,25 @@ class NerfstudioTests(unittest.TestCase):
             data.mkdir()
             (data / "frame.jpg").write_bytes(b"frame")
 
-            with patch(
-                "processing.nerfstudio._resolve_cli",
-                side_effect=lambda name: Path("/fake") / name,
-            ), patch(
-                "processing.nerfstudio._package_version",
-                side_effect=lambda name: "1.0",
-            ), patch(
-                "processing.nerfstudio.subprocess.run",
-                return_value=subprocess.CompletedProcess(["ns-train"], 2, "", "training failed"),
-            ), patch(
-                "processing.nerfstudio.shutil.which",
-                return_value=None,
+            with (
+                patch(
+                    "processing.nerfstudio._resolve_cli",
+                    side_effect=lambda name: Path("/fake") / name,
+                ),
+                patch(
+                    "processing.nerfstudio._package_version",
+                    side_effect=lambda name: "1.0",
+                ),
+                patch(
+                    "processing.nerfstudio.subprocess.run",
+                    return_value=subprocess.CompletedProcess(
+                        ["ns-train"], 2, "", "training failed"
+                    ),
+                ),
+                patch(
+                    "processing.nerfstudio.shutil.which",
+                    return_value=None,
+                ),
             ):
                 with self.assertRaises(subprocess.CalledProcessError):
                     run_splatfacto_export(data, root / "runs")

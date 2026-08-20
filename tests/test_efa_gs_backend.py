@@ -78,10 +78,10 @@ class EfaGsBackendTests(unittest.TestCase):
                 "scale_anisotropy_above_10_count": 3,
                 "scale_anisotropy_above_10_ratio": 0.15,
             }
-            with patch("processing.external_research.git_head", return_value=EFA_REVISION), patch(
-                "processing.efa_gs_backend.run_recorded_gpu_step", side_effect=fake_step
-            ), patch(
-                "processing.efa_gs_backend.gaussian_artifact_metrics", return_value=metrics
+            with (
+                patch("processing.external_research.git_head", return_value=EFA_REVISION),
+                patch("processing.efa_gs_backend.run_recorded_gpu_step", side_effect=fake_step),
+                patch("processing.efa_gs_backend.gaussian_artifact_metrics", return_value=metrics),
             ):
                 result = run_efa_gs(
                     dataset_path,

@@ -1,0 +1,20 @@
+minimum_prek_version = "0.2.0"
+
+[[repos]]
+repo = "builtin"
+hooks = [
+  { id = "trailing-whitespace" },
+  { id = "end-of-file-fixer" },
+  { id = "check-json" },
+  { id = "check-yaml" },
+]
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "check-fast"
+name = "repository fast check"
+language = "system"
+entry = "bash scripts/check-fast"
+pass_filenames = false

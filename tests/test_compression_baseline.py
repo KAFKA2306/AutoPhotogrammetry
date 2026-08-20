@@ -26,9 +26,7 @@ class CompressionBaselineTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(len(first["holdout_frame_names"]), 2)
         self.assertEqual(len(first["train_frame_names"]), 8)
-        self.assertTrue(
-            set(first["holdout_frame_names"]).isdisjoint(first["train_frame_names"])
-        )
+        self.assertTrue(set(first["holdout_frame_names"]).isdisjoint(first["train_frame_names"]))
 
     def test_named_split_uses_same_frame_names_in_each_condition(self):
         with tempfile.TemporaryDirectory() as tmp:
