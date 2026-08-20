@@ -7,12 +7,19 @@ on:
       - pyproject.toml
       - requirements.txt
       - .github/workflows/bootstrap-tooling.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - pyproject.toml
+      - requirements.txt
+      - .github/workflows/bootstrap-tooling.yml
 
 permissions:
   contents: write
 
 jobs:
   bootstrap:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
