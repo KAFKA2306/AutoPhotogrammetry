@@ -26,6 +26,26 @@ CULLING_FLAGS = {
     "cull_screen_size": "--pipeline.model.cull-screen-size",
     "stop_screen_size_at": "--pipeline.model.stop-screen-size-at",
 }
+MCMC_EFFECTIVE_CULLING_PARAMETERS = {"cull_alpha_thresh"}
+
+
+def _validate_culling_parameter_for_winner(winner: str, parameter: str) -> None:
+    if parameter not in CULLING_FLAGS:
+        raise ValueError(f"unknown culling parameter: {parameter}")
+    if winner == "mcmc" and parameter not in MCMC_EFFECTIVE_CULLING_PARAMETERS:
+        raise ValueError(
+            f"{parameter} is not consumed by the pinned Splatfacto MCMCStrategy; "
+            "do not run a no-op culling experiment"
+        )
+
+
+def _format_culling_value(parameter: str, value: float | int) -> str:
+    if parameter == "stop_screen_size_at":
+        numeric = float(value)
+        if not numeric.is_integer():
+            raise ValueError("stop_screen_size_at must be an integer")
+        return str(int(numeric))
+    return str(float(value))
 
 
 def culling_train_args(
@@ -35,7 +55,7 @@ def culling_train_args(
     parameter: str | None = None,
     value: float | int | None = None,
 ) -> tuple[str, ...]:
-    """Freeze the #43 winner and optionally change exactly one culling field."""
+    """Freeze the #43 winner and optionally change exactly one effective culling field."""
     if winner not in WINNERS:
         raise ValueError(f"winner must be one of {WINNERS}, got {winner!r}")
     args = list(winner_train_args(iterations=iterations, winner=winner))
@@ -43,11 +63,10 @@ def culling_train_args(
         if value is not None:
             raise ValueError("culling value requires a parameter")
         return tuple(args)
-    if parameter not in CULLING_FLAGS:
-        raise ValueError(f"unknown culling parameter: {parameter}")
+    _validate_culling_parameter_for_winner(winner, parameter)
     if value is None:
         raise ValueError("culling parameter requires a value")
-    args.extend((CULLING_FLAGS[parameter], str(value)))
+    args.extend((CULLING_FLAGS[parameter], _format_culling_value(parameter, value)))
     return tuple(args)
 
 
@@ -90,11 +109,10 @@ def run_culling_sweep(
     nerfstudio_source: str | Path = DEFAULT_NERFSTUDIO_SOURCE,
     timeout: float | None = None,
 ) -> dict:
-    """Compare one culling parameter family after freezing the #43 winner."""
+    """Compare one effective culling parameter family after freezing the #43 winner."""
     if winner not in WINNERS:
         raise ValueError(f"winner must be one of {WINNERS}, got {winner!r}")
-    if parameter not in CULLING_FLAGS:
-        raise ValueError(f"unknown culling parameter: {parameter}")
+    _validate_culling_parameter_for_winner(winner, parameter)
     unique_values = tuple(dict.fromkeys(float(value) for value in values))
     if not unique_values:
         raise ValueError("at least one culling value is required")
