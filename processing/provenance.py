@@ -61,6 +61,15 @@ def sha256_file(path: str | Path) -> str:
 
 
 def write_json(path: str | Path, value: Mapping | list) -> None:
+    # Reconstruction run manifests share these fields. Attach the source revision
+    # before the manifest leaves the generation process so later publication never
+    # has to infer provenance from a newer checkout.
+    if (
+        isinstance(value, dict)
+        and {"dataset", "commands", "started_at", "status"}.issubset(value)
+        and "source_revision" not in value
+    ):
+        value["source_revision"] = source_revision()
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(
