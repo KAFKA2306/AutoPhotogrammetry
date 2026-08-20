@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scene_id": "centro-aguascalientes",
+  "status": "success",
+  "generated_at": "2026-08-20T01:59:22.635524+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "5f5558a898a83e92e3a6556d9375836f1d3c198f3a1af0121ab9feb6887af9ea",
+    "sha1": "021bb75d892de6f3ce5869f08548e4e6bc171a6a",
+    "frame_count": 27,
+    "selected_frame_count": 27,
+    "registered_images": 27,
+    "registration_ratio": 1.0,
+    "sparse_points": 11322,
+    "mean_reprojection_error_px": 0.427975,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/centro-aguascalientes/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T01:57:57.246286+00:00",
+    "finished_at": "2026-08-20T01:59:03.686487+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/centro-aguascalientes/runs/splatfacto/20260820T015757Z-4de6b159/export/splat.ply",
+    "sha256": "e6b24c9e4e71b9e8a6a6d09e1d09dc34eb9303ea4048adb117264b26469b4408",
+    "size_bytes": 53207513,
+    "primitive_count": 214540,
+    "low_opacity_primitive_count": 9455,
+    "low_opacity_primitive_ratio": 0.044071035704297566,
+    "scale_anisotropy_above_10_count": 56926,
+    "scale_anisotropy_above_10_ratio": 0.26533979677449426,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
