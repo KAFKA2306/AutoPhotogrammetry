@@ -150,7 +150,8 @@ def build_orientation_evidence(
         "ply_sha256": sha256_file(ply_file),
         "derivation_method": "pinned Nerfstudio coordinate convention plus explicit consumer import transform",
     }
-    validate_orientation_evidence(evidence, expected_ply_sha256=evidence["ply_sha256"])
+    if status == "accepted":
+        validate_orientation_evidence(evidence, expected_ply_sha256=evidence["ply_sha256"])
     return evidence
 
 
