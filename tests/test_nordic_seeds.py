@@ -25,7 +25,10 @@ class NordicSeedTests(unittest.TestCase):
         self.assertGreaterEqual(len(seeds), 7)
         self.assertEqual(len({seed["category_title"] for seed in seeds}), len(seeds))
         self.assertTrue(
-            all(seed["source_url"].startswith("https://commons.wikimedia.org/wiki/Category:") for seed in seeds)
+            all(
+                seed["source_url"].startswith("https://commons.wikimedia.org/wiki/Category:")
+                for seed in seeds
+            )
         )
 
     def test_duplicate_category_is_rejected(self) -> None:
