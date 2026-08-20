@@ -1,0 +1,94 @@
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG LONGSPLAT_REVISION=19750775a9d19f30aa05a8333c4c6c231b2d5f4a
+ARG PYTORCH3D_REVISION=97bc85b6d23c9b161f1e3efff676666a3c6c5af3
+ENV CUDA_HOME=/usr/local/cuda \
+    TORCH_CUDA_ARCH_LIST=12.0 \
+    MAX_JOBS=4 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONUNBUFFERED=1
+
+LABEL org.opencontainers.image.source="https://github.com/KAFKA2306/AutoPhotogrammetry" \
+      org.opencontainers.image.description="Pinned LongSplat research backend ported to Blackwell-compatible PyTorch/CUDA"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        ca-certificates \
+        cmake \
+        git \
+        ninja-build \
+        python3 \
+        python3-dev \
+        python3-pip \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /usr/bin/python3 /usr/local/bin/python
+
+RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel ninja \
+    && python -m pip install --no-cache-dir \
+        torch==2.7.1 torchvision==0.22.1 \
+        --index-url https://download.pytorch.org/whl/cu128
+
+RUN git init /opt/longsplat \
+    && git -C /opt/longsplat remote add origin https://github.com/NVlabs/LongSplat.git \
+    && git -C /opt/longsplat fetch --depth 1 origin "${LONGSPLAT_REVISION}" \
+    && git -C /opt/longsplat checkout --detach FETCH_HEAD \
+    && test "$(git -C /opt/longsplat rev-parse HEAD)" = "${LONGSPLAT_REVISION}" \
+    && git -C /opt/longsplat submodule update --init --recursive --depth 1
+
+# Upstream requirements leave torch/torchvision/torch_scatter and pytorch3d@stable
+# unresolved for the target runtime. Keep the pinned LongSplat requirements for the
+# pure-Python dependencies, but own these GPU-sensitive packages explicitly below.
+RUN python - <<'PY'
+from pathlib import Path
+src = Path('/opt/longsplat/requirements.txt').read_text(encoding='utf-8').splitlines()
+filtered = []
+for line in src:
+    stripped = line.strip()
+    if not stripped or stripped.startswith('#'):
+        continue
+    lowered = stripped.lower()
+    if lowered in {'torch', 'torchvision', 'torch_scatter'}:
+        continue
+    if 'facebookresearch/pytorch3d' in lowered:
+        continue
+    filtered.append(stripped)
+Path('/tmp/longsplat-requirements.txt').write_text('\n'.join(filtered) + '\n', encoding='utf-8')
+PY
+
+RUN python -m pip install --no-cache-dir -r /tmp/longsplat-requirements.txt \
+    && python -m pip install --no-cache-dir --no-build-isolation torch_scatter==2.1.2 \
+    && python -m pip install --no-cache-dir --no-build-isolation \
+        "git+https://github.com/facebookresearch/pytorch3d.git@${PYTORCH3D_REVISION}" \
+    && python -m pip install --no-cache-dir --no-build-isolation \
+        /opt/longsplat/submodules/simple-knn \
+        /opt/longsplat/submodules/diff-gaussian-rasterization \
+        /opt/longsplat/submodules/fused-ssim
+
+COPY requirements.txt /tmp/autophotogrammetry-requirements.txt
+RUN python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
+    && python -m pip check \
+    && python -m pip freeze > /opt/longsplat-environment.txt
+
+COPY . /opt/autophotogrammetry
+WORKDIR /opt/autophotogrammetry
+
+RUN python - <<'PY'
+import subprocess
+import torch
+import torch_scatter
+import pytorch3d
+import diff_gaussian_rasterization
+from simple_knn import _C as simple_knn_cuda
+import fused_ssim
+
+revision = subprocess.run(
+    ['git', '-C', '/opt/longsplat', 'rev-parse', 'HEAD'],
+    check=True,
+    capture_output=True,
+    text=True,
+).stdout.strip()
+assert revision == '19750775a9d19f30aa05a8333c4c6c231b2d5f4a', revision
+assert torch.__version__.startswith('2.7.1'), torch.__version__
+print({'longsplat_revision': revision, 'torch': torch.__version__, 'cuda': torch.version.cuda})
+PY
