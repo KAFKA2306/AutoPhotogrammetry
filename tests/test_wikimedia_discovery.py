@@ -90,12 +90,48 @@ class WikimediaDiscoveryTests(unittest.TestCase):
                         }
                     ],
                 },
-                {"id": "finland", "display_name": "Finland", "status": "missing", "missing_reason": "fixture", "seeds": []},
-                {"id": "denmark", "display_name": "Denmark", "status": "missing", "missing_reason": "fixture", "seeds": []},
-                {"id": "iceland", "display_name": "Iceland", "status": "missing", "missing_reason": "fixture", "seeds": []},
-                {"id": "greenland", "display_name": "Greenland", "status": "missing", "missing_reason": "fixture", "seeds": []},
-                {"id": "faroe-islands", "display_name": "Faroe Islands", "status": "missing", "missing_reason": "fixture", "seeds": []},
-                {"id": "aland", "display_name": "Åland", "status": "missing", "missing_reason": "fixture", "seeds": []},
+                {
+                    "id": "finland",
+                    "display_name": "Finland",
+                    "status": "missing",
+                    "missing_reason": "fixture",
+                    "seeds": [],
+                },
+                {
+                    "id": "denmark",
+                    "display_name": "Denmark",
+                    "status": "missing",
+                    "missing_reason": "fixture",
+                    "seeds": [],
+                },
+                {
+                    "id": "iceland",
+                    "display_name": "Iceland",
+                    "status": "missing",
+                    "missing_reason": "fixture",
+                    "seeds": [],
+                },
+                {
+                    "id": "greenland",
+                    "display_name": "Greenland",
+                    "status": "missing",
+                    "missing_reason": "fixture",
+                    "seeds": [],
+                },
+                {
+                    "id": "faroe-islands",
+                    "display_name": "Faroe Islands",
+                    "status": "missing",
+                    "missing_reason": "fixture",
+                    "seeds": [],
+                },
+                {
+                    "id": "aland",
+                    "display_name": "Åland",
+                    "status": "missing",
+                    "missing_reason": "fixture",
+                    "seeds": [],
+                },
             ],
         }
 
@@ -104,9 +140,7 @@ class WikimediaDiscoveryTests(unittest.TestCase):
                 raise RuntimeError("fixture API failure")
             return {
                 "query": {
-                    "categorymembers": [
-                        {"ns": 6, "type": "file", "title": "File:Norway.webm"}
-                    ]
+                    "categorymembers": [{"ns": 6, "type": "file", "title": "File:Norway.webm"}]
                 }
             }
 
@@ -234,7 +268,9 @@ class WikimediaDiscoveryTests(unittest.TestCase):
                                     "extmetadata": {
                                         "Artist": {"value": "Author"},
                                         "LicenseShortName": {"value": "CC0"},
-                                        "LicenseUrl": {"value": "https://creativecommons.org/publicdomain/zero/1.0/"},
+                                        "LicenseUrl": {
+                                            "value": "https://creativecommons.org/publicdomain/zero/1.0/"
+                                        },
                                     },
                                 }
                             ],
