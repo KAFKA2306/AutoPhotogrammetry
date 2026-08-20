@@ -63,7 +63,7 @@ python main.py audit --dataset <dataset-id>
 
 このコマンドは元画像を削除せず、`readiness-report.json`、`readiness-report.html`、`selected-manifest.json` と別の `selected/` を生成します。登録画像率、再投影誤差、mesh completenessを未測定のまま3D品質保証には使いません。
 
-博物館・資料館、EC商品制作、メーカー、3D制作会社向けの利用範囲とPoC相談方法は [`docs/business/photogrammetry-input-audit.md`](docs/business/photogrammetry-input-audit.md) を参照してください。
+実装上の監査仕様は [`docs/business/photogrammetry-input-audit.md`](docs/business/photogrammetry-input-audit.md)、無料sample・有償PoC・batch相談・権利条件・3つのCTA・60日KPI契約は [`docs/business/photogrammetry-readiness-service.md`](docs/business/photogrammetry-readiness-service.md) を参照してください。
 
 ## 軽量な開発環境
 
@@ -157,38 +157,3 @@ metadata
 - local input: 1920×1080 VP9 transcode
 - SHA-256: `c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30`
 - COLMAP: **78 / 78 registered**, **1 model**, **32,782 sparse points**, **0.370830 px mean reprojection error**
-
-探索元: [Wikimedia Commons — Drone videos from Mexico](https://commons.wikimedia.org/wiki/Category:Drone_videos_from_Mexico)
-
-## Output
-
-```text
-output/huejotzingo/
-├── frames/
-├── selected/
-├── colmap/
-├── nerfstudio-data/
-├── runs/
-└── manifest.json
-```
-
-E2E成功条件:
-
-```json
-{
-  "status": "success",
-  "output": {
-    "ply_path": "...",
-    "ply_sha256": "...",
-    "ply_size_bytes": 123456
-  }
-}
-```
-
-PLY hashが得られるまで成功扱いにしません。
-
-## Scope
-
-このrepoの終点は **Gaussian Splat PLY + provenance** です。
-
-PLYのWeb / Unity / VRChat利用は [`KAFKA2306/vrmine`](https://github.com/KAFKA2306/vrmine) が担当します。
