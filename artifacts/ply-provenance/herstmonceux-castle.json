@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scene_id": "herstmonceux-castle",
+  "status": "success",
+  "generated_at": "2026-08-20T01:47:22.305044+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "dd9a9789744ddd23dddc9b5fa6de85031f9c2de75baee194a5a1f686a0d96623",
+    "sha1": "b6e7d066fc5c831761854a88f297077d933e2756",
+    "frame_count": 60,
+    "selected_frame_count": 60,
+    "registered_images": 60,
+    "registration_ratio": 1.0,
+    "sparse_points": 25126,
+    "mean_reprojection_error_px": 0.332483,
+    "license_status": "verified"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/herstmonceux-castle/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T01:46:01.216275+00:00",
+    "finished_at": "2026-08-20T01:47:06.829188+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/herstmonceux-castle/runs/splatfacto/20260820T014601Z-7dc5182d/export/splat.ply",
+    "sha256": "d36460210020b039bcc7f43598ed94d50a6a88ad617b1f3aebd08695812f413d",
+    "size_bytes": 28159017,
+    "primitive_count": 113538,
+    "low_opacity_primitive_count": 6892,
+    "low_opacity_primitive_ratio": 0.0607021437756522,
+    "scale_anisotropy_above_10_count": 35009,
+    "scale_anisotropy_above_10_ratio": 0.30834610438795823,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
