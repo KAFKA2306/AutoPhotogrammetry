@@ -9,6 +9,7 @@ from pathlib import Path, PurePosixPath
 
 import yaml
 
+from processing.orientation import OrientationContractError, write_orientation_evidence
 from processing.provenance import sha256_file, write_json
 
 
@@ -71,6 +72,23 @@ def _resolve_run_artifact_path(run_manifest_path: Path, raw_path: str) -> Path:
     )
 
 
+def _resolve_transforms_path(run_manifest_path: Path, run_manifest: dict) -> Path:
+    declared = run_manifest.get("orientation_transforms_path")
+    if declared:
+        candidate = Path(str(declared)).expanduser()
+        if not candidate.is_absolute():
+            candidate = run_manifest_path.parent / candidate
+        candidate = candidate.resolve()
+    else:
+        candidate = (run_manifest_path.parent / "nerfstudio-data" / "transforms.json").resolve()
+    if not candidate.is_file():
+        raise ArtifactPublishError(
+            "Nerfstudio transforms.json is required before Gaussian artifact publish; "
+            f"expected {candidate}"
+        )
+    return candidate
+
+
 def _hf_cache_command(hf_cache_hub_root: str | Path | None) -> list[str]:
     root_value = hf_cache_hub_root or os.environ.get("HF_CACHE_HUB_ROOT")
     if not root_value:
@@ -90,12 +108,18 @@ def build_artifact_manifest(
     bucket: str,
     source_revision: str,
     run_id: str,
+    orientation: dict,
     source_url: str | None = None,
     license_url: str | None = None,
 ) -> tuple[dict, str]:
     if not ply_path.is_file() or ply_path.stat().st_size == 0:
         raise ArtifactPublishError(f"Gaussian Splat PLY is missing or empty: {ply_path}")
     sha256 = sha256_file(ply_path)
+    if orientation.get("ply_sha256") != sha256:
+        raise ArtifactPublishError("orientation evidence does not match artifact PLY SHA-256")
+    if orientation.get("status") != "accepted":
+        raise ArtifactPublishError("only accepted orientation evidence can be published")
+
     artifact_id = f"autophotogrammetry/{dataset}/splat"
     remote_path = f"autophotogrammetry/gaussian-splats/{dataset}/{sha256}.ply"
     artifact = {
@@ -109,6 +133,7 @@ def build_artifact_manifest(
         },
         "size_bytes": ply_path.stat().st_size,
         "sha256": sha256,
+        "orientation": orientation,
         "provenance": {
             "repository": "KAFKA2306/AutoPhotogrammetry",
             "revision": source_revision,
@@ -149,6 +174,19 @@ def publish_run_splat(
     if actual_sha != expected_sha or actual_size != expected_size:
         raise ArtifactPublishError("local PLY no longer matches the successful run manifest")
 
+    transforms_path = _resolve_transforms_path(run_manifest_path, run_manifest)
+    orientation_path = run_manifest_path.parent / "orientation-evidence.json"
+    try:
+        orientation = write_orientation_evidence(transforms_path, ply_path, orientation_path)
+    except OrientationContractError as exc:
+        raise ArtifactPublishError(f"orientation gate failed: {exc}") from exc
+    if orientation["ply_sha256"] != expected_sha:
+        raise ArtifactPublishError("orientation evidence was generated for a different PLY SHA-256")
+    # Keep the artifact manifest portable: the hash is authoritative; the path is run-local provenance.
+    orientation_for_manifest = dict(orientation)
+    orientation_for_manifest["evidence_path"] = orientation_path.name
+    run_manifest["orientation"] = orientation_for_manifest
+
     revision = _recorded_revision(run_manifest, source_revision)
     registry = run_manifest.get("registry", {})
     license_info = registry.get("license") or {}
@@ -161,6 +199,7 @@ def publish_run_splat(
         bucket=bucket,
         source_revision=revision,
         run_id=run_id,
+        orientation=orientation_for_manifest,
         source_url=source_url,
         license_url=license_url,
     )
@@ -215,6 +254,8 @@ def publish_run_splat(
         "sha256": expected_sha,
         "source_revision": revision,
         "run_id": run_id,
+        "orientation_status": orientation_for_manifest["status"],
+        "orientation_evidence_sha256": orientation_for_manifest["evidence_sha256"],
         "remote_verified": True,
     }
     run_manifest["artifact_publish"] = success

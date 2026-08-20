@@ -17,7 +17,14 @@ REVISION = "a" * 40
 
 
 class ArtifactPublishTest(unittest.TestCase):
-    def _fixture(self, root: Path, *, include_revision: bool = True, container_path: bool = False):
+    def _fixture(
+        self,
+        root: Path,
+        *,
+        include_revision: bool = True,
+        container_path: bool = False,
+        orientation_override: str | None = None,
+    ):
         ply = root / "output" / "demo" / "runs" / "r1" / "export" / "splat.ply"
         ply.parent.mkdir(parents=True)
         payload = b"ply\nsynthetic"
@@ -25,6 +32,19 @@ class ArtifactPublishTest(unittest.TestCase):
         sha = hashlib.sha256(payload).hexdigest()
         manifest = root / "output" / "demo" / "manifest.json"
         manifest.parent.mkdir(parents=True, exist_ok=True)
+        transforms = manifest.parent / "nerfstudio-data" / "transforms.json"
+        transforms.parent.mkdir()
+        transforms_payload: dict[str, object] = {
+            "frames": [
+                {
+                    "file_path": "images/frame-000001.jpg",
+                    "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                }
+            ]
+        }
+        if orientation_override is not None:
+            transforms_payload["orientation_override"] = orientation_override
+        transforms.write_text(json.dumps(transforms_payload), encoding="utf-8")
         body = {
             "schema_version": 2,
             "dataset": "demo",
@@ -98,6 +118,7 @@ class ArtifactPublishTest(unittest.TestCase):
             self.assertTrue(result["remote_verified"])
             self.assertEqual(sha, result["sha256"])
             self.assertEqual(REVISION, result["source_revision"])
+            self.assertEqual("accepted", result["orientation_status"])
             artifact_manifest = yaml.safe_load(
                 (manifest.parent / "artifact-manifest.yaml").read_text(encoding="utf-8")
             )
@@ -108,9 +129,18 @@ class ArtifactPublishTest(unittest.TestCase):
             self.assertEqual(REVISION, artifact["provenance"]["revision"])
             self.assertIn("run_id", artifact["provenance"])
             self.assertNotIn("source_path", artifact["provenance"])
+            self.assertEqual("accepted", artifact["orientation"]["status"])
+            self.assertEqual(sha, artifact["orientation"]["ply_sha256"])
+            self.assertEqual("orientation-evidence.json", artifact["orientation"]["evidence_path"])
+            self.assertEqual(
+                [2**-0.5, 0.0, 0.0, 2**-0.5],
+                artifact["orientation"]["consumer_application"]["quaternion_xyzw"],
+            )
             updated = json.loads(manifest.read_text(encoding="utf-8"))
             self.assertEqual("success", updated["status"])
+            self.assertEqual("accepted", updated["orientation"]["status"])
             self.assertEqual("published", updated["artifact_publish"]["status"])
+            self.assertTrue((manifest.parent / "orientation-evidence.json").is_file())
             self.assertTrue(ply.exists())
 
     def test_container_output_path_is_resolved_on_host(self):
@@ -181,6 +211,7 @@ class ArtifactPublishTest(unittest.TestCase):
                 )
             updated = json.loads(manifest.read_text(encoding="utf-8"))
             self.assertEqual("success", updated["status"])
+            self.assertEqual("accepted", updated["orientation"]["status"])
             self.assertEqual("failed", updated["artifact_publish"]["status"])
             self.assertTrue(ply.exists())
 
@@ -194,6 +225,31 @@ class ArtifactPublishTest(unittest.TestCase):
                     manifest,
                     bucket="k4fka/artifacts",
                     hf_cache_hub_root=hf_root,
+                )
+
+    def test_missing_transforms_fails_before_publish(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, _, _, hf_root = self._fixture(root)
+            (manifest.parent / "nerfstudio-data" / "transforms.json").unlink()
+            with self.assertRaisesRegex(ArtifactPublishError, "transforms.json"):
+                publish_run_splat(
+                    manifest,
+                    bucket="k4fka/artifacts",
+                    hf_cache_hub_root=hf_root,
+                    runner=self._successful_runner,
+                )
+
+    def test_non_gravity_orientation_method_fails_before_publish(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, _, _, hf_root = self._fixture(root, orientation_override="pca")
+            with self.assertRaisesRegex(ArtifactPublishError, "only accepted orientation evidence"):
+                publish_run_splat(
+                    manifest,
+                    bucket="k4fka/artifacts",
+                    hf_cache_hub_root=hf_root,
+                    runner=self._successful_runner,
                 )
 
     def test_generated_ply_remains_gitignored(self):
