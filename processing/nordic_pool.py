@@ -479,8 +479,16 @@ def queue_candidate(
             "candidates": [],
         }
     validate_queue(queue)
+    raw_candidates = queue.get("candidates")
+    if not isinstance(raw_candidates, list):
+        raise ValueError("Nordic preflight queue requires candidates")
+    queue_candidates: list[dict[str, Any]] = []
+    for item in raw_candidates:
+        if not isinstance(item, dict):
+            raise ValueError("Nordic preflight queue candidate must be an object")
+        queue_candidates.append(item)
     existing = next(
-        (item for item in queue["candidates"] if item.get("id") == candidate_id),
+        (item for item in queue_candidates if item.get("id") == candidate_id),
         None,
     )
     if existing is not None:
@@ -489,8 +497,9 @@ def queue_candidate(
         if existing.get("media_url") != candidate.get("media_url"):
             raise ValueError(f"{candidate_id}: queued media URL changed; reselect explicitly")
         return dict(existing)
-    queue["candidates"].append(candidate)
-    queue["candidates"].sort(key=lambda item: item["id"])
+    queue_candidates.append(candidate)
+    queue_candidates.sort(key=lambda item: item["id"])
+    queue["candidates"] = queue_candidates
     validate_queue(queue, pool)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(
