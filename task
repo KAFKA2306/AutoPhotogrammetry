@@ -84,7 +84,39 @@ doctor() {
   check_docker
   check_host_gpu
   ensure_image
-  run_gpu python -c 'import importlib.metadata as m, shutil, subprocess, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap[0] == 12, f"Expected compute capability 12.x, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; rev=subprocess.run(["git","-C","/opt/nerfstudio","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev == "50e0e3c70c775e89333256213363badbf074f29d", rev; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio_revision": rev, "nerfstudio_package": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
+  run_gpu python -c 'import importlib.metadata as m, shutil, subprocess, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap[0] == 12, f"Expected compute capability 12.x, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export","ns-eval"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; rev=subprocess.run(["git","-C","/opt/nerfstudio","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev == "50e0e3c70c775e89333256213363badbf074f29d", rev; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio_revision": rev, "nerfstudio_package": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
+}
+
+require_quality_inputs() {
+  local scene="$1"
+  local data="$ROOT/output/$scene/nerfstudio-data"
+  local source="$ROOT/input/$scene/source.webm"
+  if [[ ! -f "$data/transforms.json" ]]; then
+    echo "Prepared Nerfstudio dataset is missing: $data/transforms.json" >&2
+    echo "Quality execution is GPU-only and will not rerun download/FFmpeg/COLMAP." >&2
+    return 1
+  fi
+  if [[ ! -f "$source" ]]; then
+    echo "Source video required for deterministic evaluation identity is missing: $source" >&2
+    echo "Quality execution does not redownload source media." >&2
+    return 1
+  fi
+}
+
+prepare_quality_runtime() {
+  check_docker
+  check_host_gpu
+  ensure_image
+}
+
+run_quality_scene() {
+  local scene="$1"
+  local iterations="$2"
+  run_gpu python -m processing.quality_sweep \
+    --data "/workspace/output/$scene/nerfstudio-data" \
+    --source-video "/workspace/input/$scene/source.webm" \
+    --output-root "/workspace/output/$scene/quality-sweep" \
+    --iterations "$iterations"
 }
 
 case "${1:-run}" in
@@ -116,19 +148,71 @@ case "${1:-run}" in
   quality)
     scene="${2:-huejotzingo}"
     iterations="${3:-30000}"
-    data="$ROOT/output/$scene/nerfstudio-data"
-    if [[ ! -f "$data/transforms.json" ]]; then
-      echo "Prepared Nerfstudio dataset is missing: $data/transforms.json" >&2
-      echo "Quality execution is intentionally GPU-only and will not rerun download/FFmpeg/COLMAP. Use an existing prepared dataset." >&2
-      exit 1
+    require_quality_inputs "$scene"
+    prepare_quality_runtime
+    run_quality_scene "$scene" "$iterations"
+    ;;
+  quality-pair)
+    bad_scene="${2:-}"
+    good_scene="${3:-}"
+    iterations="${4:-30000}"
+    if [[ -z "$bad_scene" || -z "$good_scene" ]]; then
+      echo "usage: ./task quality-pair <bad-scene-id> <good-control-scene-id> [iterations]" >&2
+      exit 2
     fi
-    check_docker
-    check_host_gpu
-    ensure_image
-    run_gpu python -m processing.quality_sweep \
-      --data "/workspace/output/$scene/nerfstudio-data" \
-      --output-root "/workspace/output/$scene/quality-sweep" \
+    if [[ "$bad_scene" == "$good_scene" ]]; then
+      echo "bad scene and good control must be different scene ids" >&2
+      exit 2
+    fi
+    require_quality_inputs "$bad_scene"
+    require_quality_inputs "$good_scene"
+    prepare_quality_runtime
+    run_gpu python -m processing.quality_pair \
+      --bad-scene "$bad_scene" \
+      --good-control "$good_scene" \
+      --input-root /workspace/input \
+      --output-root /workspace/output \
       --iterations "$iterations"
+    ;;
+  quality-culling)
+    scene="${2:-}"
+    winner="${3:-}"
+    parameter="${4:-}"
+    value="${5:-}"
+    iterations="${6:-30000}"
+    if [[ -z "$scene" || -z "$winner" || -z "$parameter" || -z "$value" ]]; then
+      echo "usage: ./task quality-culling <scene-id> <default|scale-regularized|mcmc> <cull_alpha_thresh|cull_scale_thresh|cull_screen_size|stop_screen_size_at> <value> [iterations]" >&2
+      exit 2
+    fi
+    require_quality_inputs "$scene"
+    prepare_quality_runtime
+    run_gpu python -m processing.quality_followup culling \
+      --data "/workspace/output/$scene/nerfstudio-data" \
+      --source-video "/workspace/input/$scene/source.webm" \
+      --output-root "/workspace/output/$scene/quality-culling/$winner/$parameter" \
+      --winner "$winner" \
+      --parameter "$parameter" \
+      --value "$value" \
+      --iterations "$iterations"
+    ;;
+  quality-budget)
+    scene="${2:-}"
+    winner="${3:-}"
+    current_iterations="${4:-}"
+    increased_iterations="${5:-}"
+    if [[ -z "$scene" || -z "$winner" || -z "$current_iterations" || -z "$increased_iterations" ]]; then
+      echo "usage: ./task quality-budget <scene-id> <default|scale-regularized|mcmc> <current-iterations> <increased-iterations>" >&2
+      exit 2
+    fi
+    require_quality_inputs "$scene"
+    prepare_quality_runtime
+    run_gpu python -m processing.quality_followup budget \
+      --data "/workspace/output/$scene/nerfstudio-data" \
+      --source-video "/workspace/input/$scene/source.webm" \
+      --output-root "/workspace/output/$scene/quality-budget/$winner" \
+      --winner "$winner" \
+      --iterations "$current_iterations" \
+      --iterations "$increased_iterations"
     ;;
   clean)
     find "$ROOT/output" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
@@ -137,7 +221,7 @@ case "${1:-run}" in
     find "$ROOT/output" "$ROOT/input" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   *)
-    echo "usage: ./task {run|run-all|quality [scene-id] [iterations]|doctor|pull|test|image|clean|clean-all}" >&2
+    echo "usage: ./task {run|run-all|quality [scene-id] [iterations]|quality-pair <bad-scene> <good-control> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current-iterations> <increased-iterations>|doctor|pull|test|image|clean|clean-all}" >&2
     exit 2
     ;;
 esac

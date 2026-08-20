@@ -34,6 +34,55 @@ def _stable_score(source_sha256: str, frame_sha256: str) -> str:
     return hashlib.sha256(f"{source_sha256}:{frame_sha256}".encode("ascii")).hexdigest()
 
 
+def _build_dataset_contract_from_records(
+    source_video: Path,
+    records: Sequence[Mapping],
+    *,
+    holdout_count: int,
+) -> dict:
+    if len(records) < 2:
+        raise ValueError("at least two frames are required")
+    if holdout_count < 1 or holdout_count >= len(records):
+        raise ValueError("holdout_count must be between 1 and frame_count - 1")
+
+    hashes = [str(record["sha256"]) for record in records]
+    if len(set(hashes)) != len(hashes):
+        raise ValueError("dataset contract requires unique frame SHA-256 values")
+
+    source_sha256 = sha256_file(source_video)
+    ranked = sorted(
+        records,
+        key=lambda record: (
+            _stable_score(source_sha256, str(record["sha256"])),
+            str(record["path"]),
+        ),
+    )
+    holdout_hashes = {str(record["sha256"]) for record in ranked[:holdout_count]}
+    annotated = [
+        {
+            **dict(record),
+            "split": "holdout" if str(record["sha256"]) in holdout_hashes else "train",
+        }
+        for record in records
+    ]
+
+    return {
+        "schema_version": 1,
+        "source_video": {
+            "path": source_video.name,
+            "size_bytes": source_video.stat().st_size,
+            "sha256": source_sha256,
+        },
+        "frames": annotated,
+        "train_frame_sha256": [
+            str(record["sha256"]) for record in annotated if record["split"] == "train"
+        ],
+        "holdout_frame_sha256": [
+            str(record["sha256"]) for record in annotated if record["split"] == "holdout"
+        ],
+    }
+
+
 def build_dataset_contract(
     source_video: str | Path,
     frame_dir: str | Path,
@@ -47,41 +96,138 @@ def build_dataset_contract(
         raise ValueError(f"source video does not exist: {video}")
     if not frames.is_dir():
         raise ValueError(f"frame directory does not exist: {frames}")
-
-    records = image_records(frames)
-    if len(records) < 2:
-        raise ValueError("at least two frames are required")
-    if holdout_count < 1 or holdout_count >= len(records):
-        raise ValueError("holdout_count must be between 1 and frame_count - 1")
-
-    source_sha256 = sha256_file(video)
-    ranked = sorted(
-        records,
-        key=lambda record: (
-            _stable_score(source_sha256, record["sha256"]),
-            record["path"],
-        ),
+    return _build_dataset_contract_from_records(
+        video,
+        image_records(frames),
+        holdout_count=holdout_count,
     )
-    holdout_hashes = {record["sha256"] for record in ranked[:holdout_count]}
-    annotated = [
-        {**record, "split": "holdout" if record["sha256"] in holdout_hashes else "train"}
-        for record in records
-    ]
 
+
+def build_nerfstudio_dataset_contract(
+    source_video: str | Path,
+    transforms_json: str | Path,
+    *,
+    holdout_count: int | None = None,
+) -> dict:
+    """Freeze the exact image files referenced by a Nerfstudio transforms.json.
+
+    When holdout_count is omitted, use a deterministic 90/10-style split while
+    preserving at least one train and one hold-out image.
+    """
+    video = Path(source_video).expanduser().resolve()
+    transforms = Path(transforms_json).expanduser().resolve()
+    if not video.is_file():
+        raise ValueError(f"source video does not exist: {video}")
+    if not transforms.is_file():
+        raise ValueError(f"Nerfstudio transforms.json does not exist: {transforms}")
+
+    meta = json.loads(transforms.read_text(encoding="utf-8"))
+    frames = meta.get("frames")
+    if not isinstance(frames, list) or len(frames) < 2:
+        raise ValueError("Nerfstudio transforms.json requires at least two frames")
+
+    records = []
+    for frame in frames:
+        declared = frame.get("file_path")
+        if not declared:
+            raise ValueError("Nerfstudio frame is missing file_path")
+        declared_path = Path(str(declared))
+        resolved = declared_path if declared_path.is_absolute() else transforms.parent / declared_path
+        resolved = resolved.resolve()
+        if not resolved.is_file():
+            raise ValueError(f"Nerfstudio frame does not exist: {resolved}")
+        records.append(
+            {
+                "path": declared_path.as_posix(),
+                "size_bytes": resolved.stat().st_size,
+                "sha256": sha256_file(resolved),
+            }
+        )
+
+    count = holdout_count
+    if count is None:
+        count = max(1, int(round(len(records) * 0.1)))
+        count = min(count, len(records) - 1)
+    return _build_dataset_contract_from_records(video, records, holdout_count=count)
+
+
+def write_nerfstudio_split_transforms(
+    transforms_json: str | Path,
+    dataset: Mapping,
+    output_path: str | Path,
+) -> dict:
+    """Write a generated Nerfstudio JSON with explicit train/val/test filenames.
+
+    The pinned Nerfstudio dataparser accepts explicit split filename lists. Resource
+    paths are made absolute because this generated JSON lives outside the original
+    processed-data directory; the original dataset is never modified.
+    """
+    source = Path(transforms_json).expanduser().resolve()
+    if not source.is_file():
+        raise ValueError(f"Nerfstudio transforms.json does not exist: {source}")
+    meta = json.loads(source.read_text(encoding="utf-8"))
+    frames = meta.get("frames")
+    if not isinstance(frames, list) or not frames:
+        raise ValueError("Nerfstudio transforms.json has no frames")
+
+    train_hashes = set(dataset.get("train_frame_sha256") or [])
+    holdout_hashes = set(dataset.get("holdout_frame_sha256") or [])
+    if not train_hashes or not holdout_hashes or train_hashes & holdout_hashes:
+        raise ValueError("dataset contract must contain disjoint train and hold-out hashes")
+
+    def absolute_path(value: str) -> Path:
+        candidate = Path(value)
+        return (candidate if candidate.is_absolute() else source.parent / candidate).resolve()
+
+    rewritten_frames = []
+    train_filenames: list[str] = []
+    holdout_filenames: list[str] = []
+    seen_hashes: set[str] = set()
+
+    for frame in frames:
+        rewritten = dict(frame)
+        file_path = absolute_path(str(frame["file_path"]))
+        if not file_path.is_file():
+            raise ValueError(f"Nerfstudio frame does not exist: {file_path}")
+        frame_hash = sha256_file(file_path)
+        seen_hashes.add(frame_hash)
+        rewritten["file_path"] = file_path.as_posix()
+        if frame_hash in train_hashes:
+            train_filenames.append(file_path.as_posix())
+        elif frame_hash in holdout_hashes:
+            holdout_filenames.append(file_path.as_posix())
+        else:
+            raise ValueError(
+                f"Nerfstudio frame hash is absent from dataset contract: {file_path} ({frame_hash})"
+            )
+
+        for key in ("mask_path", "depth_file_path"):
+            if frame.get(key):
+                rewritten[key] = absolute_path(str(frame[key])).as_posix()
+        rewritten_frames.append(rewritten)
+
+    expected_hashes = train_hashes | holdout_hashes
+    if seen_hashes != expected_hashes:
+        missing = sorted(expected_hashes - seen_hashes)
+        extra = sorted(seen_hashes - expected_hashes)
+        raise ValueError(f"dataset/transforms hash mismatch; missing={missing}, extra={extra}")
+
+    rewritten_meta = dict(meta)
+    rewritten_meta["frames"] = rewritten_frames
+    if meta.get("ply_file_path"):
+        rewritten_meta["ply_file_path"] = absolute_path(str(meta["ply_file_path"])).as_posix()
+    rewritten_meta["train_filenames"] = train_filenames
+    rewritten_meta["val_filenames"] = holdout_filenames
+    rewritten_meta["test_filenames"] = holdout_filenames
+
+    destination = Path(output_path).expanduser().resolve()
+    write_json(destination, rewritten_meta)
     return {
         "schema_version": 1,
-        "source_video": {
-            "path": video.name,
-            "size_bytes": video.stat().st_size,
-            "sha256": source_sha256,
-        },
-        "frames": annotated,
-        "train_frame_sha256": [
-            record["sha256"] for record in annotated if record["split"] == "train"
-        ],
-        "holdout_frame_sha256": [
-            record["sha256"] for record in annotated if record["split"] == "holdout"
-        ],
+        "dataset_id": dataset_identity(dataset),
+        "transforms_path": str(destination),
+        "train_frame_count": len(train_filenames),
+        "holdout_frame_count": len(holdout_filenames),
     }
 
 
