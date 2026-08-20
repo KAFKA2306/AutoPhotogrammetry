@@ -167,10 +167,12 @@ case "${1:-run}" in
     require_quality_inputs "$bad_scene"
     require_quality_inputs "$good_scene"
     prepare_quality_runtime
-    status=0
-    run_quality_scene "$bad_scene" "$iterations" || status=1
-    run_quality_scene "$good_scene" "$iterations" || status=1
-    exit "$status"
+    run_gpu python -m processing.quality_pair \
+      --bad-scene "$bad_scene" \
+      --good-control "$good_scene" \
+      --input-root /workspace/input \
+      --output-root /workspace/output \
+      --iterations "$iterations"
     ;;
   quality-culling)
     scene="${2:-}"
