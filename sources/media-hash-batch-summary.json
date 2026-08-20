@@ -1,0 +1,99 @@
+{
+  "hashed": [
+    {
+      "id": "huejotzingo",
+      "sha256": "c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30",
+      "size_bytes": 115502605
+    },
+    {
+      "id": "tepotzotlan-virreinato",
+      "sha256": "cd3efb3825dc1e5ead895ef64df80728c777a4cece790471c35a1dae3372c07e",
+      "size_bytes": 637163317
+    },
+    {
+      "id": "templo-san-marcos",
+      "sha256": "4c7732429b0e7d744d76078f88ac73ea575bc878d76fbf014d0cfa880a7cae68",
+      "size_bytes": 153163113
+    },
+    {
+      "id": "calvillo-centro",
+      "sha256": "482c2a82d061ba4a4f4e88b17e5329b2a9c8d435373218a462d94b02d2d2957b",
+      "size_bytes": 157326279
+    },
+    {
+      "id": "puente-san-ignacio-03",
+      "sha256": "9bf9fae1b61351b88ac7ebe1f2d9013a1c595909596e558daa31fe46499b7535",
+      "size_bytes": 275977256
+    },
+    {
+      "id": "san-francisco-nayarit-01",
+      "sha256": "0d9a80047976aca69050701cf60d664cde230f873a86b4d4e7ee264793454922",
+      "size_bytes": 538667417
+    },
+    {
+      "id": "baluarte-san-pedro",
+      "sha256": "882f55dd415558a4dc3758e22a1c86e98cd04f86c14ed7e49f3023329cfac66f",
+      "size_bytes": 344322146
+    },
+    {
+      "id": "puente-san-ignacio-01",
+      "sha256": "ee01f189c6882f47dd426698f9ce2f3df3fd4375da913034d177e8045219b48d",
+      "size_bytes": 1484818221
+    },
+    {
+      "id": "herstmonceux-castle",
+      "sha256": "dd9a9789744ddd23dddc9b5fa6de85031f9c2de75baee194a5a1f686a0d96623",
+      "size_bytes": 376232654
+    },
+    {
+      "id": "fachada-san-francisco-javier",
+      "sha256": "990cfbfa7e11cfcb6299b6924caaf75af590ac4935a5845839b16d59b8a92bea",
+      "size_bytes": 227806512
+    },
+    {
+      "id": "panoramica-puebla-centro",
+      "sha256": "96a378080c2cd3648b8804facc1011646fbebd8c05b5652b780c91bcfb9dcf92",
+      "size_bytes": 179886458
+    }
+  ],
+  "failed": [
+    {
+      "id": "centro-aguascalientes",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "id": "barco-la-pona-01",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "id": "presa-san-blas",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "id": "playa-guayabitos-region",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "id": "cascadas-agua-azul",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "id": "los-cabos-sunset",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "id": "la-pona-fire-2025",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    },
+    {
+      "id": "cadena-humana-la-pona",
+      "error": "HTTP Error 429: Too many requests - please contact noc@wikimedia.org to discuss a less disruptive approach or instead use thumbnail images in sizes listed on https://w.wiki/GHai. (0c640b1)"
+    }
+  ],
+  "skipped_verified": [
+    "avenida-gomez-morin"
+  ],
+  "hashed_count": 11,
+  "failed_count": 8,
+  "skipped_verified_count": 1
+}
