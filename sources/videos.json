@@ -285,8 +285,11 @@
         "source_size_bytes": 137277062,
         "mime": "video/webm",
         "download_url_available": true,
-        "license_verified": true
-      }
+        "license_verified": true,
+        "downloaded_size_bytes": 137277062,
+        "sha256_verified_from_downloaded_bytes": true
+      },
+      "sha256": "c326a9c75ba16907b5e483fda9bd58e2f85cd72055bc1c6b36e97ebde9afb2e3"
     },
     {
       "id": "san-francisco-nayarit-01",
