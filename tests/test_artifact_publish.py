@@ -12,7 +12,6 @@ from unittest.mock import patch
 import yaml
 
 from processing.artifact_publish import ArtifactPublishError, _hf_cache_command, publish_run_splat
-
 REVISION = "a" * 40
 
 
