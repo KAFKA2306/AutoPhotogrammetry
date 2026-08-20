@@ -1,0 +1,86 @@
+name: Verify GHCR research images
+
+on:
+  push:
+    branches: [evidence/ghcr-research-images]
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  verify-published-tags:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: evidence/ghcr-research-images
+          fetch-depth: 0
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Pull tags from a clean hosted runner and record digests
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          images = [
+              "ghcr.io/kafka2306/autophotogrammetry:vggt-a288dd0-sm120-v1",
+              "ghcr.io/kafka2306/autophotogrammetry:efa-57f330f-sm120-v1",
+              "ghcr.io/kafka2306/autophotogrammetry:longsplat-1975077-sm120-v1",
+              "ghcr.io/kafka2306/autophotogrammetry:quality-ns50e0e3-sm120-v1",
+          ]
+          results = []
+          for image in images:
+              pull = subprocess.run(
+                  ["docker", "pull", image],
+                  text=True,
+                  capture_output=True,
+                  check=False,
+              )
+              record = {
+                  "image": image,
+                  "pull_return_code": pull.returncode,
+                  "repo_digests": [],
+                  "error_tail": None,
+              }
+              if pull.returncode == 0:
+                  inspect = subprocess.run(
+                      ["docker", "image", "inspect", image, "--format", "{{json .RepoDigests}}"],
+                      text=True,
+                      capture_output=True,
+                      check=True,
+                  )
+                  record["repo_digests"] = json.loads(inspect.stdout.strip())
+                  subprocess.run(["docker", "image", "rm", "-f", image], check=False)
+                  subprocess.run(["docker", "builder", "prune", "-af"], check=False)
+              else:
+                  record["error_tail"] = "\n".join(pull.stderr.splitlines()[-20:])
+              results.append(record)
+
+          payload = {
+              "schema_version": 1,
+              "runner": "github-hosted ubuntu-latest",
+              "all_success": all(item["pull_return_code"] == 0 for item in results),
+              "images": results,
+          }
+          path = Path("docs/evidence/ghcr-research-images.json")
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(payload, indent=2))
+          PY
+      - name: Commit pull evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/evidence/ghcr-research-images.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Evidence: record GHCR research image digests"
+            git fetch origin evidence/ghcr-research-images
+            git rebase origin/evidence/ghcr-research-images
+            git push origin HEAD:evidence/ghcr-research-images
+          fi
+      - name: Fail if any published tag could not be pulled
+        run: python -c "import json; assert json.load(open('docs/evidence/ghcr-research-images.json'))['all_success']"
