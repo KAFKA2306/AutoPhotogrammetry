@@ -21,7 +21,13 @@ def _read_json(path: Path) -> dict:
 
 def _required_text(value: object, *, field: str, scene_id: str) -> str:
     text = str(value or "").strip()
-    if not text or text.lower() in {"unknown", "unverified", "needs_review", "none", "null"}:
+    if not text or text.lower() in {
+        "unknown",
+        "unverified",
+        "needs_review",
+        "none",
+        "null",
+    }:
         raise ValueError(f"{scene_id}: verified {field} is required")
     return text
 
@@ -56,7 +62,12 @@ def _resolve_existing_path(value: object, *, output_root: Path, scene_root: Path
     raise ValueError(f"referenced path does not exist: {value}")
 
 
-def _splatfacto_manifest(outer: Mapping, *, output_root: Path, scene_root: Path) -> tuple[dict, Path]:
+def _splatfacto_manifest(
+    outer: Mapping,
+    *,
+    output_root: Path,
+    scene_root: Path,
+) -> tuple[dict, Path]:
     splat = outer.get("splatfacto") or {}
     if not isinstance(splat, Mapping):
         raise ValueError(f"{scene_root.name}: splatfacto result is missing")
@@ -168,17 +179,18 @@ def build_final_exhibition_manifest(
     if expected_count <= 0:
         raise ValueError("expected_count must be positive")
     registry = load_video_registry(registry_path)
-    if len(registry) != expected_count:
+    sources = registry["videos"]
+    if len(sources) != expected_count:
         raise ValueError(
-            f"final exhibition requires exactly {expected_count} registry entries, got {len(registry)}"
+            f"final exhibition requires exactly {expected_count} registry entries, got {len(sources)}"
         )
-    ids = [str(source.get("id") or "") for source in registry]
+    ids = [str(source.get("id") or "") for source in sources]
     if any(not scene_id for scene_id in ids) or len(set(ids)) != len(ids):
         raise ValueError("final exhibition registry requires unique non-empty ids")
 
     root = Path(output_root).expanduser().resolve()
     entries = []
-    for order, source in enumerate(registry, start=1):
+    for order, source in enumerate(sources, start=1):
         scene_id = str(source["id"])
         scene_root = root / scene_id
         outer_path = scene_root / "manifest.json"
@@ -193,9 +205,7 @@ def build_final_exhibition_manifest(
         source_page = _required_text(
             source.get("source_page"), field="source_page", scene_id=scene_id
         )
-        author = _required_text(
-            source.get("author"), field="author", scene_id=scene_id
-        )
+        author = _required_text(source.get("author"), field="author", scene_id=scene_id)
         license_record = _license_record(source, scene_id=scene_id)
         source_record = outer.get("source") or {}
         source_sha = str(
@@ -205,7 +215,9 @@ def build_final_exhibition_manifest(
             raise ValueError(f"{scene_id}: source video SHA-256 is missing")
 
         child, child_path = _splatfacto_manifest(
-            outer, output_root=root, scene_root=scene_root
+            outer,
+            output_root=root,
+            scene_root=scene_root,
         )
         ply = _ply_record(
             outer,
@@ -246,15 +258,21 @@ def build_final_exhibition_manifest(
                 "license": license_record,
                 "source_video": {
                     "sha256": source_sha,
-                    "duration_seconds": probe.get("duration_seconds") if isinstance(probe, Mapping) else None,
+                    "duration_seconds": (
+                        probe.get("duration_seconds") if isinstance(probe, Mapping) else None
+                    ),
                     "width": probe.get("width") if isinstance(probe, Mapping) else None,
                     "height": probe.get("height") if isinstance(probe, Mapping) else None,
                 },
                 "selected_frames": selected,
                 "reconstruction": {
                     "backend": "nerfstudio-splatfacto",
-                    "nerfstudio_version": versions.get("nerfstudio") if isinstance(versions, Mapping) else None,
-                    "gsplat_version": versions.get("gsplat") if isinstance(versions, Mapping) else None,
+                    "nerfstudio_version": (
+                        versions.get("nerfstudio") if isinstance(versions, Mapping) else None
+                    ),
+                    "gsplat_version": (
+                        versions.get("gsplat") if isinstance(versions, Mapping) else None
+                    ),
                     "training_command": list(train_command),
                     "export_command": list(export_command),
                 },
