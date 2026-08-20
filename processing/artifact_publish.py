@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import os
 import subprocess
@@ -89,6 +90,23 @@ def _resolve_transforms_path(run_manifest_path: Path, run_manifest: dict) -> Pat
     return candidate
 
 
+def _resolve_physical_up_path(run_manifest_path: Path, run_manifest: dict) -> Path | None:
+    declared = run_manifest.get("physical_up_evidence_path")
+    if declared is not None:
+        if not isinstance(declared, str) or not declared.strip():
+            raise ArtifactPublishError("physical_up_evidence_path must be a non-empty path when declared")
+        candidate = Path(declared).expanduser()
+        if not candidate.is_absolute():
+            candidate = run_manifest_path.parent / candidate
+        candidate = candidate.resolve()
+        if not candidate.is_file():
+            raise ArtifactPublishError(f"declared physical-up evidence file is missing: {candidate}")
+        return candidate
+
+    candidate = (run_manifest_path.parent / "physical-up-evidence.json").resolve()
+    return candidate if candidate.is_file() else None
+
+
 def _hf_cache_command(hf_cache_hub_root: str | Path | None) -> list[str]:
     root_value = hf_cache_hub_root or os.environ.get("HF_CACHE_HUB_ROOT")
     if not root_value:
@@ -118,7 +136,7 @@ def build_artifact_manifest(
     if orientation.get("ply_sha256") != sha256:
         raise ArtifactPublishError("orientation evidence does not match artifact PLY SHA-256")
     if orientation.get("status") != "accepted":
-        raise ArtifactPublishError("only accepted orientation evidence can be published")
+        raise ArtifactPublishError("only accepted orientation basis evidence can be published")
 
     artifact_id = f"autophotogrammetry/{dataset}/splat"
     remote_path = f"autophotogrammetry/gaussian-splats/{dataset}/{sha256}.ply"
@@ -175,16 +193,27 @@ def publish_run_splat(
         raise ArtifactPublishError("local PLY no longer matches the successful run manifest")
 
     transforms_path = _resolve_transforms_path(run_manifest_path, run_manifest)
+    physical_up_path = _resolve_physical_up_path(run_manifest_path, run_manifest)
     orientation_path = run_manifest_path.parent / "orientation-evidence.json"
     try:
-        orientation = write_orientation_evidence(transforms_path, ply_path, orientation_path)
+        orientation = write_orientation_evidence(
+            transforms_path,
+            ply_path,
+            orientation_path,
+            physical_up_path=physical_up_path,
+        )
     except OrientationContractError as exc:
         raise ArtifactPublishError(f"orientation gate failed: {exc}") from exc
     if orientation["ply_sha256"] != expected_sha:
         raise ArtifactPublishError("orientation evidence was generated for a different PLY SHA-256")
-    # Keep the artifact manifest portable: the hash is authoritative; the path is run-local provenance.
-    orientation_for_manifest = dict(orientation)
+
+    # Keep the artifact manifest portable: hashes are authoritative and local paths
+    # are reduced to sidecar file names inside the run directory.
+    orientation_for_manifest = copy.deepcopy(orientation)
     orientation_for_manifest["evidence_path"] = orientation_path.name
+    physical = orientation_for_manifest.get("physical_up", {})
+    if physical.get("status") == "accepted" and physical.get("evidence_path"):
+        physical["evidence_path"] = Path(str(physical["evidence_path"])).name
     run_manifest["orientation"] = orientation_for_manifest
 
     revision = _recorded_revision(run_manifest, source_revision)
@@ -245,6 +274,7 @@ def publish_run_splat(
         write_json(run_manifest_path, run_manifest)
         raise ArtifactPublishError(f"remote publish verification failed for {artifact_id}")
 
+    physical_up = orientation_for_manifest.get("physical_up", {})
     success = {
         "status": "published",
         "artifact_id": artifact_id,
@@ -255,6 +285,9 @@ def publish_run_splat(
         "source_revision": revision,
         "run_id": run_id,
         "orientation_status": orientation_for_manifest["status"],
+        "orientation_scope": orientation_for_manifest["scope"],
+        "physical_up_status": physical_up.get("status"),
+        "physical_up_authority_type": physical_up.get("authority_type"),
         "orientation_evidence_sha256": orientation_for_manifest["evidence_sha256"],
         "remote_verified": True,
     }
