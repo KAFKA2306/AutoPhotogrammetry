@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 
-from processing.artifact_publish import ArtifactPublishError, publish_run_splat
+from processing.artifact_publish import ArtifactPublishError, _hf_cache_command, publish_run_splat
 
 
 class ArtifactPublishTest(unittest.TestCase):
@@ -40,6 +42,11 @@ class ArtifactPublishTest(unittest.TestCase):
         (hf_root / "scripts").mkdir(parents=True)
         (hf_root / "scripts" / "artifact_manager.py").write_text("# cli", encoding="utf-8")
         return manifest, ply, sha, hf_root
+
+    def test_missing_hf_cache_hub_root_fails_with_required_error(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(ArtifactPublishError, "HF_CACHE_HUB_ROOT"):
+                _hf_cache_command(None)
 
     def test_publish_records_remote_verified_provenance(self):
         with tempfile.TemporaryDirectory() as d:
