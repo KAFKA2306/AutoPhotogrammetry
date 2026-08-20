@@ -9,10 +9,22 @@ from pathlib import Path
 import numpy as np
 
 PLY_TYPES = {
-    "char": "i1", "int8": "i1", "uchar": "u1", "uint8": "u1",
-    "short": "<i2", "int16": "<i2", "ushort": "<u2", "uint16": "<u2",
-    "int": "<i4", "int32": "<i4", "uint": "<u4", "uint32": "<u4",
-    "float": "<f4", "float32": "<f4", "double": "<f8", "float64": "<f8",
+    "char": "i1",
+    "int8": "i1",
+    "uchar": "u1",
+    "uint8": "u1",
+    "short": "<i2",
+    "int16": "<i2",
+    "ushort": "<u2",
+    "uint16": "<u2",
+    "int": "<i4",
+    "int32": "<i4",
+    "uint": "<u4",
+    "uint32": "<u4",
+    "float": "<f4",
+    "float32": "<f4",
+    "double": "<f8",
+    "float64": "<f8",
 }
 
 
@@ -84,11 +96,15 @@ def axis_angles(v):
     v = unit(v)
     if v is None:
         raise ValueError("zero vector")
-    return {axis: math.degrees(math.acos(float(np.clip(abs(v[i]), 0.0, 1.0)))) for i, axis in enumerate("xyz")}
+    return {
+        axis: math.degrees(math.acos(float(np.clip(abs(v[i]), 0.0, 1.0))))
+        for i, axis in enumerate("xyz")
+    }
 
 
 def plane_angle(a, b):
-    a = unit(a); b = unit(b)
+    a = unit(a)
+    b = unit(b)
     return math.degrees(math.acos(float(np.clip(abs(np.dot(a, b)), 0.0, 1.0))))
 
 
@@ -127,7 +143,13 @@ def dominant_plane(pts, seed, iterations=700, distance_ratio=0.006):
     vals, vecs = np.linalg.eigh(cov)
     normal = vecs[:, int(np.argmin(vals))]
     residual = np.abs(c @ normal)
-    return normal, center, float(len(inliers) / len(pts)), float(np.sqrt(np.mean(residual ** 2))), threshold
+    return (
+        normal,
+        center,
+        float(len(inliers) / len(pts)),
+        float(np.sqrt(np.mean(residual**2))),
+        threshold,
+    )
 
 
 def _axis_diagnostics(angles):
@@ -162,11 +184,17 @@ def analyze(path: Path, max_points: int):
         "vertex_count": total,
         "sample_count": int(len(pts)),
         "dominant_plane": {
-            "normal": normal.tolist(), "center": center.tolist(), **plane_diag,
-            "inlier_ratio": inlier_ratio, "rms_residual": rms, "distance_threshold": threshold,
+            "normal": normal.tolist(),
+            "center": center.tolist(),
+            **plane_diag,
+            "inlier_ratio": inlier_ratio,
+            "rms_residual": rms,
+            "distance_threshold": threshold,
         },
         "global_pca": {
-            "thin_axis": thin.tolist(), **global_diag, "eigenvalues": evals.tolist(),
+            "thin_axis": thin.tolist(),
+            **global_diag,
+            "eigenvalues": evals.tolist(),
         },
         "plane_vs_global_thin_axis_deg": plane_angle(normal, thin),
     }
@@ -188,10 +216,10 @@ def main():
         results.append(r)
         p, g = r["dominant_plane"], r["global_pca"]
         print(
-            f'{r["scene"]}: plane={p["nearest_axis"]}+{p["nearest_axis_tilt_deg"]:.3f}deg '
-            f'NS-Z-up={p["nerfstudio_z_up_angle_deg"]:.3f}deg raw-Y={p["raw_unity_y_axis_angle_deg"]:.3f}deg '
-            f'inliers={p["inlier_ratio"]:.3f}; global={g["nearest_axis"]}+{g["nearest_axis_tilt_deg"]:.3f}deg '
-            f'NS-Z-up={g["nerfstudio_z_up_angle_deg"]:.3f}deg consistency={r["plane_vs_global_thin_axis_deg"]:.3f}deg'
+            f"{r['scene']}: plane={p['nearest_axis']}+{p['nearest_axis_tilt_deg']:.3f}deg "
+            f"NS-Z-up={p['nerfstudio_z_up_angle_deg']:.3f}deg raw-Y={p['raw_unity_y_axis_angle_deg']:.3f}deg "
+            f"inliers={p['inlier_ratio']:.3f}; global={g['nearest_axis']}+{g['nearest_axis_tilt_deg']:.3f}deg "
+            f"NS-Z-up={g['nerfstudio_z_up_angle_deg']:.3f}deg consistency={r['plane_vs_global_thin_axis_deg']:.3f}deg"
         )
     payload = {
         "schema_version": 2,
@@ -205,7 +233,9 @@ def main():
         "count": len(results),
         "results": results,
     }
-    Path(args.output).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    Path(args.output).write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     print(f"measured={len(results)} output={args.output}")
 
 
