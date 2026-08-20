@@ -10,6 +10,13 @@ from typing import Sequence
 from processing.gaussian_ply import gaussian_ply_metrics
 from processing.provenance import sha256_file, write_json
 
+CLEAN_GS_REPOSITORY = "https://github.com/smlab-niser/clean-gs"
+CLEAN_GS_REVISION = "ba5c2fa97e9e4bec0510e25aee9f79f6bc8fa822"
+CLEAN_GS_LICENSE = "MIT"
+CLEAN_GS_LICENSE_URL = (
+    f"{CLEAN_GS_REPOSITORY}/blob/{CLEAN_GS_REVISION}/LICENSE"
+)
+
 
 def clean_gs_command(
     script_path: str | Path,
@@ -99,12 +106,12 @@ def _git_checkout_revision(script: Path, requested_revision: str) -> dict:
 def run_clean_gs(
     *,
     script_path: str | Path,
-    upstream_revision: str,
     scene: str,
     masks_dir: str | Path,
     input_ply: str | Path,
     output_ply: str | Path,
     manifest_path: str | Path,
+    upstream_revision: str = CLEAN_GS_REVISION,
     python_executable: str = "python",
     color_threshold: float | None = None,
     k_neighbors: int | None = None,
@@ -112,7 +119,7 @@ def run_clean_gs(
     timeout: float | None = None,
     extra_args: Sequence[str] = (),
 ) -> dict:
-    """Run an explicit Clean-GS checkout and record all inputs, argv and before/after artifacts."""
+    """Run the pinned Clean-GS checkout and record auditable before/after evidence."""
     script = Path(script_path).expanduser().resolve()
     masks = Path(masks_dir).expanduser().resolve()
     source = Path(input_ply).expanduser().resolve()
@@ -154,11 +161,13 @@ def run_clean_gs(
     )
     finished = _utc_now()
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "backend": "Clean-GS",
-        "upstream_repository": "https://github.com/smlab-niser/clean-gs",
+        "upstream_repository": CLEAN_GS_REPOSITORY,
         "upstream_revision": checkout["head_revision"],
         "upstream_checkout": checkout,
+        "upstream_license": CLEAN_GS_LICENSE,
+        "upstream_license_url": CLEAN_GS_LICENSE_URL,
         "scene": scene,
         "command": command,
         "started_at": started,
@@ -198,9 +207,9 @@ def run_clean_gs(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run official Clean-GS with auditable input/output lineage.")
+    parser = argparse.ArgumentParser(description="Run pinned official Clean-GS with auditable input/output lineage.")
     parser.add_argument("--script", required=True)
-    parser.add_argument("--upstream-revision", required=True)
+    parser.add_argument("--upstream-revision", default=CLEAN_GS_REVISION)
     parser.add_argument("--scene", required=True)
     parser.add_argument("--masks-dir", required=True)
     parser.add_argument("--input-ply", required=True)
