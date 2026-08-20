@@ -3,28 +3,22 @@ name: Tooling Bootstrap
 on:
   push:
     branches: [feat/fast-quality-gates]
-    paths:
-      - pyproject.toml
-      - requirements.txt
-      - .github/workflows/bootstrap-tooling.yml
-  pull_request:
-    branches: [main]
-    paths:
-      - pyproject.toml
-      - requirements.txt
-      - .github/workflows/bootstrap-tooling.yml
+
+concurrency:
+  group: tooling-bootstrap-fast-quality-gates
+  cancel-in-progress: true
 
 permissions:
   contents: write
 
 jobs:
   bootstrap:
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
           ref: feat/fast-quality-gates
+          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -53,4 +47,6 @@ jobs:
             exit 0
           fi
           git commit -m "Tooling: freeze uv lock Pyrefly baseline and Ruff format"
+          git fetch origin feat/fast-quality-gates
+          git rebase origin/feat/fast-quality-gates
           git push origin HEAD:feat/fast-quality-gates
