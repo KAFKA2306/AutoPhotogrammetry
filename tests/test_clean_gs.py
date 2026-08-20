@@ -56,7 +56,7 @@ class CleanGsTests(unittest.TestCase):
         head = "a" * 40
 
         def fake_run(command, **kwargs):
-            args = command[4:]
+            args = command[3:]
             if args == ["rev-parse", "--show-toplevel"]:
                 stdout = "/tmp/clean-gs\n"
             elif args == ["rev-parse", "HEAD"]:
@@ -80,7 +80,7 @@ class CleanGsTests(unittest.TestCase):
         head = "b" * 40
 
         def fake_run(command, **kwargs):
-            args = command[4:]
+            args = command[3:]
             if args == ["rev-parse", "--show-toplevel"]:
                 stdout = "/tmp/clean-gs\n"
             elif args == ["rev-parse", "HEAD"]:
