@@ -105,7 +105,7 @@ def measure_frames(
     dynamics: list[float] = []
     pair_ssim: list[float] = []
 
-    for first, second in zip(frames, frames[1:]):
+    for first, second in zip(frames, frames[1:], strict=False):
         score = float(structural_similarity(first, second, data_range=1.0))
         pair_ssim.append(score)
         overlaps.append(_feature_overlap(first, second))
