@@ -138,9 +138,7 @@ def traverse_category(
             {
                 "canonical_title": title,
                 "discovered_categories": sorted(record["discovered_categories"]),
-                "discovery_paths": [
-                    list(path) for path in sorted(record["discovery_paths"])
-                ],
+                "discovery_paths": [list(path) for path in sorted(record["discovery_paths"])],
             }
         )
     return result
@@ -186,9 +184,7 @@ def discover_from_seed_config(
             )
             record["regions"].add(seed["region_id"])
             record["discovered_categories"].update(candidate["discovered_categories"])
-            record["discovery_paths"].update(
-                tuple(path) for path in candidate["discovery_paths"]
-            )
+            record["discovery_paths"].update(tuple(path) for path in candidate["discovery_paths"])
 
     candidates = []
     for title in sorted(files):
@@ -198,9 +194,7 @@ def discover_from_seed_config(
                 "canonical_title": title,
                 "regions": sorted(record["regions"]),
                 "discovered_categories": sorted(record["discovered_categories"]),
-                "discovery_paths": [
-                    list(path) for path in sorted(record["discovery_paths"])
-                ],
+                "discovery_paths": [list(path) for path in sorted(record["discovery_paths"])],
             }
         )
     return {
@@ -400,10 +394,7 @@ def normalize_discovery(
             set(existing["discovered_categories"]) | set(normalized["discovered_categories"])
         )
         existing["discovery_paths"] = sorted(
-            {
-                tuple(path)
-                for path in [*existing["discovery_paths"], *normalized["discovery_paths"]]
-            }
+            {tuple(path) for path in [*existing["discovery_paths"], *normalized["discovery_paths"]]}
         )
         existing["discovery_paths"] = [list(path) for path in existing["discovery_paths"]]
 
