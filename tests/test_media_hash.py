@@ -31,8 +31,9 @@ class MediaHashBatchTests(unittest.TestCase):
                     raise OSError("network unavailable")
                 return "b" * 64, 123
 
-            with patch("processing.media_hash.load_video_registry", return_value=registry), patch(
-                "processing.media_hash.hash_source_media", side_effect=fake_hash
+            with (
+                patch("processing.media_hash.load_video_registry", return_value=registry),
+                patch("processing.media_hash.hash_source_media", side_effect=fake_hash),
             ):
                 result = update_unhashed_registry_sources(path, timeout_seconds=3.0)
 
@@ -65,8 +66,9 @@ class MediaHashBatchTests(unittest.TestCase):
             path = Path(tmpdir) / "videos.json"
             path.write_text(json.dumps(registry), encoding="utf-8")
 
-            with patch("processing.media_hash.load_video_registry", return_value=registry), patch(
-                "processing.media_hash.hash_source_media", return_value=("b" * 64, 123)
+            with (
+                patch("processing.media_hash.load_video_registry", return_value=registry),
+                patch("processing.media_hash.hash_source_media", return_value=("b" * 64, 123)),
             ):
                 result = update_unhashed_registry_sources(path)
 
