@@ -194,7 +194,11 @@ def run_efa_gs(
             "holdout_frame_count": len(dataset.get("holdout_frame_sha256") or []),
             "wall_clock_seconds": sum(float(step["wall_clock_seconds"]) for step in steps),
             "peak_gpu_memory_bytes": max(
-                (int(step["peak_gpu_memory_bytes"]) for step in steps if step.get("peak_gpu_memory_bytes") is not None),
+                (
+                    int(step["peak_gpu_memory_bytes"])
+                    for step in steps
+                    if step.get("peak_gpu_memory_bytes") is not None
+                ),
                 default=None,
             ),
             "camera_pose_available": True,
@@ -236,7 +240,9 @@ def run_efa_gs(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run pinned EFA-GS/3DGS as a non-commercial research backend.")
+    parser = argparse.ArgumentParser(
+        description="Run pinned EFA-GS/3DGS as a non-commercial research backend."
+    )
     parser.add_argument("--dataset", required=True)
     parser.add_argument("--transforms", required=True)
     parser.add_argument("--colmap-model", required=True)

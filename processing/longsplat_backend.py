@@ -82,7 +82,10 @@ def run_longsplat(
     """
     if resolution <= 0:
         raise ValueError("resolution must be positive")
-    if any(value <= 0 for value in (pose_iterations, local_iterations, global_iterations, conversion_iterations)):
+    if any(
+        value <= 0
+        for value in (pose_iterations, local_iterations, global_iterations, conversion_iterations)
+    ):
         raise ValueError("iteration counts must be positive")
     if not 0 <= prune_ratio < 1:
         raise ValueError("prune_ratio must be in [0, 1)")
@@ -196,7 +199,11 @@ def run_longsplat(
             "holdout_frame_count": len(dataset.get("holdout_frame_sha256") or []),
             "wall_clock_seconds": sum(float(step["wall_clock_seconds"]) for step in steps),
             "peak_gpu_memory_bytes": max(
-                (int(step["peak_gpu_memory_bytes"]) for step in steps if step.get("peak_gpu_memory_bytes") is not None),
+                (
+                    int(step["peak_gpu_memory_bytes"])
+                    for step in steps
+                    if step.get("peak_gpu_memory_bytes") is not None
+                ),
                 default=None,
             ),
             "camera_pose_available": True,

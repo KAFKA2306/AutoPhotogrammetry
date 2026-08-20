@@ -24,11 +24,10 @@ class McmcQualityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "nerfstudio"
             (source / ".git").mkdir(parents=True)
-            completed = subprocess.CompletedProcess(
-                ["git"], 0, NERFSTUDIO_MCMC_REVISION + "\n", ""
-            )
-            with patch("processing.mcmc_quality.subprocess.run", return_value=completed), patch(
-                "processing.mcmc_quality.metadata.version", return_value=GSPLAT_MCMC_VERSION
+            completed = subprocess.CompletedProcess(["git"], 0, NERFSTUDIO_MCMC_REVISION + "\n", "")
+            with (
+                patch("processing.mcmc_quality.subprocess.run", return_value=completed),
+                patch("processing.mcmc_quality.metadata.version", return_value=GSPLAT_MCMC_VERSION),
             ):
                 result = verify_research_environment(source)
             self.assertEqual(result["nerfstudio_revision"], NERFSTUDIO_MCMC_REVISION)
@@ -65,8 +64,11 @@ class McmcQualityTests(unittest.TestCase):
                 "gsplat_repository": "https://github.com/nerfstudio-project/gsplat",
                 "gsplat_version": GSPLAT_MCMC_VERSION,
             }
-            with patch("processing.mcmc_quality.verify_research_environment", return_value=environment), patch(
-                "processing.mcmc_quality.run_splatfacto_export", side_effect=fake_run
+            with (
+                patch(
+                    "processing.mcmc_quality.verify_research_environment", return_value=environment
+                ),
+                patch("processing.mcmc_quality.run_splatfacto_export", side_effect=fake_run),
             ):
                 result = run_mcmc_comparison(
                     data,
@@ -78,7 +80,9 @@ class McmcQualityTests(unittest.TestCase):
             self.assertEqual(len(calls), 2)
             self.assertNotIn("--pipeline.model.strategy", calls[0])
             self.assertIn("--pipeline.model.strategy", calls[1])
-            self.assertEqual([entry["strategy"] for entry in result["experiments"]], ["default", "mcmc"])
+            self.assertEqual(
+                [entry["strategy"] for entry in result["experiments"]], ["default", "mcmc"]
+            )
             self.assertTrue(Path(result["manifest_path"]).is_file())
 
 

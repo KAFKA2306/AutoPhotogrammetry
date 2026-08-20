@@ -5,8 +5,8 @@ import json
 import os
 import subprocess
 import time
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 from processing.backend_evaluation import (
     artifact_record,
@@ -109,11 +109,15 @@ def _failed_command_and_code(
             command = phase_record.get("command")
             return_code = phase_record.get("return_code")
             if isinstance(command, list) and command:
-                return list(map(str, command)), int(return_code) if isinstance(return_code, int) else 0
+                return list(map(str, command)), int(return_code) if isinstance(
+                    return_code, int
+                ) else 0
     return ["quality-sweep", phase], 0
 
 
-def _best_effort_artifact(result: Mapping | None, manifest_path: Path | None) -> tuple[Path | None, dict | None]:
+def _best_effort_artifact(
+    result: Mapping | None, manifest_path: Path | None
+) -> tuple[Path | None, dict | None]:
     if not result or manifest_path is None:
         return None, None
     output = result.get("output")
@@ -296,14 +300,18 @@ def run_quality_sweep(
                 command = list(map(str, command_record.get("command") or ["ns-eval"]))
                 return_code = int(command_record.get("return_code") or 0)
             else:
-                command, return_code = _failed_command_and_code(exc, training_manifest, failure_phase)
+                command, return_code = _failed_command_and_code(
+                    exc, training_manifest, failure_phase
+                )
 
             metrics = _base_metrics(dataset)
             training = (training_manifest or {}).get("training") or {}
             metrics.update(
                 reconstruction_success=result is not None,
                 wall_clock_seconds=elapsed,
-                peak_gpu_memory_bytes=(training.get("peak_gpu_memory_bytes") if isinstance(training, Mapping) else None),
+                peak_gpu_memory_bytes=(
+                    training.get("peak_gpu_memory_bytes") if isinstance(training, Mapping) else None
+                ),
             )
             ply_path, artifact = _best_effort_artifact(result, manifest_path)
             if ply_path is not None:

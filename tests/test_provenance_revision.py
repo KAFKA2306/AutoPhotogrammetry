@@ -9,7 +9,6 @@ from unittest.mock import patch
 
 from processing.provenance import source_revision, write_json
 
-
 REVISION = "a" * 40
 
 
@@ -26,10 +25,13 @@ class ProvenanceRevisionTest(unittest.TestCase):
             "started_at": "2026-08-20T00:00:00Z",
             "commands": [],
         }
-        with tempfile.TemporaryDirectory() as directory, patch.dict(
-            os.environ,
-            {"AUTOPHOTOGRAMMETRY_SOURCE_REVISION": REVISION},
-            clear=False,
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            patch.dict(
+                os.environ,
+                {"AUTOPHOTOGRAMMETRY_SOURCE_REVISION": REVISION},
+                clear=False,
+            ),
         ):
             path = Path(directory) / "manifest.json"
             write_json(path, manifest)
@@ -39,10 +41,13 @@ class ProvenanceRevisionTest(unittest.TestCase):
 
     def test_unrelated_json_is_not_modified(self):
         payload = {"status": "success", "value": 1}
-        with tempfile.TemporaryDirectory() as directory, patch.dict(
-            os.environ,
-            {"AUTOPHOTOGRAMMETRY_SOURCE_REVISION": REVISION},
-            clear=False,
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            patch.dict(
+                os.environ,
+                {"AUTOPHOTOGRAMMETRY_SOURCE_REVISION": REVISION},
+                clear=False,
+            ),
         ):
             path = Path(directory) / "result.json"
             write_json(path, payload)

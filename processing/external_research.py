@@ -5,8 +5,8 @@ import os
 import shutil
 import subprocess
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from processing.backend_evaluation import dataset_identity
 from processing.nerfstudio import _run_recorded_command_with_peak_gpu_memory
@@ -94,9 +94,7 @@ def materialize_frozen_images(
     if set(expected) != set(sources):
         missing = sorted(set(expected) - set(sources))
         extra = sorted(set(sources) - set(expected))
-        raise ValueError(
-            f"dataset/transforms frame mismatch; missing={missing}, extra={extra}"
-        )
+        raise ValueError(f"dataset/transforms frame mismatch; missing={missing}, extra={extra}")
 
     destination = Path(images_dir).expanduser().resolve()
     if destination.exists():
@@ -118,9 +116,7 @@ def materialize_frozen_images(
         shutil.copy2(source, target)
         actual = sha256_file(target)
         if actual != digest:
-            raise RuntimeError(
-                f"materialized frame hash mismatch: expected {digest}, got {actual}"
-            )
+            raise RuntimeError(f"materialized frame hash mismatch: expected {digest}, got {actual}")
         materialized.append(
             {
                 "name": name,

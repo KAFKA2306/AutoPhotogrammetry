@@ -111,21 +111,27 @@ class QualitySweepTests(unittest.TestCase):
                 "scale_anisotropy_above_10_count": 20,
                 "scale_anisotropy_above_10_ratio": 0.2,
             }
-            with patch(
-                "processing.quality_sweep.verify_gpu_runtime",
-                return_value=runtime,
-            ), patch(
-                "processing.quality_sweep.verify_research_environment",
-                return_value=environment,
-            ), patch(
-                "processing.quality_sweep.run_splatfacto_export",
-                side_effect=fake_run,
-            ), patch(
-                "processing.quality_sweep.run_nerfstudio_eval",
-                side_effect=fake_eval,
-            ), patch(
-                "processing.quality_sweep.gaussian_artifact_metrics",
-                return_value=metrics,
+            with (
+                patch(
+                    "processing.quality_sweep.verify_gpu_runtime",
+                    return_value=runtime,
+                ),
+                patch(
+                    "processing.quality_sweep.verify_research_environment",
+                    return_value=environment,
+                ),
+                patch(
+                    "processing.quality_sweep.run_splatfacto_export",
+                    side_effect=fake_run,
+                ),
+                patch(
+                    "processing.quality_sweep.run_nerfstudio_eval",
+                    side_effect=fake_eval,
+                ),
+                patch(
+                    "processing.quality_sweep.gaussian_artifact_metrics",
+                    return_value=metrics,
+                ),
             ):
                 result = run_quality_sweep(
                     data,
@@ -234,21 +240,27 @@ class QualitySweepTests(unittest.TestCase):
                 "scale_anisotropy_above_10_ratio": 0.2,
             }
             output_root = root / "out"
-            with patch(
-                "processing.quality_sweep.verify_gpu_runtime",
-                return_value=runtime,
-            ), patch(
-                "processing.quality_sweep.verify_research_environment",
-                return_value=environment,
-            ), patch(
-                "processing.quality_sweep.run_splatfacto_export",
-                side_effect=fake_run,
-            ), patch(
-                "processing.quality_sweep.run_nerfstudio_eval",
-                side_effect=fake_eval,
-            ), patch(
-                "processing.quality_sweep.gaussian_artifact_metrics",
-                return_value=ply_metrics,
+            with (
+                patch(
+                    "processing.quality_sweep.verify_gpu_runtime",
+                    return_value=runtime,
+                ),
+                patch(
+                    "processing.quality_sweep.verify_research_environment",
+                    return_value=environment,
+                ),
+                patch(
+                    "processing.quality_sweep.run_splatfacto_export",
+                    side_effect=fake_run,
+                ),
+                patch(
+                    "processing.quality_sweep.run_nerfstudio_eval",
+                    side_effect=fake_eval,
+                ),
+                patch(
+                    "processing.quality_sweep.gaussian_artifact_metrics",
+                    return_value=ply_metrics,
+                ),
             ):
                 with self.assertRaisesRegex(RuntimeError, "scale-regularized"):
                     run_quality_sweep(

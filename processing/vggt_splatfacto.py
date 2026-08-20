@@ -5,8 +5,8 @@ import json
 import shutil
 import subprocess
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from processing.backend_evaluation import (
     artifact_record,
@@ -49,14 +49,18 @@ def _hash_files(root: Path) -> dict[str, Path]:
     return by_hash
 
 
-def _materialize_exact_images(dataset: Mapping, source_images: Path, destination: Path) -> list[dict]:
+def _materialize_exact_images(
+    dataset: Mapping, source_images: Path, destination: Path
+) -> list[dict]:
     """Copy the frozen #26 image bytes into Nerfstudio's required `images/` directory."""
     expected = {str(record["sha256"]): dict(record) for record in dataset.get("frames") or []}
     actual = _hash_files(source_images)
     if set(expected) != set(actual):
         missing = sorted(set(expected) - set(actual))
         extra = sorted(set(actual) - set(expected))
-        raise ValueError(f"VGGT images do not match the frozen dataset; missing={missing}, extra={extra}")
+        raise ValueError(
+            f"VGGT images do not match the frozen dataset; missing={missing}, extra={extra}"
+        )
 
     if destination.exists():
         shutil.rmtree(destination)
@@ -78,11 +82,15 @@ def _verify_colmap_sparse(sparse: Path) -> list[dict]:
         path = sparse / name
         if not path.is_file() or path.stat().st_size <= 0:
             raise ValueError(f"required VGGT COLMAP file is missing: {path}")
-        files.append({"path": str(path), "size_bytes": path.stat().st_size, "sha256": sha256_file(path)})
+        files.append(
+            {"path": str(path), "size_bytes": path.stat().st_size, "sha256": sha256_file(path)}
+        )
     return files
 
 
-def _run_recorded(command: Sequence[str], *, cwd: Path, stdout: Path, stderr: Path) -> subprocess.CompletedProcess[str]:
+def _run_recorded(
+    command: Sequence[str], *, cwd: Path, stdout: Path, stderr: Path
+) -> subprocess.CompletedProcess[str]:
     completed = subprocess.run(
         list(map(str, command)),
         shell=False,

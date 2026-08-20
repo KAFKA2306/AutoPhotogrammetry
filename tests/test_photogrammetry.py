@@ -104,9 +104,7 @@ class PhotogrammetryRunnerTests(unittest.TestCase):
                 "print('completed')\n",
                 encoding="utf-8",
             )
-            executable.chmod(
-                executable.stat().st_mode | stat.S_IXUSR
-            )
+            executable.chmod(executable.stat().st_mode | stat.S_IXUSR)
 
             result = run_backend(
                 "meshroom",
@@ -114,11 +112,7 @@ class PhotogrammetryRunnerTests(unittest.TestCase):
                 output_root,
                 BackendConfig(executable=str(executable)),
             )
-            manifest = json.loads(
-                Path(result.manifest_path).read_text(
-                    encoding="utf-8"
-                )
-            )
+            manifest = json.loads(Path(result.manifest_path).read_text(encoding="utf-8"))
             self.assertEqual(result.return_code, 0)
             self.assertEqual(manifest["backend"], "meshroom")
             self.assertEqual(manifest["version"], "fake 1.0")
@@ -127,9 +121,7 @@ class PhotogrammetryRunnerTests(unittest.TestCase):
                 manifest["artifacts"],
             )
             self.assertEqual(
-                Path(result.stdout_log).read_text(
-                    encoding="utf-8"
-                ),
+                Path(result.stdout_log).read_text(encoding="utf-8"),
                 "completed\n",
             )
 

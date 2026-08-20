@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 from processing.nerfstudio import run_splatfacto_export
 from processing.provenance import write_json

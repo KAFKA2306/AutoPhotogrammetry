@@ -23,27 +23,31 @@ class BatchTests(unittest.TestCase):
     def test_resolver_reads_wikimedia_imageinfo(self):
         payload = {
             "query": {
-                "pages": [{
-                    "imageinfo": [{
-                        "url": "https://upload.test/video.webm",
-                        "size": 123,
-                        "sha1": "abc",
-                        "mime": "video/webm",
-                        "extmetadata": {
-                            "Artist": {"value": "Author"},
-                            "LicenseShortName": {"value": "CC0"},
-                        },
-                    }]
-                }]
+                "pages": [
+                    {
+                        "imageinfo": [
+                            {
+                                "url": "https://upload.test/video.webm",
+                                "size": 123,
+                                "sha1": "abc",
+                                "mime": "video/webm",
+                                "extmetadata": {
+                                    "Artist": {"value": "Author"},
+                                    "LicenseShortName": {"value": "CC0"},
+                                },
+                            }
+                        ]
+                    }
+                ]
             }
         }
         response = io.BytesIO(json.dumps(payload).encode())
         response.__enter__ = lambda: response
         response.__exit__ = lambda *args: None
         with patch("processing.batch.urlopen", return_value=response):
-            result = resolve_media_url({
-                "source_page": "https://commons.wikimedia.org/wiki/File:Example_video.webm"
-            })
+            result = resolve_media_url(
+                {"source_page": "https://commons.wikimedia.org/wiki/File:Example_video.webm"}
+            )
         self.assertEqual(result["media_url"], "https://upload.test/video.webm")
         self.assertEqual(result["source_size_bytes"], 123)
         self.assertEqual(result["license"], "CC0")
@@ -53,8 +57,9 @@ class BatchTests(unittest.TestCase):
         response = io.BytesIO(payload)
         response.__enter__ = lambda: response
         response.__exit__ = lambda *args: None
-        with tempfile.TemporaryDirectory() as tmp, patch(
-            "processing.batch.urlopen", return_value=response
+        with (
+            tempfile.TemporaryDirectory() as tmp,
+            patch("processing.batch.urlopen", return_value=response),
         ):
             with self.assertRaisesRegex(RuntimeError, "Source SHA-1 mismatch"):
                 ensure_source(
@@ -68,12 +73,20 @@ class BatchTests(unittest.TestCase):
         registry = {
             "schema_version": 2,
             "default": "one",
-            "evaluation_policy": {"stages": {
-                "metadata": {}, "preflight": {}, "colmap": {}, "splat": {}
-            }},
+            "evaluation_policy": {
+                "stages": {"metadata": {}, "preflight": {}, "colmap": {}, "splat": {}}
+            },
             "videos": [
-                {"id": "one", "evaluation_stage": "metadata", "measurements": {"preflight": None, "colmap": None, "splat": None}},
-                {"id": "two", "evaluation_stage": "metadata", "measurements": {"preflight": None, "colmap": None, "splat": None}},
+                {
+                    "id": "one",
+                    "evaluation_stage": "metadata",
+                    "measurements": {"preflight": None, "colmap": None, "splat": None},
+                },
+                {
+                    "id": "two",
+                    "evaluation_stage": "metadata",
+                    "measurements": {"preflight": None, "colmap": None, "splat": None},
+                },
             ],
         }
         with tempfile.TemporaryDirectory() as tmp:
@@ -83,7 +96,11 @@ class BatchTests(unittest.TestCase):
             with patch(
                 "processing.batch.run_video",
                 side_effect=[
-                    {"status": "success", "manifest_path": "one/manifest.json", "splatfacto": {"ply_path": "one.ply", "ply_sha256": "a"}},
+                    {
+                        "status": "success",
+                        "manifest_path": "one/manifest.json",
+                        "splatfacto": {"ply_path": "one.ply", "ply_sha256": "a"},
+                    },
                     RuntimeError("no GPU"),
                 ],
             ):

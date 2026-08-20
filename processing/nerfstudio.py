@@ -6,10 +6,10 @@ import shutil
 import subprocess
 import threading
 import uuid
+from collections.abc import Mapping, Sequence
 from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from processing.provenance import image_records, sha256_file, write_json
 
@@ -28,8 +28,10 @@ def nerfstudio_process_images_command(
     return [
         executable,
         "images",
-        "--data", str(Path(image_dir)),
-        "--output-dir", str(Path(output_dir)),
+        "--data",
+        str(Path(image_dir)),
+        "--output-dir",
+        str(Path(output_dir)),
         *map(str, extra_args),
     ]
 
@@ -43,7 +45,8 @@ def splatfacto_train_command(
     return [
         executable,
         "splatfacto",
-        "--data", str(Path(data_dir)),
+        "--data",
+        str(Path(data_dir)),
         *map(str, extra_args),
     ]
 
@@ -58,8 +61,10 @@ def gaussian_splat_export_command(
     return [
         executable,
         "gaussian-splat",
-        "--load-config", str(Path(config_path)),
-        "--output-dir", str(Path(output_dir)),
+        "--load-config",
+        str(Path(config_path)),
+        "--output-dir",
+        str(Path(output_dir)),
         *map(str, extra_args),
     ]
 
@@ -73,8 +78,10 @@ def nerfstudio_eval_command(
 ) -> list[str]:
     command = [
         executable,
-        "--load-config", str(Path(config_path)),
-        "--output-path", str(Path(output_path)),
+        "--load-config",
+        str(Path(config_path)),
+        "--output-path",
+        str(Path(output_path)),
     ]
     if render_output_path is not None:
         command.extend(("--render-output-path", str(Path(render_output_path))))

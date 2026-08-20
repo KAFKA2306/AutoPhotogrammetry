@@ -6,8 +6,8 @@ import json
 import shutil
 import subprocess
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Mapping, Sequence
 
 from processing.backend_evaluation import gaussian_artifact_metrics
 from processing.huejotzingo import _colmap_metrics, colmap_commands
@@ -73,7 +73,7 @@ def build_timestamp_split(
     ranked = sorted(
         records,
         key=lambda record: hashlib.sha256(
-            f"{source_video_sha256}:{record['frame']}:{record['source_time_seconds']:.9f}".encode("utf-8")
+            f"{source_video_sha256}:{record['frame']}:{record['source_time_seconds']:.9f}".encode()
         ).hexdigest(),
     )
     holdout = {record["frame"] for record in ranked[:count]}
@@ -86,8 +86,12 @@ def build_timestamp_split(
         "source_video_sha256": source_video_sha256,
         "fps": fps,
         "frames": annotated,
-        "train_frame_names": [record["frame"] for record in annotated if record["split"] == "train"],
-        "holdout_frame_names": [record["frame"] for record in annotated if record["split"] == "holdout"],
+        "train_frame_names": [
+            record["frame"] for record in annotated if record["split"] == "train"
+        ],
+        "holdout_frame_names": [
+            record["frame"] for record in annotated if record["split"] == "holdout"
+        ],
     }
 
 
@@ -113,7 +117,7 @@ def write_named_split_transforms(
     expected = {record["frame"] for record in split["frames"]}
     if set(by_name) != expected:
         raise ValueError(
-            f"transforms/split frame mismatch; missing={sorted(expected-set(by_name))}, extra={sorted(set(by_name)-expected)}"
+            f"transforms/split frame mismatch; missing={sorted(expected - set(by_name))}, extra={sorted(set(by_name) - expected)}"
         )
     train = [by_name[name] for name in split["train_frame_names"]]
     holdout = [by_name[name] for name in split["holdout_frame_names"]]
@@ -129,7 +133,9 @@ def write_named_split_transforms(
     }
 
 
-def _run(command: Sequence[str], *, cwd: Path, stdout: Path, stderr: Path) -> subprocess.CompletedProcess[str]:
+def _run(
+    command: Sequence[str], *, cwd: Path, stdout: Path, stderr: Path
+) -> subprocess.CompletedProcess[str]:
     completed = subprocess.run(
         list(map(str, command)),
         shell=False,
@@ -202,9 +208,7 @@ def _run_condition(
     )
     frame_names = [path.name for path in frames]
     if frame_names != [record["frame"] for record in split["frames"]]:
-        raise RuntimeError(
-            f"compression condition changed timestamp/frame cardinality: {name}"
-        )
+        raise RuntimeError(f"compression condition changed timestamp/frame cardinality: {name}")
 
     colmap = condition / "colmap"
     (colmap / "sparse").mkdir(parents=True)
@@ -216,7 +220,9 @@ def _run_condition(
             stdout=logs / f"{step_name}.stdout.log",
             stderr=logs / f"{step_name}.stderr.log",
         )
-        commands.append({"name": step_name, "command": command, "return_code": completed.returncode})
+        commands.append(
+            {"name": step_name, "command": command, "return_code": completed.returncode}
+        )
         _require_success(completed, command)
     sparse = colmap / "sparse" / "0"
     if not sparse.is_dir():

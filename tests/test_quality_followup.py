@@ -97,16 +97,20 @@ class QualityFollowupTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             source, data = self._dataset(root)
-            with patch(
-                "processing.quality_followup.verify_gpu_runtime",
-                return_value={"gpu": "test"},
-            ), patch(
-                "processing.quality_followup.verify_research_environment",
-                return_value={"nerfstudio_revision": "revision"},
-            ), patch(
-                "processing.quality_followup._run_experiment",
-                side_effect=self._fake_experiment,
-            ) as runner:
+            with (
+                patch(
+                    "processing.quality_followup.verify_gpu_runtime",
+                    return_value={"gpu": "test"},
+                ),
+                patch(
+                    "processing.quality_followup.verify_research_environment",
+                    return_value={"nerfstudio_revision": "revision"},
+                ),
+                patch(
+                    "processing.quality_followup._run_experiment",
+                    side_effect=self._fake_experiment,
+                ) as runner,
+            ):
                 result = run_culling_sweep(
                     data,
                     source,
@@ -125,16 +129,20 @@ class QualityFollowupTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             source, data = self._dataset(root)
-            with patch(
-                "processing.quality_followup.verify_gpu_runtime",
-                return_value={"gpu": "test"},
-            ), patch(
-                "processing.quality_followup.verify_research_environment",
-                return_value={"nerfstudio_revision": "revision"},
-            ), patch(
-                "processing.quality_followup._run_experiment",
-                side_effect=self._fake_experiment,
-            ) as runner:
+            with (
+                patch(
+                    "processing.quality_followup.verify_gpu_runtime",
+                    return_value={"gpu": "test"},
+                ),
+                patch(
+                    "processing.quality_followup.verify_research_environment",
+                    return_value={"nerfstudio_revision": "revision"},
+                ),
+                patch(
+                    "processing.quality_followup._run_experiment",
+                    side_effect=self._fake_experiment,
+                ) as runner,
+            ):
                 result = run_budget_sweep(
                     data,
                     source,

@@ -3,8 +3,8 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 from urllib.request import Request, urlopen
 
 from processing.image_selection import select_video_frames

@@ -4,8 +4,8 @@ import json
 import os
 import subprocess
 import sys
+from collections.abc import Callable, Sequence
 from pathlib import Path, PurePosixPath
-from typing import Callable, Sequence
 
 import yaml
 
@@ -66,7 +66,9 @@ def _resolve_run_artifact_path(run_manifest_path: Path, raw_path: str) -> Path:
     for candidate in candidates:
         if candidate.is_file():
             return candidate.resolve()
-    raise ArtifactPublishError(f"Gaussian Splat PLY cannot be resolved from run manifest path: {raw_path}")
+    raise ArtifactPublishError(
+        f"Gaussian Splat PLY cannot be resolved from run manifest path: {raw_path}"
+    )
 
 
 def _hf_cache_command(hf_cache_hub_root: str | Path | None) -> list[str]:
@@ -137,7 +139,9 @@ def publish_run_splat(
         expected_sha = splat["ply_sha256"]
         expected_size = splat["ply_size_bytes"]
     except KeyError as exc:
-        raise ArtifactPublishError(f"run manifest is missing Gaussian Splat metadata: {exc}") from exc
+        raise ArtifactPublishError(
+            f"run manifest is missing Gaussian Splat metadata: {exc}"
+        ) from exc
 
     actual_sha = sha256_file(ply_path)
     actual_size = ply_path.stat().st_size

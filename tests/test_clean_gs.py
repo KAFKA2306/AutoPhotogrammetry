@@ -132,7 +132,9 @@ class CleanGsTests(unittest.TestCase):
                 "head_revision": CLEAN_GS_REVISION,
             }
             with (
-                patch("processing.clean_gs._git_checkout_revision", return_value=checkout) as revision_check,
+                patch(
+                    "processing.clean_gs._git_checkout_revision", return_value=checkout
+                ) as revision_check,
                 patch("processing.clean_gs.subprocess.run", side_effect=fake_run),
             ):
                 result = run_clean_gs(
@@ -180,7 +182,9 @@ class CleanGsTests(unittest.TestCase):
                 return subprocess.CompletedProcess(command, 0, "cleaned", "")
 
             with (
-                patch("processing.clean_gs._git_checkout_revision", return_value=checkout) as revision_check,
+                patch(
+                    "processing.clean_gs._git_checkout_revision", return_value=checkout
+                ) as revision_check,
                 patch("processing.clean_gs.subprocess.run", side_effect=fake_run),
             ):
                 result = run_clean_gs(

@@ -6,10 +6,10 @@ import platform
 import shutil
 import subprocess
 import uuid
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Mapping, Sequence
 
 SUPPORTED_BACKENDS = ("meshroom", "visualsfm", "colmap")
 ENV_VARS = {
@@ -60,9 +60,7 @@ def _utc_now() -> str:
 def _validate_backend(backend: str) -> str:
     normalized = backend.strip().lower()
     if normalized not in SUPPORTED_BACKENDS:
-        raise ValueError(
-            f"Unsupported backend: {backend!r}. Expected one of {SUPPORTED_BACKENDS}."
-        )
+        raise ValueError(f"Unsupported backend: {backend!r}. Expected one of {SUPPORTED_BACKENDS}.")
     return normalized
 
 
@@ -74,11 +72,7 @@ def resolve_executable(
     backend = _validate_backend(backend)
     config = config or BackendConfig()
     env = env or os.environ
-    candidate = (
-        config.executable
-        or env.get(ENV_VARS[backend])
-        or DEFAULT_EXECUTABLES[backend]
-    )
+    candidate = config.executable or env.get(ENV_VARS[backend]) or DEFAULT_EXECUTABLES[backend]
     candidate_path = Path(candidate).expanduser()
 
     if candidate_path.is_absolute() or candidate_path.parent != Path("."):
@@ -165,9 +159,7 @@ def run_backend(
     config = config or BackendConfig()
     image_dir = Path(image_dir).expanduser().resolve()
     if not image_dir.is_dir():
-        raise ValueError(
-            f"Image directory does not exist or is not a directory: {image_dir}"
-        )
+        raise ValueError(f"Image directory does not exist or is not a directory: {image_dir}")
 
     executable = resolve_executable(backend, config, env)
     run_id = f"{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}-{uuid.uuid4().hex[:8]}"
@@ -178,9 +170,7 @@ def run_backend(
     stdout_log = run_dir / "stdout.log"
     stderr_log = run_dir / "stderr.log"
     manifest_path = run_dir / "manifest.json"
-    command = build_command(
-        backend, executable, image_dir, model_dir, config.extra_args
-    )
+    command = build_command(backend, executable, image_dir, model_dir, config.extra_args)
     started_at = _utc_now()
 
     try:
@@ -242,9 +232,7 @@ def run_backend(
         manifest_path=str(manifest_path),
     )
     if return_code != 0:
-        raise subprocess.CalledProcessError(
-            return_code, command, output=stdout, stderr=stderr
-        )
+        raise subprocess.CalledProcessError(return_code, command, output=stdout, stderr=stderr)
     return result
 
 
@@ -274,14 +262,10 @@ def load_backend_configs(path: str | Path) -> dict[str, BackendConfig]:
         if not isinstance(extra_args, list) or not all(
             isinstance(item, str) for item in extra_args
         ):
-            raise ValueError(
-                f"extra_args for {backend} must be an array of strings."
-            )
+            raise ValueError(f"extra_args for {backend} must be an array of strings.")
         executable = raw.get("executable")
         if executable is not None and not isinstance(executable, str):
-            raise ValueError(
-                f"executable for {backend} must be a string or null."
-            )
+            raise ValueError(f"executable for {backend} must be a string or null.")
         configs[backend] = BackendConfig(
             executable=executable,
             extra_args=tuple(extra_args),

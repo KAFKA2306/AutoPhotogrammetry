@@ -73,7 +73,10 @@ class VideoSourceRegistryTests(unittest.TestCase):
         self.assertEqual(len({video["id"] for video in videos}), len(videos))
         self.assertEqual(len({video["source_page"] for video in videos}), len(videos))
         self.assertTrue(
-            all(video["source_page"].startswith("https://commons.wikimedia.org/wiki/File:") for video in videos)
+            all(
+                video["source_page"].startswith("https://commons.wikimedia.org/wiki/File:")
+                for video in videos
+            )
         )
 
     def test_unknown_source_fails(self) -> None:

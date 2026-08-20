@@ -34,7 +34,9 @@ class BackendEvaluationTests(unittest.TestCase):
             self.assertEqual(first, second)
             self.assertEqual(len(first["train_frame_sha256"]), 4)
             self.assertEqual(len(first["holdout_frame_sha256"]), 2)
-            self.assertTrue(set(first["train_frame_sha256"]).isdisjoint(first["holdout_frame_sha256"]))
+            self.assertTrue(
+                set(first["train_frame_sha256"]).isdisjoint(first["holdout_frame_sha256"])
+            )
             self.assertEqual(len(dataset_identity(first)), 64)
 
     def test_nerfstudio_contract_writes_explicit_split_without_mutating_source(self):
@@ -52,7 +54,12 @@ class BackendEvaluationTests(unittest.TestCase):
                 frames.append(
                     {
                         "file_path": f"images/{image.name}",
-                        "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                        "transform_matrix": [
+                            [1, 0, 0, 0],
+                            [0, 1, 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, 1],
+                        ],
                     }
                 )
             transforms = data / "transforms.json"
