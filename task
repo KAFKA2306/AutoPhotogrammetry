@@ -64,7 +64,12 @@ prepare_named_runtime() {
 }
 
 build_image() {
-  docker build --pull --build-arg "CUDA_ARCH_LIST=$HOST_GPU_ARCH" -t "$IMAGE" "$ROOT"
+  local source_revision
+  source_revision="$(git -C "$ROOT" rev-parse HEAD)"
+  docker build --pull \
+    --build-arg "CUDA_ARCH_LIST=$HOST_GPU_ARCH" \
+    --build-arg "AUTOPHOTOGRAMMETRY_REVISION=$source_revision" \
+    -t "$IMAGE" "$ROOT"
 }
 
 build_vggt_image() {
