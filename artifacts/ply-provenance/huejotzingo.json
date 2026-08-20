@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "scene_id": "huejotzingo",
+  "status": "success",
+  "generated_at": "2026-08-20T00:13:26.934593+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "c9723df1af171d40a5bf1f9530aa3ea881c6f95252ef3f2004f0f1013ab92e30",
+    "selected_frame_count": 78,
+    "selected_frame_hashes_recorded_in": "output/huejotzingo/manifest.json"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/huejotzingo/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T00:11:59.619784+00:00",
+    "finished_at": "2026-08-20T00:13:10.042945+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/huejotzingo/runs/splatfacto/20260820T001159Z-e3dabe8b/export/splat.ply",
+    "sha256": "1b63330848e6de7ef15f817a292876592c6b6cbd2527fe93fc8d9129cf04012d",
+    "size_bytes": 38555673,
+    "primitive_count": 155460,
+    "low_opacity_primitive_count": 6844,
+    "low_opacity_primitive_ratio": 0.044024186285861314,
+    "scale_anisotropy_above_10_count": 22635,
+    "scale_anisotropy_above_10_ratio": 0.14560015438054805,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
