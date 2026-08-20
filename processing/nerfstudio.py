@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
@@ -62,6 +63,23 @@ def gaussian_splat_export_command(
     ]
 
 
+def nerfstudio_eval_command(
+    config_path: str | Path,
+    output_path: str | Path,
+    *,
+    render_output_path: str | Path | None = None,
+    executable: str = "ns-eval",
+) -> list[str]:
+    command = [
+        executable,
+        "--load-config", str(Path(config_path)),
+        "--output-path", str(Path(output_path)),
+    ]
+    if render_output_path is not None:
+        command.extend(("--render-output-path", str(Path(render_output_path))))
+    return command
+
+
 def _resolve_cli(executable: str) -> Path:
     candidate = Path(executable).expanduser()
     if candidate.is_absolute() or candidate.parent != Path("."):
@@ -114,6 +132,117 @@ def _run_recorded_command(
         return subprocess.CompletedProcess(list(command), 124, stdout, stderr)
 
 
+def _nerfstudio_input_images(data: Path) -> list[dict]:
+    if data.is_dir():
+        return image_records(data)
+    if not data.is_file() or data.suffix.lower() != ".json":
+        raise ValueError(f"Nerfstudio data must be a directory or JSON file: {data}")
+    meta = json.loads(data.read_text(encoding="utf-8"))
+    records = []
+    for frame in meta.get("frames") or []:
+        declared = frame.get("file_path")
+        if not declared:
+            raise ValueError("Nerfstudio frame is missing file_path")
+        candidate = Path(str(declared))
+        resolved = candidate if candidate.is_absolute() else data.parent / candidate
+        resolved = resolved.resolve()
+        if not resolved.is_file():
+            raise ValueError(f"Nerfstudio frame does not exist: {resolved}")
+        records.append(
+            {
+                "path": str(declared),
+                "size_bytes": resolved.stat().st_size,
+                "sha256": sha256_file(resolved),
+            }
+        )
+    if not records:
+        raise ValueError(f"Nerfstudio JSON contains no image frames: {data}")
+    return records
+
+
+def run_nerfstudio_eval(
+    config_path: str | Path,
+    output_root: str | Path,
+    *,
+    executable: str = "ns-eval",
+    timeout: float | None = None,
+    env: Mapping[str, str] | None = None,
+) -> dict:
+    """Run ns-eval, save per-holdout renders, and return auditable image metrics."""
+    config = Path(config_path).expanduser().resolve()
+    if not config.is_file():
+        raise ValueError(f"Nerfstudio config does not exist: {config}")
+    eval_cli = _resolve_cli(executable)
+    root = Path(output_root).expanduser().resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    metrics_path = root / "metrics.json"
+    renders_path = root / "renders"
+    stdout_path = root / "eval.stdout.log"
+    stderr_path = root / "eval.stderr.log"
+    manifest_path = root / "eval-manifest.json"
+    command = nerfstudio_eval_command(
+        config,
+        metrics_path,
+        render_output_path=renders_path,
+        executable=str(eval_cli),
+    )
+    started_at = _utc_now()
+    completed = _run_recorded_command(
+        command,
+        cwd=root,
+        timeout=timeout,
+        env=env,
+    )
+    finished_at = _utc_now()
+    stdout_path.write_text(completed.stdout or "", encoding="utf-8")
+    stderr_path.write_text(completed.stderr or "", encoding="utf-8")
+    record = {
+        "schema_version": 1,
+        "command": command,
+        "started_at": started_at,
+        "finished_at": finished_at,
+        "return_code": completed.returncode,
+        "stdout_log": stdout_path.name,
+        "stderr_log": stderr_path.name,
+        "metrics_path": metrics_path.name,
+        "render_output_path": renders_path.name,
+        "metrics": None,
+    }
+    if completed.returncode != 0:
+        record["status"] = "failed"
+        write_json(manifest_path, record)
+        raise subprocess.CalledProcessError(
+            completed.returncode,
+            command,
+            output=completed.stdout,
+            stderr=completed.stderr,
+        )
+    if not metrics_path.is_file():
+        record["status"] = "failed"
+        write_json(manifest_path, record)
+        raise RuntimeError("ns-eval succeeded but did not write metrics.json")
+
+    payload = json.loads(metrics_path.read_text(encoding="utf-8"))
+    results = payload.get("results")
+    if not isinstance(results, dict):
+        record["status"] = "failed"
+        write_json(manifest_path, record)
+        raise RuntimeError("ns-eval metrics.json does not contain a results object")
+    measured = {}
+    for key in ("psnr", "ssim", "lpips"):
+        value = results.get(key)
+        if value is not None:
+            if not isinstance(value, (int, float)):
+                raise RuntimeError(f"ns-eval result {key} is not numeric: {value!r}")
+            measured[key] = float(value)
+    record["status"] = "success"
+    record["metrics"] = measured
+    record["raw_results"] = results
+    write_json(manifest_path, record)
+    record["manifest_path"] = str(manifest_path)
+    return record
+
+
 def run_splatfacto_export(
     data_dir: str | Path,
     output_root: str | Path,
@@ -127,8 +256,8 @@ def run_splatfacto_export(
 ) -> dict:
     """Run external Nerfstudio Splatfacto training and export one auditable PLY."""
     data = Path(data_dir).expanduser().resolve()
-    if not data.is_dir():
-        raise ValueError(f"Nerfstudio data directory does not exist: {data}")
+    if not data.is_dir() and not (data.is_file() and data.suffix.lower() == ".json"):
+        raise ValueError(f"Nerfstudio data directory/JSON does not exist: {data}")
 
     train_cli = _resolve_cli(train_executable)
     export_cli = _resolve_cli(export_executable)
@@ -156,7 +285,7 @@ def run_splatfacto_export(
     train_stderr = run_dir / "train.stderr.log"
     export_stdout = run_dir / "export.stdout.log"
     export_stderr = run_dir / "export.stderr.log"
-    input_images = image_records(data)
+    input_images = _nerfstudio_input_images(data)
 
     manifest = {
         "schema_version": 1,

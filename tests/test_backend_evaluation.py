@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -5,11 +6,13 @@ from pathlib import Path
 from processing.backend_evaluation import (
     artifact_record,
     build_dataset_contract,
+    build_nerfstudio_dataset_contract,
     compare_backend_results,
     dataset_identity,
     empty_metrics,
     validate_backend_result,
     write_comparison,
+    write_nerfstudio_split_transforms,
 )
 
 
@@ -33,6 +36,45 @@ class BackendEvaluationTests(unittest.TestCase):
             self.assertEqual(len(first["holdout_frame_sha256"]), 2)
             self.assertTrue(set(first["train_frame_sha256"]).isdisjoint(first["holdout_frame_sha256"]))
             self.assertEqual(len(dataset_identity(first)), 64)
+
+    def test_nerfstudio_contract_writes_explicit_split_without_mutating_source(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            video = root / "source.webm"
+            video.write_bytes(b"video")
+            data = root / "nerfstudio-data"
+            images = data / "images"
+            images.mkdir(parents=True)
+            frames = []
+            for index in range(10):
+                image = images / f"frame-{index:03d}.jpg"
+                image.write_bytes(f"processed-{index}".encode())
+                frames.append(
+                    {
+                        "file_path": f"images/{image.name}",
+                        "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                    }
+                )
+            transforms = data / "transforms.json"
+            transforms.write_text(json.dumps({"frames": frames}), encoding="utf-8")
+
+            dataset = build_nerfstudio_dataset_contract(video, transforms, holdout_count=2)
+            result = write_nerfstudio_split_transforms(
+                transforms,
+                dataset,
+                root / "quality" / "evaluation-transforms.json",
+            )
+            split = json.loads(Path(result["transforms_path"]).read_text(encoding="utf-8"))
+            original = json.loads(transforms.read_text(encoding="utf-8"))
+
+            self.assertEqual(result["train_frame_count"], 8)
+            self.assertEqual(result["holdout_frame_count"], 2)
+            self.assertEqual(len(split["train_filenames"]), 8)
+            self.assertEqual(split["val_filenames"], split["test_filenames"])
+            self.assertEqual(len(split["val_filenames"]), 2)
+            self.assertTrue(all(Path(path).is_absolute() for path in split["train_filenames"]))
+            self.assertNotIn("train_filenames", original)
+            self.assertEqual(result["dataset_id"], dataset_identity(dataset))
 
     def test_success_requires_real_artifact_and_traceable_metrics(self):
         with tempfile.TemporaryDirectory() as tmp:
