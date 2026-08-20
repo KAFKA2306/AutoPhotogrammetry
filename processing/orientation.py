@@ -110,7 +110,9 @@ def _load_external_physical_up(path: str | Path | None) -> dict | None:
     try:
         return load_physical_up_evidence(path)
     except PhysicalUpContractError as exc:
-        raise OrientationContractError(f"external physical-up evidence failed validation: {exc}") from exc
+        raise OrientationContractError(
+            f"external physical-up evidence failed validation: {exc}"
+        ) from exc
 
 
 def _matrix_from_payload(value: object, label: str) -> Matrix:
@@ -278,7 +280,9 @@ def validate_orientation_evidence(evidence: dict, *, expected_ply_sha256: str) -
     if physical_up.get("status") not in {"accepted", "review_required", "unavailable"}:
         raise OrientationContractError("physical_up status is missing or unsupported")
     if scope == "coordinate_basis_plus_physical_up" and physical_up.get("status") != "accepted":
-        raise OrientationContractError("physical-up composition scope requires accepted external authority")
+        raise OrientationContractError(
+            "physical-up composition scope requires accepted external authority"
+        )
 
     canonical = _matrix_from_payload(
         evidence["source_to_canonical"]["matrix3x3"],
