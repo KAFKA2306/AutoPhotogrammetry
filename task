@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:quality-ns50e0e3-sm120-v1}"
+VGGT_IMAGE="${AUTOPHOTOGRAMMETRY_VGGT_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:vggt-a288dd0-sm120-v1}"
 HOST_GPU_ARCH="${AUTOPHOTOGRAMMETRY_CUDA_ARCH:-12.0}"
 
 check_docker() {
@@ -20,8 +21,17 @@ build_image() {
   docker build --pull --build-arg "CUDA_ARCH_LIST=$HOST_GPU_ARCH" -t "$IMAGE" "$ROOT"
 }
 
-pull_image() {
-  if docker pull "$IMAGE"; then
+build_vggt_image() {
+  docker build --pull \
+    -f "$ROOT/Dockerfile.vggt" \
+    --build-arg VGGT_REVISION=a288dd0f14786c93483e45524328726ab7b1b4ce \
+    --build-arg LIGHTGLUE_REVISION=746fac2c042e05d1865315b1413419f1c1e7ba55 \
+    -t "$VGGT_IMAGE" "$ROOT"
+}
+
+pull_named_image() {
+  local image="$1"
+  if docker pull "$image"; then
     return 0
   fi
 
@@ -30,12 +40,17 @@ pull_image() {
     login="$(gh api user --jq .login)"
     token="$(gh auth token)"
     printf '%s' "$token" | docker login ghcr.io -u "$login" --password-stdin >/dev/null
-    docker pull "$IMAGE"
+    docker pull "$image"
     return 0
   fi
 
-  echo "Prebuilt GPU image is unavailable. The local quality path intentionally does not build dependencies; publish the GPU Image workflow or authenticate gh/docker to GHCR." >&2
+  echo "Prebuilt image is unavailable: $image" >&2
+  echo "Publish the matching image workflow or authenticate gh/docker to GHCR. The local GPU path does not build dependencies implicitly." >&2
   return 1
+}
+
+pull_image() {
+  pull_named_image "$IMAGE"
 }
 
 ensure_image() {
@@ -45,13 +60,20 @@ ensure_image() {
   pull_image
 }
 
+ensure_vggt_image() {
+  if docker image inspect "$VGGT_IMAGE" >/dev/null 2>&1; then
+    return 0
+  fi
+  pull_named_image "$VGGT_IMAGE"
+}
+
 check_host_gpu() {
   if ! command -v nvidia-smi >/dev/null 2>&1; then
     return 0
   fi
   HOST_GPU_ARCH="$(nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | tr -d '[:space:]')"
   if ! awk -v capability="$HOST_GPU_ARCH" 'BEGIN { exit !(capability >= 12.0 && capability < 13.0) }'; then
-    echo "GPU compute capability ${HOST_GPU_ARCH:-unknown} does not match the prebuilt sm_120 quality image. Override AUTOPHOTOGRAMMETRY_IMAGE/CUDA_ARCH only with another explicitly built image." >&2
+    echo "GPU compute capability ${HOST_GPU_ARCH:-unknown} does not match the prebuilt sm_120 images. Override the image/CUDA_ARCH only with another explicitly built image." >&2
     return 1
   fi
 }
@@ -70,6 +92,24 @@ run_gpu() {
     -v "$ROOT/output:/workspace/output" \
     -w /opt/autophotogrammetry \
     "$IMAGE" "$@"
+}
+
+run_vggt_gpu() {
+  local image_id
+  image_id="$(docker image inspect --format '{{.Id}}' "$VGGT_IMAGE" 2>/dev/null || true)"
+  mkdir -p "$ROOT/input" "$ROOT/output" "$ROOT/.cache/vggt"
+  docker run --rm --gpus all --shm-size=12g \
+    --user "$(id -u):$(id -g)" \
+    -e HOME=/tmp \
+    -e TORCH_HOME=/tmp/.cache/torch \
+    -e HF_HOME=/tmp/.cache/huggingface \
+    -e AUTOPHOTOGRAMMETRY_VGGT_IMAGE_REF="$VGGT_IMAGE" \
+    -e AUTOPHOTOGRAMMETRY_VGGT_IMAGE_ID="$image_id" \
+    -v "$ROOT/input:/workspace/input" \
+    -v "$ROOT/output:/workspace/output" \
+    -v "$ROOT/.cache/vggt:/tmp/.cache" \
+    -w /opt/autophotogrammetry \
+    "$VGGT_IMAGE" "$@"
 }
 
 run_cpu() {
@@ -125,9 +165,18 @@ case "${1:-run}" in
     check_host_gpu
     build_image
     ;;
+  vggt-image)
+    check_docker
+    check_host_gpu
+    build_vggt_image
+    ;;
   pull)
     check_docker
     pull_image
+    ;;
+  vggt-pull)
+    check_docker
+    pull_named_image "$VGGT_IMAGE"
     ;;
   doctor)
     doctor
@@ -214,6 +263,37 @@ case "${1:-run}" in
       --iterations "$current_iterations" \
       --iterations "$increased_iterations"
     ;;
+  vggt-research)
+    scene="${2:-}"
+    mode="${3:-feedforward}"
+    if [[ -z "$scene" ]]; then
+      echo "usage: ./task vggt-research <scene-id> [feedforward|ba]" >&2
+      exit 2
+    fi
+    require_quality_inputs "$scene"
+    dataset="$ROOT/output/$scene/quality-sweep/evaluation-dataset.json"
+    if [[ ! -f "$dataset" ]]; then
+      echo "Frozen #26 dataset contract is missing: $dataset" >&2
+      echo "Run ./task quality $scene first; VGGT does not invent a second train/hold-out split." >&2
+      exit 1
+    fi
+    check_docker
+    check_host_gpu
+    ensure_vggt_image
+    extra=()
+    if [[ "$mode" == "ba" ]]; then
+      extra+=(--use-ba)
+    elif [[ "$mode" != "feedforward" ]]; then
+      echo "VGGT mode must be feedforward or ba" >&2
+      exit 2
+    fi
+    run_vggt_gpu python -m processing.vggt_backend \
+      --dataset "/workspace/output/$scene/quality-sweep/evaluation-dataset.json" \
+      --transforms "/workspace/output/$scene/nerfstudio-data/transforms.json" \
+      --checkout /opt/vggt \
+      --output-root "/workspace/output/$scene/vggt-colmap" \
+      "${extra[@]}"
+    ;;
   clean)
     find "$ROOT/output" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
@@ -221,7 +301,7 @@ case "${1:-run}" in
     find "$ROOT/output" "$ROOT/input" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   *)
-    echo "usage: ./task {run|run-all|quality [scene-id] [iterations]|quality-pair <bad-scene> <good-control> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current-iterations> <increased-iterations>|doctor|pull|test|image|clean|clean-all}" >&2
+    echo "usage: ./task {run|run-all|quality [scene-id] [iterations]|quality-pair <bad-scene> <good-control> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current-iterations> <increased-iterations>|vggt-research <scene> [feedforward|ba]|doctor|pull|vggt-pull|test|image|vggt-image|clean|clean-all}" >&2
     exit 2
     ;;
 esac
