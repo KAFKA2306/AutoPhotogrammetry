@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:quality-ns50e0e3-sm120-v1}"
 VGGT_IMAGE="${AUTOPHOTOGRAMMETRY_VGGT_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:vggt-a288dd0-sm120-v1}"
+EFA_IMAGE="${AUTOPHOTOGRAMMETRY_EFA_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:efa-57f330f-sm120-v1}"
+LONGSPLAT_IMAGE="${AUTOPHOTOGRAMMETRY_LONGSPLAT_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:longsplat-1975077-sm120-v1}"
 HOST_GPU_ARCH="${AUTOPHOTOGRAMMETRY_CUDA_ARCH:-12.0}"
 
 check_docker() {
@@ -17,6 +19,50 @@ check_docker() {
   fi
 }
 
+check_host_gpu() {
+  if ! command -v nvidia-smi >/dev/null 2>&1; then
+    return 0
+  fi
+  HOST_GPU_ARCH="$(nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | tr -d '[:space:]')"
+  if ! awk -v capability="$HOST_GPU_ARCH" 'BEGIN { exit !(capability >= 12.0 && capability < 13.0) }'; then
+    echo "GPU compute capability ${HOST_GPU_ARCH:-unknown} does not match the prebuilt sm_120 images. Override the image only with another explicitly built image." >&2
+    return 1
+  fi
+}
+
+pull_named_image() {
+  local image="$1"
+  if docker pull "$image"; then
+    return 0
+  fi
+  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
+    local login token
+    login="$(gh api user --jq .login)"
+    token="$(gh auth token)"
+    printf '%s' "$token" | docker login ghcr.io -u "$login" --password-stdin >/dev/null
+    docker pull "$image"
+    return 0
+  fi
+  echo "Prebuilt image is unavailable: $image" >&2
+  echo "Publish the matching image workflow or authenticate gh/docker to GHCR. GPU commands do not build dependencies implicitly." >&2
+  return 1
+}
+
+ensure_named_image() {
+  local image="$1"
+  if docker image inspect "$image" >/dev/null 2>&1; then
+    return 0
+  fi
+  pull_named_image "$image"
+}
+
+prepare_named_runtime() {
+  local image="$1"
+  check_docker
+  check_host_gpu
+  ensure_named_image "$image"
+}
+
 build_image() {
   docker build --pull --build-arg "CUDA_ARCH_LIST=$HOST_GPU_ARCH" -t "$IMAGE" "$ROOT"
 }
@@ -27,55 +73,6 @@ build_vggt_image() {
     --build-arg VGGT_REVISION=a288dd0f14786c93483e45524328726ab7b1b4ce \
     --build-arg LIGHTGLUE_REVISION=746fac2c042e05d1865315b1413419f1c1e7ba55 \
     -t "$VGGT_IMAGE" "$ROOT"
-}
-
-pull_named_image() {
-  local image="$1"
-  if docker pull "$image"; then
-    return 0
-  fi
-
-  if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-    local login token
-    login="$(gh api user --jq .login)"
-    token="$(gh auth token)"
-    printf '%s' "$token" | docker login ghcr.io -u "$login" --password-stdin >/dev/null
-    docker pull "$image"
-    return 0
-  fi
-
-  echo "Prebuilt image is unavailable: $image" >&2
-  echo "Publish the matching image workflow or authenticate gh/docker to GHCR. The local GPU path does not build dependencies implicitly." >&2
-  return 1
-}
-
-pull_image() {
-  pull_named_image "$IMAGE"
-}
-
-ensure_image() {
-  if docker image inspect "$IMAGE" >/dev/null 2>&1; then
-    return 0
-  fi
-  pull_image
-}
-
-ensure_vggt_image() {
-  if docker image inspect "$VGGT_IMAGE" >/dev/null 2>&1; then
-    return 0
-  fi
-  pull_named_image "$VGGT_IMAGE"
-}
-
-check_host_gpu() {
-  if ! command -v nvidia-smi >/dev/null 2>&1; then
-    return 0
-  fi
-  HOST_GPU_ARCH="$(nvidia-smi --query-gpu=compute_cap --format=csv,noheader | head -n 1 | tr -d '[:space:]')"
-  if ! awk -v capability="$HOST_GPU_ARCH" 'BEGIN { exit !(capability >= 12.0 && capability < 13.0) }'; then
-    echo "GPU compute capability ${HOST_GPU_ARCH:-unknown} does not match the prebuilt sm_120 images. Override the image/CUDA_ARCH only with another explicitly built image." >&2
-    return 1
-  fi
 }
 
 run_gpu() {
@@ -112,6 +109,39 @@ run_vggt_gpu() {
     "$VGGT_IMAGE" "$@"
 }
 
+run_efa_gpu() {
+  local image_id
+  image_id="$(docker image inspect --format '{{.Id}}' "$EFA_IMAGE" 2>/dev/null || true)"
+  mkdir -p "$ROOT/input" "$ROOT/output"
+  docker run --rm --gpus all --shm-size=12g \
+    --user "$(id -u):$(id -g)" \
+    -e HOME=/tmp \
+    -e AUTOPHOTOGRAMMETRY_EFA_IMAGE_REF="$EFA_IMAGE" \
+    -e AUTOPHOTOGRAMMETRY_EFA_IMAGE_ID="$image_id" \
+    -v "$ROOT/input:/workspace/input" \
+    -v "$ROOT/output:/workspace/output" \
+    -w /opt/autophotogrammetry \
+    "$EFA_IMAGE" "$@"
+}
+
+run_longsplat_gpu() {
+  local image_id
+  image_id="$(docker image inspect --format '{{.Id}}' "$LONGSPLAT_IMAGE" 2>/dev/null || true)"
+  mkdir -p "$ROOT/input" "$ROOT/output" "$ROOT/.cache/longsplat"
+  docker run --rm --gpus all --shm-size=12g \
+    --user "$(id -u):$(id -g)" \
+    -e HOME=/tmp \
+    -e TORCH_HOME=/tmp/.cache/torch \
+    -e HF_HOME=/tmp/.cache/huggingface \
+    -e AUTOPHOTOGRAMMETRY_LONGSPLAT_IMAGE_REF="$LONGSPLAT_IMAGE" \
+    -e AUTOPHOTOGRAMMETRY_LONGSPLAT_IMAGE_ID="$image_id" \
+    -v "$ROOT/input:/workspace/input" \
+    -v "$ROOT/output:/workspace/output" \
+    -v "$ROOT/.cache/longsplat:/tmp/.cache" \
+    -w /opt/autophotogrammetry \
+    "$LONGSPLAT_IMAGE" "$@"
+}
+
 run_cpu() {
   docker run --rm \
     --user "$(id -u):$(id -g)" \
@@ -121,9 +151,7 @@ run_cpu() {
 }
 
 doctor() {
-  check_docker
-  check_host_gpu
-  ensure_image
+  prepare_named_runtime "$IMAGE"
   run_gpu python -c 'import importlib.metadata as m, shutil, subprocess, torch; assert torch.cuda.is_available(), "CUDA is not available in Docker"; cap=torch.cuda.get_device_capability(); assert cap[0] == 12, f"Expected compute capability 12.x, got {cap}"; required=["ffmpeg","ffprobe","colmap","ns-process-data","ns-train","ns-export","ns-eval"]; missing=[x for x in required if shutil.which(x) is None]; assert not missing, f"Missing executables: {missing}"; rev=subprocess.run(["git","-C","/opt/nerfstudio","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev == "50e0e3c70c775e89333256213363badbf074f29d", rev; print({"gpu": torch.cuda.get_device_name(), "capability": cap, "torch": torch.__version__, "nerfstudio_revision": rev, "nerfstudio_package": m.version("nerfstudio"), "gsplat": m.version("gsplat")})'
 }
 
@@ -133,12 +161,11 @@ require_quality_inputs() {
   local source="$ROOT/input/$scene/source.webm"
   if [[ ! -f "$data/transforms.json" ]]; then
     echo "Prepared Nerfstudio dataset is missing: $data/transforms.json" >&2
-    echo "Quality execution is GPU-only and will not rerun download/FFmpeg/COLMAP." >&2
+    echo "Quality/research execution will not rerun download/FFmpeg/COLMAP implicitly." >&2
     return 1
   fi
   if [[ ! -f "$source" ]]; then
-    echo "Source video required for deterministic evaluation identity is missing: $source" >&2
-    echo "Quality execution does not redownload source media." >&2
+    echo "Source video is missing: $source" >&2
     return 1
   fi
 }
@@ -153,10 +180,14 @@ require_frozen_dataset() {
   fi
 }
 
-prepare_quality_runtime() {
-  check_docker
-  check_host_gpu
-  ensure_image
+require_colmap_model() {
+  local scene="$1"
+  local model="$ROOT/output/$scene/colmap/sparse/0"
+  if [[ ! -f "$model/cameras.bin" && ! -f "$model/cameras.txt" ]]; then
+    echo "Canonical COLMAP model is missing: $model" >&2
+    echo "Run ./task run or ./task run-all first; EFA-GS does not invent camera poses." >&2
+    return 1
+  fi
 }
 
 run_quality_scene() {
@@ -221,11 +252,19 @@ case "${1:-run}" in
     ;;
   pull)
     check_docker
-    pull_image
+    pull_named_image "$IMAGE"
     ;;
   vggt-pull)
     check_docker
     pull_named_image "$VGGT_IMAGE"
+    ;;
+  efa-pull)
+    check_docker
+    pull_named_image "$EFA_IMAGE"
+    ;;
+  longsplat-pull)
+    check_docker
+    pull_named_image "$LONGSPLAT_IMAGE"
     ;;
   doctor)
     doctor
@@ -241,13 +280,15 @@ case "${1:-run}" in
     ;;
   run-all)
     doctor
-    run_gpu python main.py batch --input-root /workspace/input --output-root /workspace/output
+    run_gpu python -m processing.production_batch \
+      --input-root /workspace/input \
+      --output-root /workspace/output
     ;;
   quality)
     scene="${2:-huejotzingo}"
     iterations="${3:-30000}"
     require_quality_inputs "$scene"
-    prepare_quality_runtime
+    prepare_named_runtime "$IMAGE"
     run_quality_scene "$scene" "$iterations"
     ;;
   quality-pair)
@@ -264,7 +305,7 @@ case "${1:-run}" in
     fi
     require_quality_inputs "$bad_scene"
     require_quality_inputs "$good_scene"
-    prepare_quality_runtime
+    prepare_named_runtime "$IMAGE"
     run_gpu python -m processing.quality_pair \
       --bad-scene "$bad_scene" \
       --good-control "$good_scene" \
@@ -283,7 +324,7 @@ case "${1:-run}" in
       exit 2
     fi
     require_quality_inputs "$scene"
-    prepare_quality_runtime
+    prepare_named_runtime "$IMAGE"
     run_gpu python -m processing.quality_followup culling \
       --data "/workspace/output/$scene/nerfstudio-data" \
       --source-video "/workspace/input/$scene/source.webm" \
@@ -303,7 +344,7 @@ case "${1:-run}" in
       exit 2
     fi
     require_quality_inputs "$scene"
-    prepare_quality_runtime
+    prepare_named_runtime "$IMAGE"
     run_gpu python -m processing.quality_followup budget \
       --data "/workspace/output/$scene/nerfstudio-data" \
       --source-video "/workspace/input/$scene/source.webm" \
@@ -311,6 +352,23 @@ case "${1:-run}" in
       --winner "$winner" \
       --iterations "$current_iterations" \
       --iterations "$increased_iterations"
+    ;;
+  compression-baseline)
+    scene="${2:-}"
+    iterations="${3:-30000}"
+    if [[ -z "$scene" ]]; then
+      echo "usage: ./task compression-baseline <scene-id> [iterations]" >&2
+      exit 2
+    fi
+    if [[ ! -f "$ROOT/input/$scene/source.webm" ]]; then
+      echo "Source video is missing: $ROOT/input/$scene/source.webm" >&2
+      exit 1
+    fi
+    prepare_named_runtime "$IMAGE"
+    run_gpu python -m processing.compression_baseline \
+      --source-video "/workspace/input/$scene/source.webm" \
+      --output-root "/workspace/output/$scene/compression-baseline" \
+      --iterations "$iterations"
     ;;
   vggt-research)
     scene="${2:-}"
@@ -321,9 +379,7 @@ case "${1:-run}" in
     fi
     require_quality_inputs "$scene"
     require_frozen_dataset "$scene"
-    check_docker
-    check_host_gpu
-    ensure_vggt_image
+    prepare_named_runtime "$VGGT_IMAGE"
     run_vggt_research_scene "$scene" "$mode"
     ;;
   vggt-splatfacto)
@@ -335,7 +391,7 @@ case "${1:-run}" in
     fi
     require_quality_inputs "$scene"
     require_frozen_dataset "$scene"
-    prepare_quality_runtime
+    prepare_named_runtime "$IMAGE"
     run_vggt_splatfacto_scene "$scene" "$iterations"
     ;;
   vggt-compare)
@@ -350,10 +406,44 @@ case "${1:-run}" in
     require_frozen_dataset "$scene"
     check_docker
     check_host_gpu
-    ensure_vggt_image
-    ensure_image
+    ensure_named_image "$VGGT_IMAGE"
+    ensure_named_image "$IMAGE"
     run_vggt_research_scene "$scene" "$mode"
     run_vggt_splatfacto_scene "$scene" "$iterations"
+    ;;
+  efa-research)
+    scene="${2:-}"
+    iterations="${3:-30000}"
+    if [[ -z "$scene" ]]; then
+      echo "usage: ./task efa-research <scene-id> [iterations]" >&2
+      exit 2
+    fi
+    require_quality_inputs "$scene"
+    require_frozen_dataset "$scene"
+    require_colmap_model "$scene"
+    prepare_named_runtime "$EFA_IMAGE"
+    run_efa_gpu python -m processing.efa_gs_backend \
+      --dataset "/workspace/output/$scene/quality-sweep/evaluation-dataset.json" \
+      --transforms "/workspace/output/$scene/nerfstudio-data/transforms.json" \
+      --colmap-model "/workspace/output/$scene/colmap/sparse/0" \
+      --checkout /opt/efa-gs \
+      --output-root "/workspace/output/$scene/efa-gs" \
+      --iterations "$iterations"
+    ;;
+  longsplat-research)
+    scene="${2:-}"
+    if [[ -z "$scene" ]]; then
+      echo "usage: ./task longsplat-research <scene-id>" >&2
+      exit 2
+    fi
+    require_quality_inputs "$scene"
+    require_frozen_dataset "$scene"
+    prepare_named_runtime "$LONGSPLAT_IMAGE"
+    run_longsplat_gpu python -m processing.longsplat_backend \
+      --dataset "/workspace/output/$scene/quality-sweep/evaluation-dataset.json" \
+      --transforms "/workspace/output/$scene/nerfstudio-data/transforms.json" \
+      --checkout /opt/longsplat \
+      --output-root "/workspace/output/$scene/longsplat"
     ;;
   clean)
     find "$ROOT/output" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
@@ -362,7 +452,7 @@ case "${1:-run}" in
     find "$ROOT/output" "$ROOT/input" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   *)
-    echo "usage: ./task {run|run-all|quality [scene-id] [iterations]|quality-pair <bad-scene> <good-control> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current-iterations> <increased-iterations>|vggt-research <scene> [feedforward|ba]|vggt-splatfacto <scene> [iterations]|vggt-compare <scene> [feedforward|ba] [iterations]|doctor|pull|vggt-pull|test|image|vggt-image|clean|clean-all}" >&2
+    echo "usage: ./task {run|run-all|quality [scene] [iterations]|quality-pair <bad> <good> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current> <increased>|compression-baseline <scene> [iterations]|vggt-research <scene> [feedforward|ba]|vggt-splatfacto <scene> [iterations]|vggt-compare <scene> [feedforward|ba] [iterations]|efa-research <scene> [iterations]|longsplat-research <scene>|doctor|pull|vggt-pull|efa-pull|longsplat-pull|test|image|vggt-image|clean|clean-all}" >&2
     exit 2
     ;;
 esac
