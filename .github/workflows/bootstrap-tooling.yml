@@ -39,10 +39,10 @@ jobs:
       - name: Apply mechanical Ruff migration
         run: |
           uv run ruff format .
-          uv run ruff check . --fix --exit-zero
+          uv run ruff check . --fix
       - name: Freeze existing Pyrefly debt
         run: |
-          uv run pyrefly check --baseline=.pyrefly-baseline.json --update-baseline
+          uv run pyrefly check --baseline=.pyrefly-baseline.json --update-baseline || test -s .pyrefly-baseline.json
           uv run pyrefly check
       - name: Commit generated lock baseline and formatting
         run: |
