@@ -20,7 +20,14 @@ class OrientationContractTest(unittest.TestCase):
     def _fixture(self, root: Path, *, orientation_override: str | None = None):
         transforms = root / "nerfstudio-data" / "transforms.json"
         transforms.parent.mkdir(parents=True)
-        payload = {"frames": [{"file_path": "images/frame-000001.jpg", "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]}]}
+        payload = {
+            "frames": [
+                {
+                    "file_path": "images/frame-000001.jpg",
+                    "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                }
+            ]
+        }
         if orientation_override is not None:
             payload["orientation_override"] = orientation_override
         transforms.write_text(json.dumps(payload), encoding="utf-8")
@@ -45,7 +52,9 @@ class OrientationContractTest(unittest.TestCase):
                 [math.sqrt(0.5), 0.0, 0.0, math.sqrt(0.5)],
                 evidence["consumer_application"]["quaternion_xyzw"],
             )
-            validate_orientation_evidence(evidence, expected_ply_sha256=hashlib.sha256(ply.read_bytes()).hexdigest())
+            validate_orientation_evidence(
+                evidence, expected_ply_sha256=hashlib.sha256(ply.read_bytes()).hexdigest()
+            )
 
     def test_vertical_is_explicitly_accepted(self):
         with tempfile.TemporaryDirectory() as d:
@@ -85,7 +94,9 @@ class OrientationContractTest(unittest.TestCase):
             evidence = write_orientation_evidence(transforms, ply, out)
             self.assertTrue(out.is_file())
             self.assertEqual(str(out.resolve()), evidence["evidence_path"])
-            self.assertEqual(hashlib.sha256(out.read_bytes()).hexdigest(), evidence["evidence_sha256"])
+            self.assertEqual(
+                hashlib.sha256(out.read_bytes()).hexdigest(), evidence["evidence_sha256"]
+            )
 
     def test_raw_ply_is_not_rewritten(self):
         with tempfile.TemporaryDirectory() as d:
