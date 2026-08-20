@@ -34,6 +34,14 @@ RUN git init /opt/efa-gs \
     && git -C /opt/efa-gs checkout --detach FETCH_HEAD \
     && test "$(git -C /opt/efa-gs rev-parse HEAD)" = "${EFA_REVISION}"
 
+# CUDA 12.8 no longer leaves FLT_MAX visible transitively for this pinned legacy
+# simple-knn source. Apply one repository-owned compile-compatibility patch only;
+# the upstream algorithm/source revision remains recorded separately and unchanged.
+COPY patches/efa-simple-knn-cuda12.8.patch /tmp/efa-simple-knn-cuda12.8.patch
+RUN git -C /opt/efa-gs apply --check /tmp/efa-simple-knn-cuda12.8.patch \
+    && git -C /opt/efa-gs apply /tmp/efa-simple-knn-cuda12.8.patch \
+    && grep -F '#include <cfloat>' /opt/efa-gs/3DGS/submodules/simple-knn/simple_knn.cu
+
 RUN python -m pip install --no-cache-dir \
         GPUtil==1.4.0 \
         opencv-python-headless==4.10.0.84 \
@@ -65,5 +73,12 @@ revision = subprocess.run(
 ).stdout.strip()
 assert revision == "57f330f6f9b12d2684c6df0f0359ffec8f60976d", revision
 assert torch.__version__.startswith("2.7.1"), torch.__version__
-print({"efa_revision": revision, "torch": torch.__version__, "cuda": torch.version.cuda})
+patch_diff = subprocess.run(
+    ["git", "-C", "/opt/efa-gs", "diff", "--", "3DGS/submodules/simple-knn/simple_knn.cu"],
+    check=True,
+    capture_output=True,
+    text=True,
+).stdout
+assert '#include <cfloat>' in patch_diff, patch_diff
+print({"efa_revision": revision, "torch": torch.__version__, "cuda": torch.version.cuda, "compat_patch": "efa-simple-knn-cuda12.8.patch"})
 PY
