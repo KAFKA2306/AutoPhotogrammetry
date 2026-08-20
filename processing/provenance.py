@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import subprocess
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Mapping
+from typing import Callable, Mapping
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"}
 
@@ -23,6 +25,31 @@ class VideoSource:
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def source_revision(
+    runner: Callable[..., subprocess.CompletedProcess] = subprocess.run,
+) -> str:
+    """Return the exact AutoPhotogrammetry revision executing this run."""
+    revision = os.environ.get("AUTOPHOTOGRAMMETRY_SOURCE_REVISION", "").strip()
+    if not revision:
+        try:
+            completed = runner(
+                ["git", "rev-parse", "HEAD"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise RuntimeError(
+                "AUTOPHOTOGRAMMETRY_SOURCE_REVISION is required when the runtime does not contain .git"
+            ) from exc
+        revision = completed.stdout.strip()
+    if len(revision) != 40 or any(char not in "0123456789abcdef" for char in revision):
+        raise RuntimeError(
+            "AutoPhotogrammetry source revision must be a full lowercase 40-character Git commit SHA"
+        )
+    return revision
 
 
 def sha256_file(path: str | Path) -> str:
