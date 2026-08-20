@@ -1,0 +1,56 @@
+name: Nordic Wikimedia Discovery
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: nordic-wikimedia-discovery
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -r requirements.txt
+      - name: Refresh Nordic discovery snapshot
+        run: python -m processing.nordic_discovery discover
+      - name: Validate discovery contract
+        run: python -m processing.nordic_discovery validate
+      - name: Run Nordic unit tests
+        run: python -m unittest tests.test_nordic_discovery -v
+      - name: Open refresh pull request when data changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- sources/discovery/nordic-wikimedia.json sources/discovery/nordic-coverage.json; then
+            echo "No Nordic discovery changes."
+            exit 0
+          fi
+          branch="automation/nordic-wikimedia-discovery"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add sources/discovery/nordic-wikimedia.json sources/discovery/nordic-coverage.json
+          git commit -m "Refresh Nordic Wikimedia discovery"
+          git push --force-with-lease origin "$branch"
+          existing="$(gh pr list --head "$branch" --base main --state open --json number --jq '.[0].number // empty')"
+          if [[ -z "$existing" ]]; then
+            gh pr create --base main --head "$branch" --title "Refresh Nordic Wikimedia discovery" --body "Automated refresh of the Wikimedia Commons Nordic candidate pool and coverage report. No media blobs are committed."
+          fi
