@@ -8,7 +8,9 @@ from unittest.mock import patch
 from processing.nerfstudio import (
     NerfstudioConfigurationError,
     gaussian_splat_export_command,
+    nerfstudio_eval_command,
     nerfstudio_process_images_command,
+    run_nerfstudio_eval,
     run_splatfacto_export,
     splatfacto_train_command,
 )
@@ -43,6 +45,22 @@ class NerfstudioTests(unittest.TestCase):
                 "outputs/config.yml",
                 "--output-dir",
                 "exports/splat",
+            ],
+        )
+        self.assertEqual(
+            nerfstudio_eval_command(
+                "outputs/config.yml",
+                "evaluation/metrics.json",
+                render_output_path="evaluation/renders",
+            ),
+            [
+                "ns-eval",
+                "--load-config",
+                "outputs/config.yml",
+                "--output-path",
+                "evaluation/metrics.json",
+                "--render-output-path",
+                "evaluation/renders",
             ],
         )
 
@@ -114,6 +132,83 @@ class NerfstudioTests(unittest.TestCase):
                 manifest["output"]["ply_path"],
                 "export/splat.ply",
             )
+
+    def test_splatfacto_runner_accepts_explicit_dataset_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "image.jpg"
+            image.write_bytes(b"image")
+            dataset = root / "evaluation-transforms.json"
+            dataset.write_text(
+                json.dumps(
+                    {
+                        "frames": [
+                            {
+                                "file_path": image.as_posix(),
+                                "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with patch(
+                "processing.nerfstudio._resolve_cli",
+                side_effect=lambda name: Path("/fake") / name,
+            ), patch(
+                "processing.nerfstudio._package_version",
+                return_value="1.0",
+            ), patch(
+                "processing.nerfstudio.subprocess.run",
+                return_value=subprocess.CompletedProcess(["ns-train"], 2, "", "stop"),
+            ):
+                with self.assertRaises(subprocess.CalledProcessError):
+                    run_splatfacto_export(dataset, root / "runs")
+            manifest = json.loads(next((root / "runs").rglob("manifest.json")).read_text())
+            self.assertEqual(manifest["input"]["image_count"], 1)
+            self.assertEqual(manifest["input"]["data_dir"], str(dataset.resolve()))
+
+    def test_eval_runner_records_image_metrics_and_render_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config.yml"
+            config.write_text("config", encoding="utf-8")
+
+            def fake_run(command, **kwargs):
+                metrics = Path(command[command.index("--output-path") + 1])
+                metrics.write_text(
+                    json.dumps(
+                        {
+                            "results": {
+                                "psnr": 24.5,
+                                "ssim": 0.91,
+                                "lpips": 0.12,
+                                "psnr_std": 1.0,
+                            }
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                return subprocess.CompletedProcess(command, 0, "evaluated", "")
+
+            with patch(
+                "processing.nerfstudio._resolve_cli",
+                return_value=Path("/fake/ns-eval"),
+            ), patch(
+                "processing.nerfstudio.subprocess.run",
+                side_effect=fake_run,
+            ):
+                result = run_nerfstudio_eval(config, root / "evaluation")
+
+            self.assertEqual(
+                result["metrics"],
+                {"psnr": 24.5, "ssim": 0.91, "lpips": 0.12},
+            )
+            self.assertEqual(result["return_code"], 0)
+            self.assertEqual(result["status"], "success")
+            self.assertTrue(Path(result["manifest_path"]).is_file())
+            self.assertEqual(result["render_output_path"], "renders")
 
     def test_splatfacto_runner_records_training_failure(self):
         with tempfile.TemporaryDirectory() as tmp:
