@@ -42,7 +42,9 @@ class OrientationContractError(RuntimeError):
     pass
 
 
-def _mat_vec(matrix: tuple[tuple[float, float, float], ...], vector: tuple[float, float, float]) -> tuple[float, float, float]:
+def _mat_vec(
+    matrix: tuple[tuple[float, float, float], ...], vector: tuple[float, float, float]
+) -> tuple[float, float, float]:
     return tuple(sum(row[i] * vector[i] for i in range(3)) for row in matrix)  # type: ignore[return-value]
 
 
@@ -51,8 +53,7 @@ def _mat_mul(
     right: tuple[tuple[float, float, float], ...],
 ) -> tuple[tuple[float, float, float], ...]:
     return tuple(
-        tuple(sum(left[r][k] * right[k][c] for k in range(3)) for c in range(3))
-        for r in range(3)
+        tuple(sum(left[r][k] * right[k][c] for k in range(3)) for c in range(3)) for r in range(3)
     )
 
 
@@ -63,7 +64,9 @@ def _det3(matrix: tuple[tuple[float, float, float], ...]) -> float:
     return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g)
 
 
-def _close_vector(actual: tuple[float, float, float], expected: tuple[float, float, float], tol: float = 1e-9) -> bool:
+def _close_vector(
+    actual: tuple[float, float, float], expected: tuple[float, float, float], tol: float = 1e-9
+) -> bool:
     return all(abs(a - b) <= tol for a, b in zip(actual, expected, strict=True))
 
 
@@ -72,7 +75,9 @@ def _orientation_method(transforms: dict) -> str:
     if override is None:
         return "up"
     if not isinstance(override, str) or not override.strip():
-        raise OrientationContractError("transforms.json orientation_override must be a non-empty string when present")
+        raise OrientationContractError(
+            "transforms.json orientation_override must be a non-empty string when present"
+        )
     return override.strip().lower()
 
 
@@ -165,20 +170,34 @@ def validate_orientation_evidence(evidence: dict, *, expected_ply_sha256: str) -
             f"orientation evidence is not accepted: {evidence.get('status')} ({evidence.get('reason')})"
         )
     if evidence.get("nerfstudio_revision") != PINNED_NERFSTUDIO_REVISION:
-        raise OrientationContractError("orientation evidence Nerfstudio revision is stale or unsupported")
+        raise OrientationContractError(
+            "orientation evidence Nerfstudio revision is stale or unsupported"
+        )
     if evidence.get("algorithm_version") != ALGORITHM_VERSION:
-        raise OrientationContractError("orientation evidence algorithm_version is stale or unsupported")
+        raise OrientationContractError(
+            "orientation evidence algorithm_version is stale or unsupported"
+        )
 
-    canonical = tuple(tuple(float(v) for v in row) for row in evidence["source_to_canonical"]["matrix3x3"])
-    consumer = tuple(tuple(float(v) for v in row) for row in evidence["consumer_application"]["matrix3x3"])
+    canonical = tuple(
+        tuple(float(v) for v in row) for row in evidence["source_to_canonical"]["matrix3x3"]
+    )
+    consumer = tuple(
+        tuple(float(v) for v in row) for row in evidence["consumer_application"]["matrix3x3"]
+    )
     if abs(_det3(canonical) - 1.0) > 1e-9 or abs(_det3(consumer) - 1.0) > 1e-9:
-        raise OrientationContractError("orientation rotation matrix must be a proper rotation with determinant +1")
+        raise OrientationContractError(
+            "orientation rotation matrix must be a proper rotation with determinant +1"
+        )
     if not _close_vector(_mat_vec(canonical, (0.0, 0.0, 1.0)), (0.0, 1.0, 0.0)):
-        raise OrientationContractError("source_to_canonical does not map Nerfstudio +Z up to canonical +Y up")
+        raise OrientationContractError(
+            "source_to_canonical does not map Nerfstudio +Z up to canonical +Y up"
+        )
 
     final_matrix = _mat_mul(VRCHAT_POST_REFLECTION_MATRIX, consumer)
     if not _close_vector(_mat_vec(final_matrix, (0.0, 0.0, 1.0)), (0.0, 1.0, 0.0)):
-        raise OrientationContractError("consumer transform plus mandatory Y reflection does not produce final +Y up")
+        raise OrientationContractError(
+            "consumer transform plus mandatory Y reflection does not produce final +Y up"
+        )
 
     quat = [float(v) for v in evidence["consumer_application"]["quaternion_xyzw"]]
     if len(quat) != 4 or abs(sum(v * v for v in quat) - 1.0) > 1e-9:
