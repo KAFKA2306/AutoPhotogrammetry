@@ -11,11 +11,13 @@ PINNED_VRCHAT_RENDERER_REVISION = "f96c0117cba518ff84d059d36f16909b873e23aa"
 ORIENTATION_SCHEMA_VERSION = 1
 ALGORITHM_VERSION = "nerfstudio-z-up-to-unity-y-up-v1"
 _SQRT_HALF = math.sqrt(0.5)
+Matrix = tuple[tuple[float, ...], ...]
+Vector = tuple[float, ...]
 
 # Nerfstudio model/world coordinates are +X right, +Y back, +Z up.
 # A pure canonical basis rotation Rx(-90 deg) maps +Z(up) -> +Y(up)
 # and +Y(back) -> -Z(back), i.e. +Z is forward in the target semantic frame.
-SOURCE_TO_CANONICAL_MATRIX = (
+SOURCE_TO_CANONICAL_MATRIX: Matrix = (
     (1.0, 0.0, 0.0),
     (0.0, 0.0, 1.0),
     (0.0, -1.0, 0.0),
@@ -26,12 +28,12 @@ SOURCE_TO_CANONICAL_QUATERNION_XYZW = (-_SQRT_HALF, 0.0, 0.0, _SQRT_HALF)
 # alignment. Therefore the pre-reflection horizon quaternion must map source
 # +Z to -Y so the mandatory reflection produces final +Y.
 VRCHAT_HORIZON_QUATERNION_XYZW = (_SQRT_HALF, 0.0, 0.0, _SQRT_HALF)
-VRCHAT_HORIZON_MATRIX = (
+VRCHAT_HORIZON_MATRIX: Matrix = (
     (1.0, 0.0, 0.0),
     (0.0, 0.0, -1.0),
     (0.0, 1.0, 0.0),
 )
-VRCHAT_POST_REFLECTION_MATRIX = (
+VRCHAT_POST_REFLECTION_MATRIX: Matrix = (
     (1.0, 0.0, 0.0),
     (0.0, -1.0, 0.0),
     (0.0, 0.0, 1.0),
@@ -42,31 +44,24 @@ class OrientationContractError(RuntimeError):
     pass
 
 
-def _mat_vec(
-    matrix: tuple[tuple[float, float, float], ...], vector: tuple[float, float, float]
-) -> tuple[float, float, float]:
-    return tuple(sum(row[i] * vector[i] for i in range(3)) for row in matrix)  # type: ignore[return-value]
+def _mat_vec(matrix: Matrix, vector: Vector) -> Vector:
+    return tuple(sum(row[i] * vector[i] for i in range(3)) for row in matrix)
 
 
-def _mat_mul(
-    left: tuple[tuple[float, float, float], ...],
-    right: tuple[tuple[float, float, float], ...],
-) -> tuple[tuple[float, float, float], ...]:
+def _mat_mul(left: Matrix, right: Matrix) -> Matrix:
     return tuple(
         tuple(sum(left[r][k] * right[k][c] for k in range(3)) for c in range(3)) for r in range(3)
     )
 
 
-def _det3(matrix: tuple[tuple[float, float, float], ...]) -> float:
+def _det3(matrix: Matrix) -> float:
     a, b, c = matrix[0]
     d, e, f = matrix[1]
     g, h, i = matrix[2]
     return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g)
 
 
-def _close_vector(
-    actual: tuple[float, float, float], expected: tuple[float, float, float], tol: float = 1e-9
-) -> bool:
+def _close_vector(actual: Vector, expected: Vector, tol: float = 1e-9) -> bool:
     return all(abs(a - b) <= tol for a, b in zip(actual, expected, strict=True))
 
 
@@ -178,10 +173,10 @@ def validate_orientation_evidence(evidence: dict, *, expected_ply_sha256: str) -
             "orientation evidence algorithm_version is stale or unsupported"
         )
 
-    canonical = tuple(
+    canonical: Matrix = tuple(
         tuple(float(v) for v in row) for row in evidence["source_to_canonical"]["matrix3x3"]
     )
-    consumer = tuple(
+    consumer: Matrix = tuple(
         tuple(float(v) for v in row) for row in evidence["consumer_application"]["matrix3x3"]
     )
     if abs(_det3(canonical) - 1.0) > 1e-9 or abs(_det3(consumer) - 1.0) > 1e-9:
