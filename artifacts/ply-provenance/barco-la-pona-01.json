@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "scene_id": "barco-la-pona-01",
+  "status": "success",
+  "generated_at": "2026-08-20T02:06:43.086822+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "sha256": "7cf3d9f9e9bcb14dbf3588875b6459a3862f18af3b15b6370a6e3eb92612328a",
+    "sha1": "54113609d7bd7d0fd673c69c1ecd67db904deede",
+    "frame_count": 90,
+    "selected_frame_count": 90,
+    "registered_images": 90,
+    "registration_ratio": 1.0,
+    "sparse_points": 38463,
+    "mean_reprojection_error_px": 0.375133,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/barco-la-pona-01/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T02:05:10.864579+00:00",
+    "finished_at": "2026-08-20T02:06:24.672045+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/barco-la-pona-01/runs/splatfacto/20260820T020510Z-b631a69e/export/splat.ply",
+    "sha256": "adcfc54215a5b287f2e547cc816ca466076a51f9d4536c7f9eb9373d4339e988",
+    "size_bytes": 48526017,
+    "primitive_count": 195663,
+    "low_opacity_primitive_count": 8836,
+    "low_opacity_primitive_ratio": 0.04515927896434175,
+    "scale_anisotropy_above_10_count": 11736,
+    "scale_anisotropy_above_10_ratio": 0.05998068106898085,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
