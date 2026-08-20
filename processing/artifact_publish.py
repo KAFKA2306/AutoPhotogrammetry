@@ -30,9 +30,10 @@ def git_revision(runner: Callable[..., subprocess.CompletedProcess] = subprocess
 
 
 def _hf_cache_command(hf_cache_hub_root: str | Path | None) -> list[str]:
-    root = Path(hf_cache_hub_root or os.environ.get("HF_CACHE_HUB_ROOT", "")).expanduser()
-    if not str(root):
+    root_value = hf_cache_hub_root or os.environ.get("HF_CACHE_HUB_ROOT")
+    if not root_value:
         raise ArtifactPublishError("HF_CACHE_HUB_ROOT or --hf-cache-hub-root is required")
+    root = Path(root_value).expanduser()
     script = root / "scripts" / "artifact_manager.py"
     if not script.is_file():
         raise ArtifactPublishError(f"hf-cache-hub artifact CLI not found: {script}")
