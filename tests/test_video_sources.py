@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import json
+import tempfile
 import unittest
+from pathlib import Path
+
+from pydantic import ValidationError
 
 from processing.video_sources import get_video_source, load_video_registry, video_sources
 
@@ -82,6 +87,19 @@ class VideoSourceRegistryTests(unittest.TestCase):
     def test_unknown_source_fails(self) -> None:
         with self.assertRaises(KeyError):
             get_video_source("does-not-exist")
+
+    def test_untrusted_registry_structure_is_rejected_before_semantic_policy(self) -> None:
+        malformed = {
+            "schema_version": 2,
+            "default": "scene",
+            "evaluation_policy": {"stages": {stage: {} for stage in ("metadata", "preflight", "colmap", "splat")}},
+            "videos": [{"id": "scene", "evaluation_stage": "metadata"}],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "videos.json"
+            path.write_text(json.dumps(malformed), encoding="utf-8")
+            with self.assertRaises(ValidationError):
+                load_video_registry(path)
 
 
 if __name__ == "__main__":
