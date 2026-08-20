@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from processing.backend_evaluation import dataset_identity
 from processing.quality_followup import (
     culling_train_args,
     run_budget_sweep,
@@ -37,7 +38,7 @@ class QualityFollowupTests(unittest.TestCase):
             {"name": name, "status": "success", "metrics": {}},
             {
                 "schema_version": 1,
-                "dataset_id": __import__("processing.backend_evaluation", fromlist=["dataset_identity"]).dataset_identity(kwargs["dataset"]),
+                "dataset_id": dataset_identity(kwargs["dataset"]),
                 "backend": {"name": name, "upstream_revision": "revision"},
                 "command": ["ns-train", "splatfacto"],
                 "config": dict(kwargs["config"]),
@@ -62,6 +63,24 @@ class QualityFollowupTests(unittest.TestCase):
             changed[len(base) :],
             ("--pipeline.model.cull-alpha-thresh", "0.05"),
         )
+
+    def test_mcmc_rejects_culling_fields_its_strategy_does_not_consume(self):
+        with self.assertRaisesRegex(ValueError, "not consumed"):
+            culling_train_args(
+                winner="mcmc",
+                iterations=30000,
+                parameter="cull_scale_thresh",
+                value=0.5,
+            )
+
+    def test_integer_culling_field_is_emitted_as_integer(self):
+        args = culling_train_args(
+            winner="default",
+            iterations=30000,
+            parameter="stop_screen_size_at",
+            value=5000,
+        )
+        self.assertEqual(args[-2:], ("--pipeline.model.stop-screen-size-at", "5000"))
 
     def test_culling_sweep_runs_baseline_plus_each_value(self):
         with tempfile.TemporaryDirectory() as tmp:
