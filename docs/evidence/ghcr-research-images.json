@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "runner": "github-hosted ubuntu-latest",
+  "all_success": false,
+  "images": [
+    {
+      "image": "ghcr.io/kafka2306/autophotogrammetry:vggt-a288dd0-sm120-v1",
+      "pull_return_code": 1,
+      "repo_digests": [],
+      "error_tail": "Error response from daemon: manifest unknown"
+    },
+    {
+      "image": "ghcr.io/kafka2306/autophotogrammetry:efa-57f330f-sm120-v1",
+      "pull_return_code": 0,
+      "repo_digests": [
+        "ghcr.io/kafka2306/autophotogrammetry@sha256:7cfce0ef72deb25abc2eb534a1d6f3648448e34ca88d5df73dae8814e7181405"
+      ],
+      "error_tail": null
+    },
+    {
+      "image": "ghcr.io/kafka2306/autophotogrammetry:longsplat-1975077-sm120-v1",
+      "pull_return_code": 0,
+      "repo_digests": [
+        "ghcr.io/kafka2306/autophotogrammetry@sha256:b679143c54010ba0bf7d95f30d1e2cc624e9913d39f87bb6444d208a97a10445"
+      ],
+      "error_tail": null
+    },
+    {
+      "image": "ghcr.io/kafka2306/autophotogrammetry:quality-ns50e0e3-sm120-v1",
+      "pull_return_code": 0,
+      "repo_digests": [
+        "ghcr.io/kafka2306/autophotogrammetry@sha256:afabd39c3a6a6923b2cd92d76d68d874128e7b64f445e2eeb3dfd82f4df297fb"
+      ],
+      "error_tail": null
+    }
+  ]
+}
