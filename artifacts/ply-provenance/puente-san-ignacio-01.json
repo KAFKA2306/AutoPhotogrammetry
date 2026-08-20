@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "scene_id": "puente-san-ignacio-01",
+  "status": "success",
+  "generated_at": "2026-08-20T01:42:38.399860+00:00",
+  "repository_commit": "1d48110c8abd891d7b0a19f9e6ce793901758742",
+  "source": {
+    "source_page": "https://commons.wikimedia.org/wiki/File:Puente_de_San_Ignacio_desde_un_dron_01.webm",
+    "variant": "Wikimedia Commons 1080p VP9 transcode",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/Puente_de_San_Ignacio_desde_un_dron_01.webm/Puente_de_San_Ignacio_desde_un_dron_01.webm.1080p.vp9.webm",
+    "original_sha1": "4b5c55c17fe0870e53774c0e84e6ba7bebe5d742",
+    "original_size_bytes": 1484818221,
+    "sha256": "3cfab6e9a06adbe752d9fd3e6ba32e06e94bd35e8ee42c4e2a46a584584b950c",
+    "sha1": "ccc613009b4dbb71d0168dc21fa9cf95fb799aec",
+    "frame_count": 40,
+    "selected_frame_count": 38,
+    "registered_images": 33,
+    "registration_ratio": 0.868421052631579,
+    "sparse_points": 18131,
+    "mean_reprojection_error_px": 0.27886,
+    "license_status": "needs_review"
+  },
+  "environment": {
+    "cuda": "12.8.1",
+    "torch": "2.7.1+cu128",
+    "nerfstudio_revision": "50e0e3c70c775e89333256213363badbf074f29d",
+    "nerfstudio_package": "1.1.5",
+    "gsplat": "1.4.0",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "compute_capability": "8.6",
+    "local_image": "autophotogrammetry:quality-ns50e0e3-sm86-local",
+    "local_image_id": "sha256:c472b30d39a37d99896b445ad93bbfc79de54cb183499e8366a27c4d1d107067"
+  },
+  "training": {
+    "iterations": 2000,
+    "command": "ns-train splatfacto --data /workspace/output/puente-san-ignacio-01/nerfstudio-data --max-num-iterations 2000 --viewer.quit-on-train-completion True",
+    "return_code": 0,
+    "started_at": "2026-08-20T01:41:16.701311+00:00",
+    "finished_at": "2026-08-20T01:42:23.059462+00:00"
+  },
+  "artifact": {
+    "format": "gaussian-splat-ply",
+    "local_path": "output/puente-san-ignacio-01/runs/splatfacto/20260820T014116Z-151ce4ce/export/splat.ply",
+    "sha256": "8a845b437e58792f92ee71b229844bba4976b32f9037806aebb4cdbd07ed70a3",
+    "size_bytes": 29579065,
+    "primitive_count": 119264,
+    "low_opacity_primitive_count": 6134,
+    "low_opacity_primitive_ratio": 0.05143211698416957,
+    "scale_anisotropy_above_10_count": 26944,
+    "scale_anisotropy_above_10_ratio": 0.22591896968070835,
+    "committed_to_git": false,
+    "commit_policy": "Generated PLY binaries remain outside Git history; this compact provenance record is the tracked handoff."
+  }
+}
