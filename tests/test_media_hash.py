@@ -1,88 +1,78 @@
-from __future__ import annotations
-
-import hashlib
-import io
 import json
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from processing.media_hash import sha256_stream, update_registry_source_hash
+from processing.media_hash import update_unhashed_registry_sources
 
 
-def _registry(path: Path, *, sha256: str | None = None, expected_size: int | None = 3) -> None:
-    source = {
-        "id": "sample",
-        "status": "candidate",
-        "evaluation_stage": "metadata",
-        "title": "sample",
-        "provider": "Wikimedia Commons",
-        "source_page": "https://commons.wikimedia.org/wiki/File:sample.webm",
-        "media_url": "https://upload.wikimedia.org/sample.webm",
-        "author": "author",
-        "license": {
-            "name": "CC0",
-            "status": "verified",
-            "url": "https://creativecommons.org/publicdomain/zero/1.0/",
-        },
-        "duration_seconds": 1,
-        "resolution": [1, 1],
-        "measurements": {"preflight": None, "colmap": None, "splat": None},
-        "metadata_evidence": {"source_size_bytes": expected_size},
-    }
-    if sha256 is not None:
-        source["sha256"] = sha256
-    path.write_text(
-        json.dumps(
-            {
-                "schema_version": 2,
-                "default": "sample",
-                "evaluation_policy": {
-                    "stages": {
-                        "metadata": {},
-                        "preflight": {},
-                        "colmap": {},
-                        "splat": {},
-                    }
+class MediaHashBatchTests(unittest.TestCase):
+    def test_batch_skips_verified_persists_success_and_isolates_failure(self):
+        registry = {
+            "videos": [
+                {
+                    "id": "already-done",
+                    "sha256": "a" * 64,
+                    "metadata_evidence": {"sha256_verified_from_downloaded_bytes": True},
                 },
-                "videos": [source],
-            }
-        ),
-        encoding="utf-8",
-    )
+                {"id": "success", "media_url": "https://example.invalid/success"},
+                {"id": "failure", "media_url": "https://example.invalid/failure"},
+            ]
+        }
 
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "videos.json"
+            path.write_text(json.dumps(registry), encoding="utf-8")
 
-class MediaHashTest(unittest.TestCase):
-    def test_sha256_stream_hashes_exact_bytes(self) -> None:
-        digest, size = sha256_stream(io.BytesIO(b"abc"), chunk_size=2)
-        self.assertEqual(digest, hashlib.sha256(b"abc").hexdigest())
-        self.assertEqual(size, 3)
+            def fake_hash(source, *, timeout_seconds):
+                self.assertEqual(timeout_seconds, 3.0)
+                if source["id"] == "failure":
+                    raise OSError("network unavailable")
+                return "b" * 64, 123
 
-    def test_update_registry_source_hash_records_downloaded_bytes(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            registry = Path(tmp) / "videos.json"
-            _registry(registry)
-            expected = hashlib.sha256(b"abc").hexdigest()
+            with patch("processing.media_hash.load_video_registry", return_value=registry), patch(
+                "processing.media_hash.hash_source_media", side_effect=fake_hash
+            ):
+                result = update_unhashed_registry_sources(path, timeout_seconds=3.0)
 
-            with patch("processing.media_hash.hash_source_media", return_value=(expected, 3)):
-                result = update_registry_source_hash("sample", registry)
+            self.assertEqual(result["hashed_count"], 1)
+            self.assertEqual(result["failed_count"], 1)
+            self.assertEqual(result["skipped_verified_count"], 1)
+            self.assertEqual(result["hashed"][0]["id"], "success")
+            self.assertEqual(result["failed"], [{"id": "failure", "error": "network unavailable"}])
+            self.assertEqual(result["skipped_verified"], ["already-done"])
 
-            saved = json.loads(registry.read_text(encoding="utf-8"))["videos"][0]
-            self.assertEqual(result, {"id": "sample", "sha256": expected, "size_bytes": 3})
-            self.assertEqual(saved["sha256"], expected)
-            self.assertEqual(saved["metadata_evidence"]["downloaded_size_bytes"], 3)
-            self.assertIs(saved["metadata_evidence"]["sha256_verified_from_downloaded_bytes"], True)
+            persisted = json.loads(path.read_text(encoding="utf-8"))
+            success = next(item for item in persisted["videos"] if item["id"] == "success")
+            self.assertEqual(success["sha256"], "b" * 64)
+            self.assertEqual(success["metadata_evidence"]["downloaded_size_bytes"], 123)
+            self.assertTrue(success["metadata_evidence"]["sha256_verified_from_downloaded_bytes"])
 
-    def test_update_registry_source_hash_refuses_existing_identity_drift(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            registry = Path(tmp) / "videos.json"
-            _registry(registry, sha256="0" * 64)
-            actual = hashlib.sha256(b"abc").hexdigest()
+    def test_existing_unverified_hash_must_match_download(self):
+        registry = {
+            "videos": [
+                {
+                    "id": "mismatch",
+                    "sha256": "a" * 64,
+                    "media_url": "https://example.invalid/mismatch",
+                    "metadata_evidence": {},
+                }
+            ]
+        }
 
-            with patch("processing.media_hash.hash_source_media", return_value=(actual, 3)):
-                with self.assertRaisesRegex(ValueError, "does not match downloaded bytes"):
-                    update_registry_source_hash("sample", registry)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "videos.json"
+            path.write_text(json.dumps(registry), encoding="utf-8")
+
+            with patch("processing.media_hash.load_video_registry", return_value=registry), patch(
+                "processing.media_hash.hash_source_media", return_value=("b" * 64, 123)
+            ):
+                result = update_unhashed_registry_sources(path)
+
+            self.assertEqual(result["hashed_count"], 0)
+            self.assertEqual(result["failed_count"], 1)
+            self.assertIn("does not match downloaded bytes", result["failed"][0]["error"])
 
 
 if __name__ == "__main__":
