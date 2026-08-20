@@ -34,7 +34,7 @@ class ArtifactPublishTest(unittest.TestCase):
         manifest.parent.mkdir(parents=True, exist_ok=True)
         transforms = manifest.parent / "nerfstudio-data" / "transforms.json"
         transforms.parent.mkdir()
-        transforms_payload = {
+        transforms_payload: dict[str, object] = {
             "frames": [
                 {
                     "file_path": "images/frame-000001.jpg",
@@ -244,7 +244,7 @@ class ArtifactPublishTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             manifest, _, _, hf_root = self._fixture(root, orientation_override="pca")
-            with self.assertRaisesRegex(ArtifactPublishError, "orientation gate failed"):
+            with self.assertRaisesRegex(ArtifactPublishError, "only accepted orientation evidence"):
                 publish_run_splat(
                     manifest,
                     bucket="k4fka/artifacts",
