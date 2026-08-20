@@ -156,9 +156,7 @@ class NordicPoolTests(unittest.TestCase):
 
     def test_partial_refresh_preserves_previous_snapshots(self) -> None:
         failed_pool = pool_with(complete_candidate())
-        failed_pool["discovery_failures"] = [
-            {"region_id": "norway", "error": "fixture failure"}
-        ]
+        failed_pool["discovery_failures"] = [{"region_id": "norway", "error": "fixture failure"}]
         with tempfile.TemporaryDirectory() as tmp:
             pool_path = Path(tmp) / "pool.json"
             coverage_path = Path(tmp) / "coverage.json"

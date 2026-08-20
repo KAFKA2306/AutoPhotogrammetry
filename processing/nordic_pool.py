@@ -107,10 +107,7 @@ def _candidate_record(
     height = raw.get("height")
     resolution = (
         [width, height]
-        if isinstance(width, int)
-        and width > 0
-        and isinstance(height, int)
-        and height > 0
+        if isinstance(width, int) and width > 0 and isinstance(height, int) and height > 0
         else None
     )
     duration = raw.get("duration_seconds")
@@ -362,9 +359,7 @@ def build_coverage(
 def _without_volatile(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {
-            key: _without_volatile(item)
-            for key, item in value.items()
-            if key not in _VOLATILE_KEYS
+            key: _without_volatile(item) for key, item in value.items() if key not in _VOLATILE_KEYS
         }
     if isinstance(value, list):
         return [_without_volatile(item) for item in value]
