@@ -54,17 +54,21 @@ class OrientationContractTest(unittest.TestCase):
             self.assertEqual("accepted", evidence["status"])
             self.assertEqual("vertical", evidence["orientation_method"])
 
-    def test_pca_requires_review_and_cannot_publish(self):
+    def test_pca_is_preserved_as_review_required_and_cannot_publish(self):
         with tempfile.TemporaryDirectory() as d:
             transforms, ply = self._fixture(Path(d), orientation_override="pca")
+            evidence = build_orientation_evidence(transforms, ply)
+            self.assertEqual("review_required", evidence["status"])
             with self.assertRaisesRegex(OrientationContractError, "not accepted"):
-                build_orientation_evidence(transforms, ply)
+                validate_orientation_evidence(evidence, expected_ply_sha256=evidence["ply_sha256"])
 
-    def test_none_requires_review_and_cannot_publish(self):
+    def test_none_is_preserved_as_review_required_and_cannot_publish(self):
         with tempfile.TemporaryDirectory() as d:
             transforms, ply = self._fixture(Path(d), orientation_override="none")
+            evidence = build_orientation_evidence(transforms, ply)
+            self.assertEqual("review_required", evidence["status"])
             with self.assertRaisesRegex(OrientationContractError, "not accepted"):
-                build_orientation_evidence(transforms, ply)
+                validate_orientation_evidence(evidence, expected_ply_sha256=evidence["ply_sha256"])
 
     def test_exact_ply_hash_is_a_gate(self):
         with tempfile.TemporaryDirectory() as d:
