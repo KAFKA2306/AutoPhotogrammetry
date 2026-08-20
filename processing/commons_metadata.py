@@ -107,7 +107,8 @@ def refresh_registry(
     *,
     request_delay_seconds: float = 0.5,
 ) -> dict[str, Any]:
-    path = Path(registry_path).expanduser().resolve()
+    registry_ref = Path(registry_path)
+    path = registry_ref.expanduser().resolve()
     registry = load_video_registry(path)
     refreshed: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
@@ -131,7 +132,7 @@ def refresh_registry(
 
     summary = {
         "schema_version": 1,
-        "registry": str(path),
+        "registry": registry_ref.as_posix(),
         "source_count": len(refreshed),
         "verified_license_count": sum(
             1
