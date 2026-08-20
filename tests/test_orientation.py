@@ -20,7 +20,7 @@ class OrientationContractTest(unittest.TestCase):
     def _fixture(self, root: Path, *, orientation_override: str | None = None):
         transforms = root / "nerfstudio-data" / "transforms.json"
         transforms.parent.mkdir(parents=True)
-        payload = {
+        payload: dict[str, object] = {
             "frames": [
                 {
                     "file_path": "images/frame-000001.jpg",
