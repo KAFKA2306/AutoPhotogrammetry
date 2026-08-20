@@ -93,9 +93,7 @@ class VideoSourceRegistryTests(unittest.TestCase):
             "schema_version": 2,
             "default": "scene",
             "evaluation_policy": {
-                "stages": {
-                    stage: {} for stage in ("metadata", "preflight", "colmap", "splat")
-                }
+                "stages": {stage: {} for stage in ("metadata", "preflight", "colmap", "splat")}
             },
             "videos": [{"id": "scene", "evaluation_stage": "metadata"}],
         }
