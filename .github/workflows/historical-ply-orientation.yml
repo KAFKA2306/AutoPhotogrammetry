@@ -6,6 +6,11 @@ on:
     paths:
       - "scripts/measure_historical_ply_orientation.py"
       - ".github/workflows/historical-ply-orientation.yml"
+  pull_request:
+    branches: ["verify/historical-ply-base"]
+    paths:
+      - "scripts/measure_historical_ply_orientation.py"
+      - ".github/workflows/historical-ply-orientation.yml"
   workflow_dispatch:
 
 permissions:
