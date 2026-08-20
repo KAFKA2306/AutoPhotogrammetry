@@ -37,6 +37,31 @@ class OrientationContractTest(unittest.TestCase):
         ply.write_bytes(b"ply\nsynthetic-gaussian")
         return transforms, ply
 
+    def _physical_up(self, root: Path, *, angle_deg: float = 30.0) -> Path:
+        angle = math.radians(angle_deg)
+        path = root / "physical-up-evidence.json"
+        path.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "authority_type": "surveyed_up_vector",
+                    "authority_source": "fixture://survey.json",
+                    "authority_source_sha256": "b" * 64,
+                    "source_frame": "survey-frame",
+                    "vector_semantics": "up",
+                    "source_vector": [0.0, math.sin(angle), math.cos(angle)],
+                    "source_to_model_matrix3x3": [
+                        [1.0, 0.0, 0.0],
+                        [0.0, 1.0, 0.0],
+                        [0.0, 0.0, 1.0],
+                    ],
+                    "angular_uncertainty_deg": 0.1,
+                }
+            ),
+            encoding="utf-8",
+        )
+        return path
+
     def test_default_up_accepts_basis_but_not_physical_gravity(self):
         with tempfile.TemporaryDirectory() as d:
             transforms, ply = self._fixture(Path(d))
@@ -70,7 +95,54 @@ class OrientationContractTest(unittest.TestCase):
             self.assertEqual("vertical", evidence["orientation_method"])
             self.assertEqual("review_required", evidence["physical_up"]["status"])
 
-    def test_pca_is_review_required(self):
+    def test_external_authority_is_composed_and_maps_real_up_to_unity_y(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            transforms, ply = self._fixture(root)
+            physical_up = self._physical_up(root, angle_deg=30.0)
+            evidence = build_orientation_evidence(
+                transforms,
+                ply,
+                physical_up_path=physical_up,
+            )
+            self.assertEqual("accepted", evidence["status"])
+            self.assertEqual("coordinate_basis_plus_physical_up", evidence["scope"])
+            self.assertEqual("accepted", evidence["physical_up"]["status"])
+            self.assertEqual("surveyed_up_vector", evidence["physical_up"]["authority_type"])
+            self.assertTrue(evidence["canonical_frame"]["physical_gravity_claimed"])
+            model_up = evidence["physical_up"]["model_up_vector"]
+            matrix = evidence["source_to_canonical"]["matrix3x3"]
+            final_up = [sum(matrix[r][c] * model_up[c] for c in range(3)) for r in range(3)]
+            self.assertAlmostEqual(0.0, final_up[0], places=7)
+            self.assertAlmostEqual(1.0, final_up[1], places=7)
+            self.assertAlmostEqual(0.0, final_up[2], places=7)
+            validate_orientation_evidence(evidence, expected_ply_sha256=evidence["ply_sha256"])
+
+    def test_external_authority_can_resolve_pca_model_frame(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            transforms, ply = self._fixture(root, orientation_override="pca")
+            physical_up = self._physical_up(root, angle_deg=15.0)
+            evidence = build_orientation_evidence(
+                transforms,
+                ply,
+                physical_up_path=physical_up,
+            )
+            self.assertEqual("accepted", evidence["status"])
+            self.assertEqual("accepted", evidence["physical_up"]["status"])
+
+    def test_invalid_external_authority_fails_closed(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            transforms, ply = self._fixture(root)
+            physical_up = self._physical_up(root)
+            payload = json.loads(physical_up.read_text(encoding="utf-8"))
+            payload["authority_type"] = "dominant_plane_pca"
+            physical_up.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(OrientationContractError, "external physical-up evidence"):
+                build_orientation_evidence(transforms, ply, physical_up_path=physical_up)
+
+    def test_pca_is_review_required_without_external_authority(self):
         with tempfile.TemporaryDirectory() as d:
             transforms, ply = self._fixture(Path(d), orientation_override="pca")
             evidence = build_orientation_evidence(transforms, ply)
