@@ -2,7 +2,7 @@ FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LONGSPLAT_REVISION=19750775a9d19f30aa05a8333c4c6c231b2d5f4a
-ARG PYTORCH3D_REVISION=97bc85b6d23c9b161f1e3efff676666a3c6c5af3
+ARG PYTORCH3D_REVISION=33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba
 ENV CUDA_HOME=/usr/local/cuda \
     TORCH_CUDA_ARCH_LIST=12.0 \
     MAX_JOBS=4 \
@@ -90,5 +90,5 @@ revision = subprocess.run(
 ).stdout.strip()
 assert revision == '19750775a9d19f30aa05a8333c4c6c231b2d5f4a', revision
 assert torch.__version__.startswith('2.7.1'), torch.__version__
-print({'longsplat_revision': revision, 'torch': torch.__version__, 'cuda': torch.version.cuda})
+print({'longsplat_revision': revision, 'pytorch3d_revision': '33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba', 'torch': torch.__version__, 'cuda': torch.version.cuda})
 PY
