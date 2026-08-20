@@ -30,9 +30,13 @@ AutoPhotogrammetryはStorage Bucket APIを独自実装しません。upload/down
 git clone https://github.com/KAFKA2306/hf-cache-hub.git ~/src/hf-cache-hub
 export HF_CACHE_HUB_ROOT="$HOME/src/hf-cache-hub"
 export HF_ARTIFACT_BUCKET="<namespace>/<bucket>"
+# Set this when the project Python differs from the environment that has
+# huggingface_hub Storage Bucket support installed.
+export HF_CACHE_HUB_PYTHON="$HOME/.venvs/hf-cache/bin/python"
 ```
 
 `HF_ARTIFACT_BUCKET` は実在し書き込み可能なStorage Bucketを指定してください。実際のupload/readbackを観測していないbucketをpublish済みとは扱いません。
+`HF_CACHE_HUB_PYTHON` を省略した場合は、publish-splatを起動したPythonを使います。
 
 ## Publish one successful run
 
