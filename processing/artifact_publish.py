@@ -94,13 +94,17 @@ def _resolve_physical_up_path(run_manifest_path: Path, run_manifest: dict) -> Pa
     declared = run_manifest.get("physical_up_evidence_path")
     if declared is not None:
         if not isinstance(declared, str) or not declared.strip():
-            raise ArtifactPublishError("physical_up_evidence_path must be a non-empty path when declared")
+            raise ArtifactPublishError(
+                "physical_up_evidence_path must be a non-empty path when declared"
+            )
         candidate = Path(declared).expanduser()
         if not candidate.is_absolute():
             candidate = run_manifest_path.parent / candidate
         candidate = candidate.resolve()
         if not candidate.is_file():
-            raise ArtifactPublishError(f"declared physical-up evidence file is missing: {candidate}")
+            raise ArtifactPublishError(
+                f"declared physical-up evidence file is missing: {candidate}"
+            )
         return candidate
 
     candidate = (run_manifest_path.parent / "physical-up-evidence.json").resolve()
