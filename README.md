@@ -21,31 +21,37 @@ cd AutoPhotogrammetry
 ./task run
 ```
 
-GPU用のCUDA / PyTorch / gsplat / Nerfstudio環境はGitHub Actionsでコンテナ化します。通常のGPU実行ではローカルでNerfstudio checkoutやpip installを行いません。`task` がprebuilt imageを取得し、入力・出力だけをhostへmountします。
+GPU用のCUDA / PyTorch / gsplat / Nerfstudio環境をbuild/pushする `GPU Image` workflow はmainに存在します。通常のGPU実行ではローカルでNerfstudio checkoutやpip installを行いません。`task` は指定imageがlocalにあればそのimageを使い、なければGHCRからpullを試みます。imageが取得できない場合はlocal buildへ自動fallbackせず失敗します。
 
-Docker CLIまたはDocker daemonが利用できない場合、`./task doctor` / `./task run` / `./task run-all` は `BLOCKED` と明示して停止します。このrepositoryのtaskはDocker Desktop、WSL、GPU driver、OS設定、Docker storageを修復・resetしません。host環境の修復はrepository実行とは分離してください。
+**2026-08-20時点でrepositoryから確認済みなのはworkflow定義・Dockerfile・runner・通常Test workflowのPASSまでです。GHCR上のtag publish成功や対象PCからのpull成功は、実GPU runのevidenceが残るまで確認済みとは扱いません。**
+
+Docker CLIまたはDocker daemonが利用できない場合、`./task doctor` / `./task run` / `./task run-all` / `./task quality` は明示的に停止します。このrepositoryのtaskはDocker Desktop、WSL、GPU driver、OS設定、Docker storageを修復・resetしません。host環境の修復はrepository実行とは分離してください。
 
 実行入口: [`task`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/task)  
 GPU環境: [`Dockerfile`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/Dockerfile)  
 E2E実装: [`processing/huejotzingo.py`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/processing/huejotzingo.py)
 
-### GPUだけで品質候補を比較する
+### 既存processed datasetで品質候補をGPU比較する
 
-既に `output/<scene>/nerfstudio-data/transforms.json` があるsceneは、ローカル側では次の1コマンドだけで品質比較できます。
+既に `output/<scene>/nerfstudio-data/transforms.json` があるsceneでは、操作入口は次の1コマンドです。
 
 ```bash
 ./task quality huejotzingo 30000
 ```
 
-このrunは同じprocessed dataset、同じ30,000 iteration budget、同じexact Nerfstudio / gsplat環境で以下を独立実行します。
+`task quality` はhost側でDocker daemon、GPU compute capability、指定imageの存在/pullをpreflightした後、**1回のGPU container invocation**でquality sweepを起動します。source download、FFmpeg、COLMAP、Nerfstudio checkout、pip install、Docker buildはquality pathでは行いません。
+
+GPU container内では同じprocessed dataset、同じ30,000 iteration budget、同じexact Nerfstudio / gsplat環境で以下を独立実行します。
 
 - upstream default Splatfacto
 - `use_scale_regularization=True`
 - `strategy=mcmc`
 
-各PLYについてSHA-256、size、primitive count、opacity < 0.1、scale anisotropy > 10を自動集計し、`output/<scene>/quality-sweep/quality-sweep.json` に保存します。semantic maskが必要なClean-GSはtraining strategyの比較と混ぜず、別のpost-process実験として扱います。
+各PLYについてSHA-256、size、primitive count、opacity < 0.1、scale anisotropy > 10を自動集計し、GPU名、compute capability、PyTorch/CUDA runtime、container image ref/IDとともに `output/<scene>/quality-sweep/quality-sweep.json` に保存します。semantic maskが必要なClean-GSはtraining strategyの比較と混ぜず、別のpost-process実験として扱います。
 
-GPU imageはNerfstudio commit `50e0e3c70c775e89333256213363badbf074f29d`、gsplat `1.4.0`、CUDA 12.8 / PyTorch 2.7.1、`sm_120`を固定します。floating `main` には依存しません。
+DockerfileはNerfstudio commit `50e0e3c70c775e89333256213363badbf074f29d`、gsplat `1.4.0`、CUDA 12.8 / PyTorch 2.7.1、`sm_120`を固定します。floating `main` には依存しません。
+
+現時点ではrunnerとunit testはmainにmerge済みですが、bad scene / good controlでの実GPU quality sweep、PSNR / SSIM / LPIPS、fixed novel-view、winner strategyは未確定です。
 
 ## 撮影セットを3D化前に監査する
 
