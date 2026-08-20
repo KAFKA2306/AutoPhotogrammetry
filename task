@@ -143,6 +143,16 @@ require_quality_inputs() {
   fi
 }
 
+require_frozen_dataset() {
+  local scene="$1"
+  local dataset="$ROOT/output/$scene/quality-sweep/evaluation-dataset.json"
+  if [[ ! -f "$dataset" ]]; then
+    echo "Frozen #26 dataset contract is missing: $dataset" >&2
+    echo "Run ./task quality $scene first; research backends do not invent a second train/hold-out split." >&2
+    return 1
+  fi
+}
+
 prepare_quality_runtime() {
   check_docker
   check_host_gpu
@@ -156,6 +166,45 @@ run_quality_scene() {
     --data "/workspace/output/$scene/nerfstudio-data" \
     --source-video "/workspace/input/$scene/source.webm" \
     --output-root "/workspace/output/$scene/quality-sweep" \
+    --iterations "$iterations"
+}
+
+run_vggt_research_scene() {
+  local scene="$1"
+  local mode="$2"
+  local extra=()
+  if [[ "$mode" == "ba" ]]; then
+    extra+=(--use-ba)
+  elif [[ "$mode" != "feedforward" ]]; then
+    echo "VGGT mode must be feedforward or ba" >&2
+    return 2
+  fi
+  run_vggt_gpu python -m processing.vggt_backend \
+    --dataset "/workspace/output/$scene/quality-sweep/evaluation-dataset.json" \
+    --transforms "/workspace/output/$scene/nerfstudio-data/transforms.json" \
+    --checkout /opt/vggt \
+    --output-root "/workspace/output/$scene/vggt-colmap" \
+    "${extra[@]}"
+}
+
+run_vggt_splatfacto_scene() {
+  local scene="$1"
+  local iterations="$2"
+  local baseline="/workspace/output/$scene/quality-sweep/default/backend-result.json"
+  if [[ ! -f "$ROOT/output/$scene/quality-sweep/default/backend-result.json" ]]; then
+    echo "Default Splatfacto baseline result is missing: $ROOT/output/$scene/quality-sweep/default/backend-result.json" >&2
+    return 1
+  fi
+  if [[ ! -f "$ROOT/output/$scene/vggt-colmap/scene/sparse/cameras.bin" ]]; then
+    echo "VGGT COLMAP result is missing. Run ./task vggt-research $scene first." >&2
+    return 1
+  fi
+  run_gpu python -m processing.vggt_splatfacto \
+    --dataset "/workspace/output/$scene/quality-sweep/evaluation-dataset.json" \
+    --source-video "/workspace/input/$scene/source.webm" \
+    --vggt-scene "/workspace/output/$scene/vggt-colmap/scene" \
+    --output-root "/workspace/output/$scene/vggt-splatfacto" \
+    --baseline-result "$baseline" \
     --iterations "$iterations"
 }
 
@@ -271,28 +320,40 @@ case "${1:-run}" in
       exit 2
     fi
     require_quality_inputs "$scene"
-    dataset="$ROOT/output/$scene/quality-sweep/evaluation-dataset.json"
-    if [[ ! -f "$dataset" ]]; then
-      echo "Frozen #26 dataset contract is missing: $dataset" >&2
-      echo "Run ./task quality $scene first; VGGT does not invent a second train/hold-out split." >&2
-      exit 1
-    fi
+    require_frozen_dataset "$scene"
     check_docker
     check_host_gpu
     ensure_vggt_image
-    extra=()
-    if [[ "$mode" == "ba" ]]; then
-      extra+=(--use-ba)
-    elif [[ "$mode" != "feedforward" ]]; then
-      echo "VGGT mode must be feedforward or ba" >&2
+    run_vggt_research_scene "$scene" "$mode"
+    ;;
+  vggt-splatfacto)
+    scene="${2:-}"
+    iterations="${3:-30000}"
+    if [[ -z "$scene" ]]; then
+      echo "usage: ./task vggt-splatfacto <scene-id> [iterations]" >&2
       exit 2
     fi
-    run_vggt_gpu python -m processing.vggt_backend \
-      --dataset "/workspace/output/$scene/quality-sweep/evaluation-dataset.json" \
-      --transforms "/workspace/output/$scene/nerfstudio-data/transforms.json" \
-      --checkout /opt/vggt \
-      --output-root "/workspace/output/$scene/vggt-colmap" \
-      "${extra[@]}"
+    require_quality_inputs "$scene"
+    require_frozen_dataset "$scene"
+    prepare_quality_runtime
+    run_vggt_splatfacto_scene "$scene" "$iterations"
+    ;;
+  vggt-compare)
+    scene="${2:-}"
+    mode="${3:-feedforward}"
+    iterations="${4:-30000}"
+    if [[ -z "$scene" ]]; then
+      echo "usage: ./task vggt-compare <scene-id> [feedforward|ba] [iterations]" >&2
+      exit 2
+    fi
+    require_quality_inputs "$scene"
+    require_frozen_dataset "$scene"
+    check_docker
+    check_host_gpu
+    ensure_vggt_image
+    ensure_image
+    run_vggt_research_scene "$scene" "$mode"
+    run_vggt_splatfacto_scene "$scene" "$iterations"
     ;;
   clean)
     find "$ROOT/output" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
@@ -301,7 +362,7 @@ case "${1:-run}" in
     find "$ROOT/output" "$ROOT/input" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   *)
-    echo "usage: ./task {run|run-all|quality [scene-id] [iterations]|quality-pair <bad-scene> <good-control> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current-iterations> <increased-iterations>|vggt-research <scene> [feedforward|ba]|doctor|pull|vggt-pull|test|image|vggt-image|clean|clean-all}" >&2
+    echo "usage: ./task {run|run-all|quality [scene-id] [iterations]|quality-pair <bad-scene> <good-control> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current-iterations> <increased-iterations>|vggt-research <scene> [feedforward|ba]|vggt-splatfacto <scene> [iterations]|vggt-compare <scene> [feedforward|ba] [iterations]|doctor|pull|vggt-pull|test|image|vggt-image|clean|clean-all}" >&2
     exit 2
     ;;
 esac
