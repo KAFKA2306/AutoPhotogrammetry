@@ -131,17 +131,11 @@ def update_unhashed_registry_sources(
         for source in registry["videos"]
         if not (
             source.get("sha256")
-            and (source.get("metadata_evidence") or {}).get(
-                "sha256_verified_from_downloaded_bytes"
-            )
+            and (source.get("metadata_evidence") or {}).get("sha256_verified_from_downloaded_bytes")
             is True
         )
     ]
-    skipped.extend(
-        str(source["id"])
-        for source in registry["videos"]
-        if source not in unresolved
-    )
+    skipped.extend(str(source["id"]) for source in registry["videos"] if source not in unresolved)
 
     for index, source in enumerate(unresolved):
         try:
