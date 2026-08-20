@@ -46,11 +46,11 @@ jobs:
             ghcr.io/kafka2306/autophotogrammetry:longsplat-sha-${{ github.sha }}
           build-args: |
             LONGSPLAT_REVISION=19750775a9d19f30aa05a8333c4c6c231b2d5f4a
-            PYTORCH3D_REVISION=97bc85b6d23c9b161f1e3efff676666a3c6c5af3
+            PYTORCH3D_REVISION=33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Verify research image contract
         if: github.event_name == 'pull_request'
         run: |
           docker run --rm ghcr.io/kafka2306/autophotogrammetry:longsplat-1975077-sm120-v1 \
-            python -c 'import subprocess,torch,torch_scatter,pytorch3d,diff_gaussian_rasterization,fused_ssim; from simple_knn import _C; rev=subprocess.run(["git","-C","/opt/longsplat","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev=="19750775a9d19f30aa05a8333c4c6c231b2d5f4a"; assert torch.__version__.startswith("2.7.1"); print({"revision":rev,"torch":torch.__version__,"cuda":torch.version.cuda})'
+            python -c 'import subprocess,torch,torch_scatter,pytorch3d,diff_gaussian_rasterization,fused_ssim; from simple_knn import _C; rev=subprocess.run(["git","-C","/opt/longsplat","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev=="19750775a9d19f30aa05a8333c4c6c231b2d5f4a"; assert torch.__version__.startswith("2.7.1"); print({"revision":rev,"pytorch3d_revision":"33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba","torch":torch.__version__,"cuda":torch.version.cuda})'
