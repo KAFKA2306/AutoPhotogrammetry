@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
+from processing.artifact_publish import ArtifactPublishError, publish_run_splat
 from processing.backend_evaluation import build_dataset_contract, write_comparison
 from processing.batch import run_all_videos
 from processing.collection import collect_images
@@ -64,6 +66,14 @@ def main() -> None:
     batch_parser.add_argument("--timeout", type=float, default=None)
     batch_parser.add_argument("--train-iterations", type=int, default=2000)
     batch_parser.add_argument("--fresh", action="store_true")
+
+    publish_parser = subparsers.add_parser(
+        "publish-splat",
+        help="Publish one successful run PLY through hf-cache-hub and verify remote readback.",
+    )
+    publish_parser.add_argument("--run-manifest", required=True)
+    publish_parser.add_argument("--bucket", default=os.environ.get("HF_ARTIFACT_BUCKET"))
+    publish_parser.add_argument("--hf-cache-hub-root", default=os.environ.get("HF_CACHE_HUB_ROOT"))
 
     dataset_parser = subparsers.add_parser(
         "evaluation-dataset",
@@ -127,6 +137,18 @@ def main() -> None:
             input_root=args.input_root,
             output_root=args.output_root,
         )
+    elif args.command == "publish-splat":
+        if not args.bucket:
+            raise SystemExit("--bucket or HF_ARTIFACT_BUCKET is required")
+        try:
+            result = publish_run_splat(
+                args.run_manifest,
+                bucket=args.bucket,
+                hf_cache_hub_root=args.hf_cache_hub_root,
+            )
+        except ArtifactPublishError as exc:
+            print(json.dumps({"status": "failed", "error": str(exc)}, ensure_ascii=False, indent=2))
+            raise SystemExit(1) from exc
     elif args.command == "evaluation-dataset":
         result = build_dataset_contract(
             args.source_video,

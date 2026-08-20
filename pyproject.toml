@@ -7,6 +7,7 @@ dependencies = [
   "beautifulsoup4>=4.12,<5",
   "numpy>=1.24,<3",
   "Pillow>=10,<12",
+  "PyYAML>=6,<7",
   "requests>=2.31,<3",
   "scikit-image>=0.22,<1",
 ]
