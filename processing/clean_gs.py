@@ -58,6 +58,44 @@ def _mask_records(masks_dir: Path) -> list[dict]:
     ]
 
 
+def _git_checkout_revision(script: Path, requested_revision: str) -> dict:
+    """Resolve the script's Git checkout and require requested revision == HEAD."""
+    requested = requested_revision.strip()
+    if not requested:
+        raise ValueError("upstream_revision is required")
+
+    def git(*args: str) -> str:
+        try:
+            completed = subprocess.run(
+                ["git", "-C", str(script.parent), *args],
+                shell=False,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise ValueError(f"Clean-GS script is not in a readable Git checkout: {script}") from exc
+        return completed.stdout.strip()
+
+    checkout_root = git("rev-parse", "--show-toplevel")
+    head_revision = git("rev-parse", "HEAD")
+    try:
+        requested_commit = git("rev-parse", "--verify", f"{requested}^{{commit}}")
+    except ValueError as exc:
+        raise ValueError(f"upstream_revision cannot be resolved in Clean-GS checkout: {requested}") from exc
+    if requested_commit != head_revision:
+        raise ValueError(
+            "Clean-GS checkout HEAD does not match upstream_revision: "
+            f"requested={requested_commit}, head={head_revision}"
+        )
+    return {
+        "checkout_root": checkout_root,
+        "requested_revision": requested,
+        "resolved_revision": requested_commit,
+        "head_revision": head_revision,
+    }
+
+
 def run_clean_gs(
     *,
     script_path: str | Path,
@@ -82,8 +120,7 @@ def run_clean_gs(
     manifest_file = Path(manifest_path).expanduser().resolve()
     if not script.is_file():
         raise ValueError(f"Clean-GS script does not exist: {script}")
-    if not upstream_revision.strip():
-        raise ValueError("upstream_revision is required")
+    checkout = _git_checkout_revision(script, upstream_revision)
     if not masks.is_dir():
         raise ValueError(f"mask directory does not exist: {masks}")
     if not source.is_file():
@@ -120,7 +157,8 @@ def run_clean_gs(
         "schema_version": 1,
         "backend": "Clean-GS",
         "upstream_repository": "https://github.com/smlab-niser/clean-gs",
-        "upstream_revision": upstream_revision,
+        "upstream_revision": checkout["head_revision"],
+        "upstream_checkout": checkout,
         "scene": scene,
         "command": command,
         "started_at": started,
