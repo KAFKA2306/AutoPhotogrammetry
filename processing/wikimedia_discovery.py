@@ -12,8 +12,10 @@ from bs4 import BeautifulSoup
 from processing.nordic_seeds import enabled_seed_categories, load_nordic_seeds
 
 WIKIMEDIA_API = "https://commons.wikimedia.org/w/api.php"
+WIKIMEDIA_REST = "https://commons.wikimedia.org/w/rest.php/v1"
 USER_AGENT = "AutoPhotogrammetry/0.7 (+Nordic Commons discovery)"
 JsonRequester = Callable[[Mapping[str, str]], dict[str, Any]]
+FileJsonRequester = Callable[[str], dict[str, Any]]
 
 
 def _request_json(params: Mapping[str, str]) -> dict[str, Any]:
@@ -28,6 +30,19 @@ def _request_json(params: Mapping[str, str]) -> dict[str, Any]:
         raise RuntimeError("Wikimedia API returned a non-object payload")
     if payload.get("error"):
         raise RuntimeError(f"Wikimedia API error: {payload['error']}")
+    return payload
+
+
+def _request_file_json(canonical_title: str) -> dict[str, Any]:
+    encoded_title = quote(canonical_title.replace(" ", "_"), safe=":(),")
+    request = Request(
+        f"{WIKIMEDIA_REST}/file/{encoded_title}",
+        headers={"User-Agent": USER_AGENT},
+    )
+    with urlopen(request, timeout=60) as response:
+        payload = json.load(response)
+    if not isinstance(payload, dict):
+        raise RuntimeError("MediaWiki REST file API returned a non-object payload")
     return payload
 
 
@@ -237,6 +252,23 @@ def _metadata_value(metadata: Mapping[str, object], key: str) -> object:
     return value
 
 
+def _duration_value(value: object) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    return float(value)
+
+
+def _rest_duration(payload: Mapping[str, Any]) -> float | None:
+    for key in ("original", "preferred"):
+        representation = payload.get(key)
+        if not isinstance(representation, Mapping):
+            continue
+        duration = _duration_value(representation.get("duration"))
+        if duration is not None:
+            return duration
+    return None
+
+
 def _source_page(title: str) -> str:
     return "https://commons.wikimedia.org/wiki/" + quote(
         title.replace(" ", "_"),
@@ -319,9 +351,12 @@ def normalize_videoinfo(
         width = width if width is not None else dimensions.get("width")
         height = height if height is not None else dimensions.get("height")
 
-    duration = info.get("duration")
+    duration = _duration_value(info.get("duration"))
+    duration_authority = "Wikimedia Commons videoinfo" if duration is not None else None
     if duration is None:
-        duration = _metadata_value(commonmetadata, "duration")
+        duration = _duration_value(_metadata_value(commonmetadata, "duration"))
+        if duration is not None:
+            duration_authority = "Wikimedia Commons videoinfo commonmetadata"
 
     return {
         "canonical_title": canonical_title,
@@ -334,7 +369,8 @@ def normalize_videoinfo(
         "confirmed_video": confirmed_video,
         "width": width if isinstance(width, int) else None,
         "height": height if isinstance(height, int) else None,
-        "duration_seconds": float(duration) if isinstance(duration, (int, float)) else None,
+        "duration_seconds": duration,
+        "duration_authority": duration_authority,
         "author": author,
         "license": {
             "name": license_name,
@@ -357,6 +393,7 @@ def normalize_discovery(
     discovery: Mapping[str, Any],
     *,
     request_json: JsonRequester = _request_json,
+    request_file_json: FileJsonRequester = _request_file_json,
 ) -> dict[str, Any]:
     candidates = discovery.get("candidates")
     if not isinstance(candidates, list):
@@ -383,6 +420,22 @@ def normalize_discovery(
             continue
         if not normalized["confirmed_video"]:
             continue
+
+        if normalized["duration_seconds"] is None:
+            try:
+                rest_payload = request_file_json(title)
+            except Exception as exc:
+                metadata_failures.append(
+                    {
+                        "canonical_title": title,
+                        "error": f"{type(exc).__name__}: REST file information: {exc}",
+                    }
+                )
+                continue
+            duration = _rest_duration(rest_payload)
+            if duration is not None:
+                normalized["duration_seconds"] = duration
+                normalized["duration_authority"] = "MediaWiki REST API file information"
 
         identity = normalized.get("source_sha1") or normalized["canonical_title"]
         existing = normalized_by_identity.get(str(identity))
