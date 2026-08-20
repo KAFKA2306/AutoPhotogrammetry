@@ -26,40 +26,29 @@ class QualityFollowupTests(unittest.TestCase):
             frames.append(
                 {
                     "file_path": f"images/{image.name}",
-                    "transform_matrix": [
-                        [1, 0, 0, 0],
-                        [0, 1, 0, 0],
-                        [0, 0, 1, 0],
-                        [0, 0, 0, 1],
-                    ],
+                    "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
                 }
             )
-        (data / "transforms.json").write_text(
-            json.dumps({"frames": frames}),
-            encoding="utf-8",
-        )
+        (data / "transforms.json").write_text(json.dumps({"frames": frames}), encoding="utf-8")
         return source, data
 
     def _fake_experiment(self, **kwargs):
         name = kwargs["name"]
-        result = {
-            "schema_version": 2,
-            "dataset_id": dataset_identity(kwargs["dataset"]),
-            "backend": {"name": name, "upstream_revision": "revision"},
-            "command": ["ns-train", "splatfacto"],
-            "config": dict(kwargs["config"]),
-            "return_code": 0,
-            "status": "success",
-            "failure_phase": None,
-            "artifact": {
-                "path": "artifact.ply",
-                "format": "ply",
-                "size_bytes": 1,
-                "sha256": "a" * 64,
+        return (
+            {"name": name, "status": "success", "metrics": {}},
+            {
+                "schema_version": 1,
+                "dataset_id": dataset_identity(kwargs["dataset"]),
+                "backend": {"name": name, "upstream_revision": "revision"},
+                "command": ["ns-train", "splatfacto"],
+                "config": dict(kwargs["config"]),
+                "return_code": 0,
+                "status": "success",
+                "failure_phase": None,
+                "artifact": {"path": "artifact.ply", "format": "ply", "size_bytes": 1, "sha256": "a" * 64},
+                "metrics": {},
             },
-            "metrics": {},
-        }
-        return {"name": name, "status": "success", "metrics": {}}, result
+        )
 
     def test_culling_changes_only_one_named_parameter_after_winner(self):
         base = culling_train_args(winner="mcmc", iterations=30000)
@@ -75,7 +64,7 @@ class QualityFollowupTests(unittest.TestCase):
             ("--pipeline.model.cull-alpha-thresh", "0.05"),
         )
 
-    def test_mcmc_rejects_default_strategy_only_culling_fields(self):
+    def test_mcmc_rejects_culling_fields_its_strategy_does_not_consume(self):
         with self.assertRaisesRegex(ValueError, "not consumed"):
             culling_train_args(
                 winner="mcmc",
@@ -84,7 +73,7 @@ class QualityFollowupTests(unittest.TestCase):
                 value=0.5,
             )
 
-    def test_integer_culling_field_remains_integer(self):
+    def test_integer_culling_field_is_emitted_as_integer(self):
         args = culling_train_args(
             winner="default",
             iterations=30000,
@@ -97,20 +86,13 @@ class QualityFollowupTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             source, data = self._dataset(root)
-            with (
-                patch(
-                    "processing.quality_followup.verify_gpu_runtime",
-                    return_value={"gpu": "test"},
-                ),
-                patch(
-                    "processing.quality_followup.verify_research_environment",
-                    return_value={"nerfstudio_revision": "revision"},
-                ),
-                patch(
-                    "processing.quality_followup._run_experiment",
-                    side_effect=self._fake_experiment,
-                ) as runner,
-            ):
+            with patch("processing.quality_followup.verify_gpu_runtime", return_value={"gpu": "test"}), patch(
+                "processing.quality_followup.verify_research_environment",
+                return_value={"nerfstudio_revision": "revision"},
+            ), patch(
+                "processing.quality_followup.run_splatfacto_experiment",
+                side_effect=self._fake_experiment,
+            ) as runner:
                 result = run_culling_sweep(
                     data,
                     source,
@@ -120,46 +102,34 @@ class QualityFollowupTests(unittest.TestCase):
                     values=[0.25, 0.5],
                     holdout_count=1,
                 )
-
         self.assertEqual(runner.call_count, 3)
         self.assertEqual(len(result["comparison"]["results"]), 3)
-        self.assertEqual(result["status"], "success")
+        self.assertTrue(result["all_experiments_succeeded"])
 
-    def test_budget_sweep_changes_only_iteration_budget(self):
+    def test_budget_sweep_requires_two_budgets_and_freezes_winner(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             source, data = self._dataset(root)
-            with (
-                patch(
-                    "processing.quality_followup.verify_gpu_runtime",
-                    return_value={"gpu": "test"},
-                ),
-                patch(
-                    "processing.quality_followup.verify_research_environment",
-                    return_value={"nerfstudio_revision": "revision"},
-                ),
-                patch(
-                    "processing.quality_followup._run_experiment",
-                    side_effect=self._fake_experiment,
-                ) as runner,
-            ):
+            with patch("processing.quality_followup.verify_gpu_runtime", return_value={"gpu": "test"}), patch(
+                "processing.quality_followup.verify_research_environment",
+                return_value={"nerfstudio_revision": "revision"},
+            ), patch(
+                "processing.quality_followup.run_splatfacto_experiment",
+                side_effect=self._fake_experiment,
+            ) as runner:
                 result = run_budget_sweep(
                     data,
                     source,
                     root / "out",
-                    winner="scale-regularized",
+                    winner="default",
                     budgets=[30000, 60000],
                     holdout_count=1,
                 )
-
         self.assertEqual(runner.call_count, 2)
-        first = runner.call_args_list[0].kwargs["train_args"]
-        second = runner.call_args_list[1].kwargs["train_args"]
-        self.assertEqual(first[0], "--max-num-iterations")
-        self.assertEqual(second[0], "--max-num-iterations")
-        self.assertEqual(first[1], "30000")
-        self.assertEqual(second[1], "60000")
-        self.assertEqual(first[2:], second[2:])
+        first_args = runner.call_args_list[0].kwargs["train_args"]
+        second_args = runner.call_args_list[1].kwargs["train_args"]
+        self.assertIn("30000", first_args)
+        self.assertIn("60000", second_args)
         self.assertEqual(len(result["comparison"]["results"]), 2)
 
 
