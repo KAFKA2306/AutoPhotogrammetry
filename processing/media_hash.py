@@ -3,9 +3,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import time
 import urllib.request
 from pathlib import Path
 from typing import BinaryIO
+from urllib.error import HTTPError
 
 from processing.video_sources import load_video_registry
 
@@ -22,6 +24,29 @@ def sha256_stream(stream: BinaryIO, *, chunk_size: int = 1024 * 1024) -> tuple[s
     return digest.hexdigest(), size
 
 
+def _open_with_wikimedia_backoff(
+    request: urllib.request.Request,
+    *,
+    timeout_seconds: float,
+    max_attempts: int = 4,
+    minimum_retry_seconds: float = 60.0,
+):
+    for attempt in range(max_attempts):
+        try:
+            return urllib.request.urlopen(request, timeout=timeout_seconds)
+        except HTTPError as exc:
+            if exc.code != 429 or attempt == max_attempts - 1:
+                raise
+            retry_after = exc.headers.get("Retry-After")
+            try:
+                server_delay = float(retry_after) if retry_after else 0.0
+            except (TypeError, ValueError):
+                server_delay = 0.0
+            exponential_delay = minimum_retry_seconds * (2**attempt)
+            time.sleep(min(600.0, max(server_delay, exponential_delay)))
+    raise RuntimeError("source-media retry loop ended unexpectedly")
+
+
 def hash_source_media(source: dict, *, timeout_seconds: float = 120.0) -> tuple[str, int]:
     media_url = source.get("media_url")
     if not media_url:
@@ -31,7 +56,10 @@ def hash_source_media(source: dict, *, timeout_seconds: float = 120.0) -> tuple[
         str(media_url),
         headers={"User-Agent": "KAFKA2306-AutoPhotogrammetry/1.0"},
     )
-    with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+    with _open_with_wikimedia_backoff(
+        request,
+        timeout_seconds=timeout_seconds,
+    ) as response:
         sha256, size = sha256_stream(response)
 
     expected_size = (source.get("metadata_evidence") or {}).get("source_size_bytes")
@@ -80,13 +108,17 @@ def update_unhashed_registry_sources(
     registry_path: str | Path = "sources/videos.json",
     *,
     timeout_seconds: float = 120.0,
+    request_delay_seconds: float = 0.0,
 ) -> dict:
     """Hash every registry source that lacks byte-verified SHA-256 evidence.
 
     Each source is isolated: one download failure does not hide successful hashes for
     other sources. The registry is persisted after every successful source so a long
-    batch can resume without repeating completed downloads.
+    batch can resume without repeating completed downloads. An optional inter-source
+    delay allows hosted evidence runs to respect Wikimedia rate limits.
     """
+    if request_delay_seconds < 0:
+        raise ValueError("request_delay_seconds must be non-negative")
 
     path = Path(registry_path)
     registry = load_video_registry(path)
@@ -94,12 +126,18 @@ def update_unhashed_registry_sources(
     failures: list[dict] = []
     skipped: list[str] = []
 
-    for source in registry["videos"]:
-        evidence = source.get("metadata_evidence") or {}
-        if source.get("sha256") and evidence.get("sha256_verified_from_downloaded_bytes") is True:
-            skipped.append(str(source["id"]))
-            continue
+    unresolved = [
+        source
+        for source in registry["videos"]
+        if not (
+            source.get("sha256")
+            and (source.get("metadata_evidence") or {}).get("sha256_verified_from_downloaded_bytes")
+            is True
+        )
+    ]
+    skipped.extend(str(source["id"]) for source in registry["videos"] if source not in unresolved)
 
+    for index, source in enumerate(unresolved):
         try:
             sha256, size = hash_source_media(source, timeout_seconds=timeout_seconds)
             results.append(_apply_hash_result(source, sha256, size))
@@ -109,6 +147,8 @@ def update_unhashed_registry_sources(
             )
         except Exception as exc:  # preserve independent candidate evidence
             failures.append({"id": str(source.get("id")), "error": str(exc)})
+        if request_delay_seconds > 0 and index < len(unresolved) - 1:
+            time.sleep(request_delay_seconds)
 
     return {
         "hashed": results,
@@ -129,12 +169,14 @@ def main() -> None:
     mode.add_argument("--all-unhashed", action="store_true")
     parser.add_argument("--registry", default="sources/videos.json")
     parser.add_argument("--timeout-seconds", type=float, default=120.0)
+    parser.add_argument("--request-delay-seconds", type=float, default=0.0)
     args = parser.parse_args()
 
     if args.all_unhashed:
         result = update_unhashed_registry_sources(
             args.registry,
             timeout_seconds=args.timeout_seconds,
+            request_delay_seconds=args.request_delay_seconds,
         )
     else:
         result = update_registry_source_hash(

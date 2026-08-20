@@ -1,0 +1,62 @@
+{
+  "hashed": [
+    {
+      "id": "centro-aguascalientes",
+      "sha256": "5f5558a898a83e92e3a6556d9375836f1d3c198f3a1af0121ab9feb6887af9ea",
+      "size_bytes": 951086461
+    },
+    {
+      "id": "barco-la-pona-01",
+      "sha256": "7cf3d9f9e9bcb14dbf3588875b6459a3862f18af3b15b6370a6e3eb92612328a",
+      "size_bytes": 699016970
+    },
+    {
+      "id": "presa-san-blas",
+      "sha256": "92b70b5d6a0f26602a0cd8de927c971c92e6179482634689e0d41b293f9212fa",
+      "size_bytes": 622167530
+    },
+    {
+      "id": "playa-guayabitos-region",
+      "sha256": "51eb81e247df60eae5df304f0f9bf937a0545769887f7efbec810f6cf1fb9d2b",
+      "size_bytes": 282502715
+    },
+    {
+      "id": "cascadas-agua-azul",
+      "sha256": "cbabc653827b6d7a695498654077004e27216b9f115ec92e5bb1f6b5bba51bb6",
+      "size_bytes": 708674740
+    },
+    {
+      "id": "los-cabos-sunset",
+      "sha256": "abbd8fa511827ed416be4273478941f856380a0fec0e9f0ec71fa4226ec5787a",
+      "size_bytes": 1176492467
+    },
+    {
+      "id": "la-pona-fire-2025",
+      "sha256": "59e592aab33883fa36390fd245052d305282afc9bea47e0e8d0f6feb5ceff62a",
+      "size_bytes": 242227766
+    },
+    {
+      "id": "cadena-humana-la-pona",
+      "sha256": "4a99eb36e7a20297c4ef29bb99ecaca80458d6e31599a3c0ea3d15bbc1f1f2fd",
+      "size_bytes": 245718701
+    }
+  ],
+  "failed": [],
+  "skipped_verified": [
+    "huejotzingo",
+    "tepotzotlan-virreinato",
+    "templo-san-marcos",
+    "calvillo-centro",
+    "puente-san-ignacio-03",
+    "avenida-gomez-morin",
+    "san-francisco-nayarit-01",
+    "baluarte-san-pedro",
+    "puente-san-ignacio-01",
+    "herstmonceux-castle",
+    "fachada-san-francisco-javier",
+    "panoramica-puebla-centro"
+  ],
+  "hashed_count": 8,
+  "failed_count": 0,
+  "skipped_verified_count": 12
+}
