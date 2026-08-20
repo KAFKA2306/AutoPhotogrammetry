@@ -51,7 +51,12 @@ class VggtSplatfactoTests(unittest.TestCase):
         sparse.mkdir(parents=True)
         by_hash = {record["sha256"]: record for record in dataset["frames"]}
         for index, (digest, _) in enumerate(sorted(by_hash.items()), start=1):
-            source_image = next(path for path in images.iterdir() if __import__("processing.provenance", fromlist=["sha256_file"]).sha256_file(path) == digest)
+            source_image = next(
+                path
+                for path in images.iterdir()
+                if __import__("processing.provenance", fromlist=["sha256_file"]).sha256_file(path)
+                == digest
+            )
             target = vggt_images / f"{index:04d}-{digest[:12]}.jpg"
             target.write_bytes(source_image.read_bytes())
         for name in ("cameras.bin", "images.bin", "points3D.bin"):
@@ -71,11 +76,18 @@ class VggtSplatfactoTests(unittest.TestCase):
                 frames = [
                     {
                         "file_path": f"./images/{path.name}",
-                        "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                        "transform_matrix": [
+                            [1, 0, 0, 0],
+                            [0, 1, 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, 1],
+                        ],
                     }
                     for path in sorted(images_dir.iterdir())
                 ]
-                (output_dir / "transforms.json").write_text(json.dumps({"frames": frames}), encoding="utf-8")
+                (output_dir / "transforms.json").write_text(
+                    json.dumps({"frames": frames}), encoding="utf-8"
+                )
                 return subprocess.CompletedProcess(command, 0, "ok", "")
 
             with patch("processing.vggt_splatfacto._run_recorded", side_effect=fake_run):
@@ -88,7 +100,7 @@ class VggtSplatfactoTests(unittest.TestCase):
     def test_e2e_reuses_dataset_identity_and_writes_two_backend_comparison(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            source, dataset, dataset_path, transforms, scene = self._fixture(root)
+            source, dataset, dataset_path, _, scene = self._fixture(root)
             prepared_root = root / "prepared-source"
             prepared_images = prepared_root / "images"
             prepared_images.mkdir(parents=True)
@@ -97,12 +109,19 @@ class VggtSplatfactoTests(unittest.TestCase):
             prepared_frames = [
                 {
                     "file_path": f"images/{path.name}",
-                    "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                    "transform_matrix": [
+                        [1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0],
+                        [0, 0, 0, 1],
+                    ],
                 }
                 for path in sorted(prepared_images.iterdir())
             ]
             prepared_transforms = prepared_root / "transforms.json"
-            prepared_transforms.write_text(json.dumps({"frames": prepared_frames}), encoding="utf-8")
+            prepared_transforms.write_text(
+                json.dumps({"frames": prepared_frames}), encoding="utf-8"
+            )
 
             baseline_artifact = root / "baseline.ply"
             baseline_artifact.write_bytes(b"baseline")
@@ -199,7 +218,9 @@ class VggtSplatfactoTests(unittest.TestCase):
             self.assertEqual(result["dataset_id"], dataset_identity(dataset))
             self.assertEqual(result["metrics"]["psnr"], 24.0)
             self.assertEqual(result["metrics"]["peak_gpu_memory_bytes"], 123)
-            comparison = json.loads(Path(result["comparison_path"]).read_text(encoding="utf-8"))
+            comparison = json.loads(
+                Path(result["comparison_path"]).read_text(encoding="utf-8")
+            )
             self.assertEqual(len(comparison["results"]), 2)
             self.assertEqual(
                 [row["backend"] for row in comparison["results"]],
@@ -213,20 +234,38 @@ class VggtSplatfactoTests(unittest.TestCase):
             prepared = root / "changed"
             images = prepared / "images"
             images.mkdir(parents=True)
-            (images / "wrong.jpg").write_bytes(b"wrong")
+            changed_frames = []
+            for index in range(2):
+                image = images / f"wrong-{index}.jpg"
+                image.write_bytes(f"wrong-{index}".encode())
+                changed_frames.append(
+                    {
+                        "file_path": f"images/{image.name}",
+                        "transform_matrix": [
+                            [1, 0, 0, 0],
+                            [0, 1, 0, 0],
+                            [0, 0, 1, 0],
+                            [0, 0, 0, 1],
+                        ],
+                    }
+                )
             transforms = prepared / "transforms.json"
             transforms.write_text(
-                json.dumps({"frames": [{"file_path": "images/wrong.jpg", "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]}]}),
+                json.dumps({"frames": changed_frames}),
                 encoding="utf-8",
             )
             with patch(
                 "processing.vggt_splatfacto.prepare_vggt_nerfstudio_data",
                 return_value={"transforms_path": str(transforms)},
-            ), patch("processing.vggt_splatfacto.verify_gpu_runtime", return_value={}), patch(
+            ), patch(
+                "processing.vggt_splatfacto.verify_gpu_runtime", return_value={}
+            ), patch(
                 "processing.vggt_splatfacto.verify_research_environment",
                 return_value={"nerfstudio_revision": "ns-rev"},
             ), patch("processing.vggt_splatfacto.run_splatfacto_export") as train:
-                with self.assertRaisesRegex(RuntimeError, "changed the frozen dataset identity"):
+                with self.assertRaisesRegex(
+                    RuntimeError, "changed the frozen dataset identity"
+                ):
                     run_vggt_splatfacto(dataset_path, source, scene, root / "out")
                 train.assert_not_called()
 
