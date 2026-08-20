@@ -19,5 +19,6 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -r requirements.txt
+      - run: bash -n task
       - run: python -m py_compile main.py processing/*.py tests/*.py
       - run: python -m unittest discover -s tests -v
