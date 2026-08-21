@@ -111,9 +111,7 @@ class GaussianPlyMetricsTests(unittest.TestCase):
             self._write_ply(path)
             inspection = gaussian_ply_inspection(path)
             poisson = validate_gaussian_ply_backend(inspection, "point-cloud-poisson")
-            covariance = validate_gaussian_ply_backend(
-                inspection, "gaussian-covariance-normal"
-            )
+            covariance = validate_gaussian_ply_backend(inspection, "gaussian-covariance-normal")
             tsdf = validate_gaussian_ply_backend(inspection, "render-depth-tsdf")
             self.assertTrue(poisson["supported"])
             self.assertFalse(covariance["supported"])
