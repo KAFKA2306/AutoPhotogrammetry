@@ -71,10 +71,12 @@ def _orb_correspondences(
             detector.detect_and_extract(image)
         except RuntimeError:
             return np.empty((0, 2)), np.empty((0, 2)), 0, 0, 0
-        if detector.descriptors is None or detector.keypoints is None:
+        raw_descriptors = getattr(detector, "descriptors", None)
+        raw_keypoints = getattr(detector, "keypoints", None)
+        if raw_descriptors is None or raw_keypoints is None:
             return np.empty((0, 2)), np.empty((0, 2)), 0, 0, 0
-        keypoints.append(detector.keypoints)
-        descriptors.append(detector.descriptors)
+        keypoints.append(np.asarray(raw_keypoints))
+        descriptors.append(np.asarray(raw_descriptors))
     matches = match_descriptors(descriptors[0], descriptors[1], cross_check=True)
     if len(matches) == 0:
         return (
@@ -131,7 +133,10 @@ def _fit_essential_ransac(
                 continue
         except (ValueError, np.linalg.LinAlgError):
             continue
-        params = np.asarray(model.params, dtype=np.float64)
+        raw_params = getattr(model, "params", None)
+        if raw_params is None:
+            continue
+        params = np.asarray(raw_params, dtype=np.float64)
         residuals = _sampson_residuals(params, first, second)
         inliers = residuals <= threshold
         count = int(np.sum(inliers))
@@ -149,8 +154,10 @@ def _fit_essential_ransac(
     refined = EssentialMatrixTransform()
     try:
         if refined.estimate(first[best_inliers], second[best_inliers]):
-            best_model = np.asarray(refined.params, dtype=np.float64)
-            best_inliers = _sampson_residuals(best_model, first, second) <= threshold
+            raw_params = getattr(refined, "params", None)
+            if raw_params is not None:
+                best_model = np.asarray(raw_params, dtype=np.float64)
+                best_inliers = _sampson_residuals(best_model, first, second) <= threshold
     except (ValueError, np.linalg.LinAlgError):
         pass
     return best_model, best_inliers
@@ -190,7 +197,10 @@ def _fit_homography_ransac(
                 continue
         except (ValueError, np.linalg.LinAlgError):
             continue
-        residuals = _projective_transfer_error(np.asarray(model.params), first, second)
+        raw_params = getattr(model, "params", None)
+        if raw_params is None:
+            continue
+        residuals = _projective_transfer_error(np.asarray(raw_params), first, second)
         inliers = residuals <= threshold_px
         count = int(np.sum(inliers))
         if count < 4:

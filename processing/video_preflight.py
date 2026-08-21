@@ -233,9 +233,11 @@ def run_video_preflight(
     destination.parent.mkdir(parents=True, exist_ok=True)
     probe = probe_video(source)
     duration_raw = (probe.get("format") or {}).get("duration")
+    if not isinstance(duration_raw, (str, int, float)):
+        raise ValueError("video probe did not provide a finite duration")
     try:
         duration_seconds = float(duration_raw)
-    except (TypeError, ValueError) as exc:
+    except ValueError as exc:
         raise ValueError("video probe did not provide a finite duration") from exc
     if not math.isfinite(duration_seconds) or duration_seconds <= 0:
         raise ValueError("video probe did not provide a finite duration")
@@ -257,7 +259,7 @@ def run_video_preflight(
         root = Path(tmp)
         shot_frames: dict[str, list[Path]] = {}
         for interval in intervals:
-            shot = dict(interval)
+            shot: dict[str, Any] = dict(interval)
             shot_id = str(shot["id"])
             try:
                 frames, command = _extract_shot_frames(
