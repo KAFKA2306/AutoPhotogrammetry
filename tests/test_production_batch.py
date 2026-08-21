@@ -8,7 +8,7 @@ class ProductionBatchTests(unittest.TestCase):
     def test_batch_failure_never_attempts_final_ready_manifest(self):
         with (
             patch(
-                "processing.production_batch.run_all_videos",
+                "processing.production_batch.run_all_shot_videos",
                 return_value={"status": "failed", "results": []},
             ),
             patch("processing.production_batch.build_final_exhibition_manifest") as finalizer,
@@ -21,7 +21,7 @@ class ProductionBatchTests(unittest.TestCase):
     def test_full_batch_success_requires_final_twenty_manifest_success(self):
         with (
             patch(
-                "processing.production_batch.run_all_videos",
+                "processing.production_batch.run_all_shot_videos",
                 return_value={"status": "success", "results": [object()] * 20},
             ),
             patch(
@@ -40,7 +40,7 @@ class ProductionBatchTests(unittest.TestCase):
     def test_finalizer_failure_is_not_relabelled_as_batch_success(self):
         with (
             patch(
-                "processing.production_batch.run_all_videos",
+                "processing.production_batch.run_all_shot_videos",
                 return_value={"status": "success", "results": [object()] * 20},
             ),
             patch(
