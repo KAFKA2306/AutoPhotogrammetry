@@ -92,6 +92,7 @@ run_gpu() {
     -e AUTOPHOTOGRAMMETRY_IMAGE_ID="$image_id" \
     -v "$ROOT/input:/workspace/input" \
     -v "$ROOT/output:/workspace/output" \
+    -v "$ROOT/sources:/workspace/sources" \
     -w /opt/autophotogrammetry \
     "$IMAGE" "$@"
 }
@@ -281,11 +282,28 @@ case "${1:-run}" in
     ;;
   run)
     doctor
-    run_gpu python main.py huejotzingo --input-root /workspace/input --output-root /workspace/output
+    run_gpu python -m processing.shot_batch \
+      --registry /workspace/sources/videos.json \
+      --input-root /workspace/input \
+      --output-root /workspace/output
+    ;;
+  run-one)
+    scene="${2:-}"
+    if [[ -z "$scene" ]]; then
+      echo "usage: ./task run-one <scene-id>" >&2
+      exit 2
+    fi
+    doctor
+    run_gpu python -m processing.shot_batch \
+      --registry /workspace/sources/videos.json \
+      --input-root /workspace/input \
+      --output-root /workspace/output \
+      --id "$scene"
     ;;
   run-all)
     doctor
     run_gpu python -m processing.production_batch \
+      --registry /workspace/sources/videos.json \
       --input-root /workspace/input \
       --output-root /workspace/output
     ;;
@@ -295,6 +313,10 @@ case "${1:-run}" in
     require_quality_inputs "$scene"
     prepare_named_runtime "$IMAGE"
     run_quality_scene "$scene" "$iterations"
+    run_gpu python -m processing.stage_d_sync \
+      --registry /workspace/sources/videos.json \
+      --source-id "$scene" \
+      --backend-result "/workspace/output/$scene/quality-sweep/default/backend-result.json"
     ;;
   quality-pair)
     bad_scene="${2:-}"
@@ -457,7 +479,7 @@ case "${1:-run}" in
     find "$ROOT/output" "$ROOT/input" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   *)
-    echo "usage: ./task {run|run-all|quality [scene] [iterations]|quality-pair <bad> <good> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current> <increased>|compression-baseline <scene> [iterations]|vggt-research <scene> [feedforward|ba]|vggt-splatfacto <scene> [iterations]|vggt-compare <scene> [feedforward|ba] [iterations]|efa-research <scene> [iterations]|longsplat-research <scene>|doctor|pull|vggt-pull|efa-pull|longsplat-pull|test|image|vggt-image|clean|clean-all}" >&2
+    echo "usage: ./task {run|run-one <scene-id>|run-all|quality [scene] [iterations]|quality-pair <bad> <good> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current> <increased>|compression-baseline <scene> [iterations]|vggt-research <scene> [feedforward|ba]|vggt-splatfacto <scene> [iterations]|vggt-compare <scene> [feedforward|ba] [iterations]|efa-research <scene> [iterations]|longsplat-research <scene>|doctor|pull|vggt-pull|efa-pull|longsplat-pull|test|image|vggt-image|clean|clean-all}" >&2
     exit 2
     ;;
 esac

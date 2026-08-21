@@ -9,18 +9,18 @@ from typing import Any
 def parse_model_analyzer(text: str) -> dict[str, int | float]:
     """Parse the stable numeric summary emitted by COLMAP model_analyzer."""
     patterns: dict[str, tuple[str, type[int] | type[float]]] = {
-        "cameras": (r"Cameras:\s*(\d+)", int),
-        "images": (r"Images:\s*(\d+)", int),
-        "registered_images": (r"Registered images:\s*(\d+)", int),
-        "points": (r"Points:\s*(\d+)", int),
-        "observations": (r"Observations:\s*(\d+)", int),
-        "mean_track_length": (r"Mean track length:\s*([0-9.eE+-]+)", float),
+        "cameras": (r"(?m)^Cameras:\s*(\d+)", int),
+        "images": (r"(?m)^Images:\s*(\d+)", int),
+        "registered_images": (r"(?m)^Registered images:\s*(\d+)", int),
+        "points": (r"(?m)^Points:\s*(\d+)", int),
+        "observations": (r"(?m)^Observations:\s*(\d+)", int),
+        "mean_track_length": (r"(?m)^Mean track length:\s*([0-9.eE+-]+)", float),
         "mean_observations_per_image": (
-            r"Mean observations per image:\s*([0-9.eE+-]+)",
+            r"(?m)^Mean observations per image:\s*([0-9.eE+-]+)",
             float,
         ),
         "mean_reprojection_error_px": (
-            r"Mean reprojection error:\s*([0-9.eE+-]+)\s*px",
+            r"(?m)^Mean reprojection error:\s*([0-9.eE+-]+)\s*px",
             float,
         ),
     }

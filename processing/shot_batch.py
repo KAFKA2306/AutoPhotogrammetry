@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 from collections.abc import Mapping, Sequence
@@ -153,7 +154,13 @@ def run_shot_video(
     manifest_path = dataset_output / "manifest.json"
     if not fresh:
         cached = _successful_manifest(manifest_path)
-        if cached:
+        cached_preflight = cached.get("preflight") if isinstance(cached, Mapping) else None
+        if (
+            cached
+            and cached.get("schema_version") == 3
+            and isinstance(cached_preflight, Mapping)
+            and cached_preflight.get("selected_shot_id")
+        ):
             return cached
     if dataset_output.exists():
         shutil.rmtree(dataset_output)
@@ -276,9 +283,14 @@ def run_shot_video(
         )
         if int(colmap["registered_images"]) < 1 or int(colmap["sparse_points"]) < 1:
             raise RuntimeError(f"COLMAP produced no usable reconstruction: {colmap}")
+        sparse_model = Path(str(colmap["largest_model_path"]))
+        canonical_model = sparse_root / "canonical"
+        if canonical_model.exists():
+            shutil.rmtree(canonical_model)
+        shutil.copytree(sparse_model, canonical_model)
+        colmap["canonical_model_path"] = str(canonical_model)
         manifest["colmap"] = colmap
         apply_colmap_to_registry(registry_path, dataset, colmap)
-        sparse_model = Path(str(colmap["largest_model_path"]))
 
         phase = "nerfstudio-process-data"
         nerfstudio_data = dataset_output / "nerfstudio-data"
@@ -288,7 +300,7 @@ def run_shot_video(
             extra_args=(
                 "--skip-colmap",
                 "--colmap-model-path",
-                str(sparse_model.resolve()),
+                str(canonical_model.resolve()),
             ),
         )
         _run_recorded(
@@ -413,3 +425,35 @@ def run_all_shot_videos(
     batch["manifest_path"] = str(batch_path)
     write_json(batch_path, batch)
     return batch
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Run one or more registry videos from measured continuous shots."
+    )
+    parser.add_argument("--registry", default="sources/videos.json")
+    parser.add_argument("--input-root", default="input")
+    parser.add_argument("--output-root", default="output")
+    parser.add_argument("--id", action="append", dest="ids")
+    parser.add_argument("--train-iterations", type=int, default=2000)
+    parser.add_argument("--timeout", type=float)
+    parser.add_argument("--fresh", action="store_true")
+    args = parser.parse_args()
+    registry = load_video_registry(args.registry)
+    ids = args.ids or [str(registry["default"])]
+    result = run_all_shot_videos(
+        registry_path=args.registry,
+        input_root=args.input_root,
+        output_root=args.output_root,
+        ids=ids,
+        train_iterations=args.train_iterations,
+        timeout=args.timeout,
+        fresh=args.fresh,
+    )
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    if result["status"] != "success":
+        raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    main()
