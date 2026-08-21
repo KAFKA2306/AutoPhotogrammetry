@@ -25,9 +25,7 @@ def stage_d_measurements(backend_result: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(holdout_count, int) or holdout_count < 1:
         raise ValueError("Stage D requires at least one deterministic hold-out frame")
     missing = [
-        key
-        for key in REQUIRED_HOLDOUT_METRICS
-        if not isinstance(metrics.get(key), (int, float))
+        key for key in REQUIRED_HOLDOUT_METRICS if not isinstance(metrics.get(key), (int, float))
     ]
     if missing:
         raise ValueError(f"Stage D is missing hold-out metrics: {missing}")

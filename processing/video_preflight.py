@@ -307,9 +307,7 @@ def run_video_preflight(
         selected_shot_id = select_shot(measured_shots)
         if selected_shot_id is None:
             raise RuntimeError("no shot produced valid two-view geometry evidence")
-        selected_measured = next(
-            shot for shot in measured_shots if shot["id"] == selected_shot_id
-        )
+        selected_measured = next(shot for shot in measured_shots if shot["id"] == selected_shot_id)
         selected_frames = shot_frames[selected_shot_id]
         frame_records = [
             {

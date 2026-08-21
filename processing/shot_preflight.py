@@ -105,10 +105,7 @@ def _sampson_residuals(matrix: np.ndarray, first: np.ndarray, second: np.ndarray
     et_second = (matrix.T @ second_h.T).T
     numerator = np.sum(second_h * e_first, axis=1) ** 2
     denominator = (
-        e_first[:, 0] ** 2
-        + e_first[:, 1] ** 2
-        + et_second[:, 0] ** 2
-        + et_second[:, 1] ** 2
+        e_first[:, 0] ** 2 + e_first[:, 1] ** 2 + et_second[:, 0] ** 2 + et_second[:, 1] ** 2
     )
     return np.sqrt(numerator / np.maximum(denominator, 1e-12))
 

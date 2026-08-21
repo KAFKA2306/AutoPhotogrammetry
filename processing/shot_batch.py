@@ -23,7 +23,9 @@ from processing.video_preflight import apply_preflight_to_registry, run_video_pr
 from processing.video_sources import EVALUATION_STAGES, load_video_registry
 
 
-def _expected_source_identity(source: Mapping[str, Any], resolved: Mapping[str, Any]) -> dict[str, Any]:
+def _expected_source_identity(
+    source: Mapping[str, Any], resolved: Mapping[str, Any]
+) -> dict[str, Any]:
     evidence = source.get("metadata_evidence")
     metadata = evidence if isinstance(evidence, Mapping) else {}
     return {
