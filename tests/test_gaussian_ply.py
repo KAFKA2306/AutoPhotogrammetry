@@ -76,7 +76,7 @@ class GaussianPlyMetricsTests(unittest.TestCase):
             self.assertAlmostEqual(result["scale_anisotropy_ratio"]["above_10_ratio"], 0.5)
             self.assertEqual(len(result["sha256"]), 64)
 
-    def test_inspection_records_fields_bounds_hash_and_unknown_dialect(self):
+    def test_inspection_records_fields_bounds_hash_and_metrics(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "splat.ply"
             self._write_ply(path, include_rotation=True)
@@ -87,8 +87,13 @@ class GaussianPlyMetricsTests(unittest.TestCase):
             self.assertEqual(result["position"]["bbox_min"], [-1.0, 0.0, 0.0])
             self.assertEqual(result["position"]["bbox_max"], [3.0, 2.0, 1.0])
             self.assertEqual(result["position"]["centroid"], [1.0, 1.0, 0.5])
+            self.assertEqual(result["position"]["extent"], [4.0, 2.0, 1.0])
             self.assertTrue(result["gaussian_fields"]["rotation"])
             self.assertEqual(result["gaussian_fields"]["inferred_sh_degree"], 0)
+            self.assertEqual(result["gaussian_metrics"]["opacity"]["below_0_1_count"], 1)
+            self.assertEqual(
+                result["gaussian_metrics"]["scale_anisotropy_ratio"]["above_10_count"], 1
+            )
             self.assertEqual(len(result["sha256"]), 64)
 
     def test_inspection_rejects_missing_xyz(self):
@@ -103,6 +108,15 @@ class GaussianPlyMetricsTests(unittest.TestCase):
             path = Path(tmp) / "nan.ply"
             self._write_ply(path, nonfinite_x=True)
             with self.assertRaisesRegex(ValueError, "non-finite"):
+                gaussian_ply_inspection(path)
+
+    def test_inspection_rejects_truncated_payload(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "truncated.ply"
+            self._write_ply(path, include_rotation=True)
+            data = path.read_bytes()
+            path.write_bytes(data[:-4])
+            with self.assertRaisesRegex(ValueError, "payload is truncated"):
                 gaussian_ply_inspection(path)
 
     def test_backend_validator_reports_missing_fields_without_guessing(self):
