@@ -350,10 +350,19 @@ def run_nerfstudio_eval(
         render_output_path=renders_path,
         executable=str(eval_cli),
     )
+    # ns-train records ``trainer.load_dir`` relative to the training run root,
+    # while ns-eval is otherwise launched from the evaluation output directory.
+    # Reuse the run root when a sibling training manifest identifies it so the
+    # recorded checkpoint path resolves identically for training and evaluation.
+    evaluation_cwd = root
+    for parent in (config.parent, *config.parents):
+        if (parent / "manifest.json").is_file():
+            evaluation_cwd = parent
+            break
     started_at = _utc_now()
     completed = _run_recorded_command(
         command,
-        cwd=root,
+        cwd=evaluation_cwd,
         timeout=timeout,
         env=env,
     )

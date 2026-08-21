@@ -1,42 +1,906 @@
 {
   "schema_version": 1,
-  "snapshot_state": "bootstrap",
+  "snapshot_state": "api",
   "authority": {
-    "bootstrap": "issue #84 category-page observations; MediaWiki API refresh required before Stage A queueing",
     "category_discovery": "Wikimedia Commons categorymembers",
     "video_metadata": "Wikimedia Commons videoinfo/categories",
     "duration_fallback": "MediaWiki REST API file information"
   },
   "seed_config_sha256": "e916e8cfa0913b8bddfc3e775a40c4d72be832b45963d8d87be5a325831dd864",
-  "regions": ["norway", "sweden", "finland", "denmark", "iceland", "greenland", "faroe-islands", "aland"],
+  "regions": [
+    "norway",
+    "sweden",
+    "finland",
+    "denmark",
+    "iceland",
+    "greenland",
+    "faroe-islands",
+    "aland"
+  ],
   "minimum_duration_seconds": 120.0,
   "raw_discovered_file_count_by_region": {
-    "norway": 7,
-    "sweden": 2,
-    "finland": 1,
-    "denmark": 0,
-    "iceland": 1,
-    "greenland": 3,
+    "norway": 24,
+    "sweden": 9,
+    "finland": 10,
+    "denmark": 9,
+    "iceland": 8,
+    "greenland": 4,
     "faroe-islands": 1,
     "aland": 0
   },
   "candidates": [
-    {"id":"wikimedia-faroe-ferry-d16c6f88c6","canonical_title":"File:Faroe-ferry.ogv","title":"Faroe-ferry","regions":["faroe-islands"],"source_page":"https://commons.wikimedia.org/wiki/File:Faroe-ferry.ogv","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":292,"resolution":[720,576],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Videos from the Faroe Islands"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-forest-in-finland-as-viewed-from-fpv-drone-fea55276e6","canonical_title":"File:Forest in Finland as viewed from FPV drone.webm","title":"Forest in Finland as viewed from FPV drone","regions":["finland"],"source_page":"https://commons.wikimedia.org/wiki/File:Forest_in_Finland_as_viewed_from_FPV_drone.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":253,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Finland"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-aappilattoq-south-greenland-71de26ae36","canonical_title":"File:Aappilattoq, South Greenland.webm","title":"Aappilattoq, South Greenland","regions":["greenland"],"source_page":"https://commons.wikimedia.org/wiki/File:Aappilattoq,_South_Greenland.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":124,"resolution":[1920,1080],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Greenland"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-swiss-camp-greenland-aerial-video-c759195630","canonical_title":"File:Swiss Camp (Greenland), aerial video.webm","title":"Swiss Camp (Greenland), aerial video","regions":["greenland"],"source_page":"https://commons.wikimedia.org/wiki/File:Swiss_Camp_(Greenland),_aerial_video.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":166,"resolution":[1920,1080],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Greenland"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-tasiusaq-settlements-of-south-greenland-decfb31f73","canonical_title":"File:Tasiusaq - Settlements of South Greenland.webm","title":"Tasiusaq - Settlements of South Greenland","regions":["greenland"],"source_page":"https://commons.wikimedia.org/wiki/File:Tasiusaq_-_Settlements_of_South_Greenland.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":155,"resolution":[1280,720],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Greenland"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-eruption-of-fagradalsfjall-volcano-2021-03-24-2-2edd6b6982","canonical_title":"File:Eruption of Fagradalsfjall volcano, 2021-03-24, 2.webm","title":"Eruption of Fagradalsfjall volcano, 2021-03-24, 2","regions":["iceland"],"source_page":"https://commons.wikimedia.org/wiki/File:Eruption_of_Fagradalsfjall_volcano,_2021-03-24,_2.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":709,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Iceland"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-aerial-imagery-of-sommary-and-surrounding-islands-norway-a6432893c6","canonical_title":"File:Aerial imagery of Sommarøy and surrounding islands, Norway.webm","title":"Aerial imagery of Sommarøy and surrounding islands, Norway","regions":["norway"],"source_page":"https://commons.wikimedia.org/wiki/File:Aerial_imagery_of_Sommar%C3%B8y_and_surrounding_islands,_Norway.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":220,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Norway"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-aerial-imagery-of-sommary-sommary-bridge-and-surrounding-islands-78dca81d34","canonical_title":"File:Aerial imagery of Sommarøy, Sommarøy Bridge and surrounding islands, Norway.webm","title":"Aerial imagery of Sommarøy, Sommarøy Bridge and surrounding islands, Norway","regions":["norway"],"source_page":"https://commons.wikimedia.org/wiki/File:Aerial_imagery_of_Sommar%C3%B8y,_Sommar%C3%B8y_Bridge_and_surrounding_islands,_Norway.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":259,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Norway"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-aerial-imagery-of-fjords-and-rivers-in-arctic-norway-4e6b578dae","canonical_title":"File:Aerial imagery of fjords and rivers in Arctic Norway.webm","title":"Aerial imagery of fjords and rivers in Arctic Norway","regions":["norway"],"source_page":"https://commons.wikimedia.org/wiki/File:Aerial_imagery_of_fjords_and_rivers_in_Arctic_Norway.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":252,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Norway"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-daniel-herskedal-the-hunting-golden-eagle-nature-drone-cinematog-912aa947e4","canonical_title":"File:Daniel Herskedal – The Hunting Golden Eagle – Nature drone cinematography of snowy landscapes in Norway.webm","title":"Daniel Herskedal – The Hunting Golden Eagle – Nature drone cinematography of snowy landscapes in Norway","regions":["norway"],"source_page":"https://commons.wikimedia.org/wiki/File:Daniel_Herskedal_%E2%80%93_The_Hunting_Golden_Eagle_%E2%80%93_Nature_drone_cinematography_of_snowy_landscapes_in_Norway.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":261,"resolution":[1920,1080],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Norway"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-nes-kirkeruiner-3cddba2d06","canonical_title":"File:Nes kirkeruiner.webm","title":"Nes kirkeruiner","regions":["norway"],"source_page":"https://commons.wikimedia.org/wiki/File:Nes_kirkeruiner.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":361,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Norway"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-rros-mai-2018-45ac53b5d3","canonical_title":"File:Røros mai 2018.webm","title":"Røros mai 2018","regions":["norway"],"source_page":"https://commons.wikimedia.org/wiki/File:R%C3%B8ros_mai_2018.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":177,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Norway"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-troldhaugen-c0f0859b9a","canonical_title":"File:Troldhaugen.webm","title":"Troldhaugen","regions":["norway"],"source_page":"https://commons.wikimedia.org/wiki/File:Troldhaugen.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":173,"resolution":[2048,1080],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Norway"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-gothenburg-downtown-dronefly-cc53cb099f","canonical_title":"File:Gothenburg downtown dronefly.webm","title":"Gothenburg downtown dronefly","regions":["sweden"],"source_page":"https://commons.wikimedia.org/wiki/File:Gothenburg_downtown_dronefly.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":584,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Sweden"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}},
-    {"id":"wikimedia-stockholm-epic-morning-drone-flight-eba0b45061","canonical_title":"File:Stockholm epic morning drone flight.webm","title":"Stockholm epic morning drone flight","regions":["sweden"],"source_page":"https://commons.wikimedia.org/wiki/File:Stockholm_epic_morning_drone_flight.webm","media_url":null,"author":null,"license":{"name":null,"url":null,"status":"unknown"},"duration_seconds":869,"resolution":[3840,2160],"source_sha1":null,"source_size_bytes":null,"mime":null,"media_type":null,"confirmed_video":false,"downloadable":false,"discovered_categories":["Category:Drone videos from Sweden"],"evaluation_stage":"metadata","measurements":{"preflight":null,"colmap":null,"splat":null},"metadata_authority":"issue #84 category-page bootstrap; MediaWiki API refresh required","stage_a":{"eligible_for_preflight":false,"failed_requirements":["author_present","downloadability_checked","license_present","license_verified","media_url_present","source_sha1_present","source_size_present","video_media_confirmed"]}}
+    {
+      "id": "wikimedia-024-kronborg-och-farjor-34-sek-cce7f5e6c4",
+      "canonical_title": "File:024 Kronborg och färjor, 34 sek .webm",
+      "title": "024 Kronborg och färjor, 34 sek ",
+      "provider": "Wikimedia Commons",
+      "regions": [
+        "denmark"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:024_Kronborg_och_f%C3%A4rjor,_34_sek_.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/35/024_Kronborg_och_f%C3%A4rjor%2C_34_sek_.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Helsingborgs Stad / Stefan Siwersson",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 34.444,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "source_sha1": "8d1ff9b080ac0d2085929222918a567318ccc7af",
+      "source_size_bytes": 19866448,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "downloadable": false,
+      "commons_categories": [
+        "Category:Aerial photographs of Sweden approved by the Swedish Defence Forces - self reviewed",
+        "Category:Aerial videos from Denmark",
+        "Category:CC-BY-3.0",
+        "Category:Media from Helsingborgs stad",
+        "Category:Media from YouTube",
+        "Category:Videos of Kronborg"
+      ],
+      "discovered_categories": [
+        "Category:Aerial videos from Denmark"
+      ],
+      "discovery_paths": [
+        [
+          "Category:Aerial videos from Denmark"
+        ]
+      ],
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "downloadability_checked": false,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "duration_threshold_pass": false,
+        "minimum_duration_seconds": 120.0,
+        "eligible_for_preflight": false,
+        "failed_requirements": [
+          "downloadability_checked",
+          "duration_threshold_pass"
+        ]
+      }
+    },
+    {
+      "id": "wikimedia-025-kronborg-och-hamnen-20-sek-537bf2d694",
+      "canonical_title": "File:025 Kronborg och hamnen, 20 sek.webm",
+      "title": "025 Kronborg och hamnen, 20 sek",
+      "provider": "Wikimedia Commons",
+      "regions": [
+        "denmark"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:025_Kronborg_och_hamnen,_20_sek.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/025_Kronborg_och_hamnen%2C_20_sek.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Helsingborgs Stad / Stefan Siwersson",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 20.76,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "source_sha1": "876bca3fdee8e75897234bd9494e6d6eff435e93",
+      "source_size_bytes": 14568687,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "downloadable": false,
+      "commons_categories": [
+        "Category:Aerial photographs of Sweden approved by the Swedish Defence Forces - self reviewed",
+        "Category:Aerial videos from Denmark",
+        "Category:CC-BY-3.0",
+        "Category:Media from Helsingborgs stad",
+        "Category:Media from YouTube",
+        "Category:Video display resolution 1920 x 1080",
+        "Category:Videos of Kronborg",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:Aerial videos from Denmark"
+      ],
+      "discovery_paths": [
+        [
+          "Category:Aerial videos from Denmark"
+        ]
+      ],
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "downloadability_checked": false,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "duration_threshold_pass": false,
+        "minimum_duration_seconds": 120.0,
+        "eligible_for_preflight": false,
+        "failed_requirements": [
+          "downloadability_checked",
+          "duration_threshold_pass"
+        ]
+      }
+    },
+    {
+      "id": "wikimedia-028-kronborg-i-sol-16-sek-b75daef7e2",
+      "canonical_title": "File:028 Kronborg i sol, 16 sek .webm",
+      "title": "028 Kronborg i sol, 16 sek ",
+      "provider": "Wikimedia Commons",
+      "regions": [
+        "denmark"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:028_Kronborg_i_sol,_16_sek_.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/028_Kronborg_i_sol%2C_16_sek_.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Helsingborgs Stad / Stefan Siwersson",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 16.56,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "source_sha1": "5a0df94f5241cdc32d9b38ffff9c3ab0cdd2890f",
+      "source_size_bytes": 10567577,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "downloadable": false,
+      "commons_categories": [
+        "Category:Aerial photographs of Sweden approved by the Swedish Defence Forces - self reviewed",
+        "Category:CC-BY-3.0",
+        "Category:Drone videos from Denmark",
+        "Category:Media from Helsingborgs stad",
+        "Category:Media from YouTube",
+        "Category:Video display resolution 1920 x 1080",
+        "Category:Videos of Kronborg",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:Drone videos from Denmark"
+      ],
+      "discovery_paths": [
+        [
+          "Category:Aerial videos from Denmark",
+          "Category:Drone videos from Denmark"
+        ],
+        [
+          "Category:Drone videos from Denmark"
+        ]
+      ],
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "downloadability_checked": false,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "duration_threshold_pass": false,
+        "minimum_duration_seconds": 120.0,
+        "eligible_for_preflight": false,
+        "failed_requirements": [
+          "downloadability_checked",
+          "duration_threshold_pass"
+        ]
+      }
+    },
+    {
+      "id": "wikimedia-005-seals-observed-in-their-natural-environment-at-rauisandur-in-e8238c0745",
+      "canonical_title": "File:005 Seals observed in their natural environment at Rauðisandur in Iceland with a drone Video by Giles Laurent.webm",
+      "title": "005 Seals observed in their natural environment at Rauðisandur in Iceland with a drone Video by Giles Laurent",
+      "provider": "Wikimedia Commons",
+      "regions": [
+        "iceland"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:005_Seals_observed_in_their_natural_environment_at_Rau%C3%B0isandur_in_Iceland_with_a_drone_Video_by_Giles_Laurent.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/005_Seals_observed_in_their_natural_environment_at_Rau%C3%B0isandur_in_Iceland_with_a_drone_Video_by_Giles_Laurent.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Giles Laurent",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 29.981,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "873a6a749338d999d76da8e428186f9b62352708",
+      "source_size_bytes": 39471398,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "downloadable": false,
+      "commons_categories": [
+        "Category:Awarded pictures by Giles Laurent",
+        "Category:CC-BY-SA-4.0",
+        "Category:Drone videos from Iceland",
+        "Category:Drone videos of nature",
+        "Category:Featured media",
+        "Category:Featured media by Giles Laurent",
+        "Category:Featured media of drone videos",
+        "Category:Featured media uploaded by Giles Laurent",
+        "Category:Files with coordinates missing SDC location of creation",
+        "Category:Images from Wiki Science Competition 2023 in the rest of the world",
+        "Category:Language-neutral videos",
+        "Category:Media of the day",
+        "Category:National finalists for the Non-photographic media category from Wiki Science Competition 2023",
+        "Category:Non-photographic media from Wiki Science Competition 2023",
+        "Category:Pinnipedia in Iceland",
+        "Category:Rauðisandur",
+        "Category:Self-published work",
+        "Category:Uploaded via Campaign:wsc-int",
+        "Category:Videos by Giles Laurent",
+        "Category:Videos of 2023 from Iceland",
+        "Category:Videos of Phocidae",
+        "Category:Videos taken on 2023-08-05",
+        "Category:Videos without audio"
+      ],
+      "discovered_categories": [
+        "Category:Drone videos from Iceland"
+      ],
+      "discovery_paths": [
+        [
+          "Category:Drone videos from Iceland"
+        ]
+      ],
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "downloadability_checked": false,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "duration_threshold_pass": false,
+        "minimum_duration_seconds": 120.0,
+        "eligible_for_preflight": false,
+        "failed_requirements": [
+          "downloadability_checked",
+          "duration_threshold_pass"
+        ]
+      }
+    },
+    {
+      "id": "wikimedia-007-volcano-eruption-of-litli-hrutur-in-iceland-in-2023-video-by-cf271a79a2",
+      "canonical_title": "File:007 Volcano eruption of Litli-Hrútur in Iceland in 2023 Video by Giles Laurent.webm",
+      "title": "007 Volcano eruption of Litli-Hrútur in Iceland in 2023 Video by Giles Laurent",
+      "provider": "Wikimedia Commons",
+      "regions": [
+        "iceland"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:007_Volcano_eruption_of_Litli-Hr%C3%BAtur_in_Iceland_in_2023_Video_by_Giles_Laurent.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/5/53/007_Volcano_eruption_of_Litli-Hr%C3%BAtur_in_Iceland_in_2023_Video_by_Giles_Laurent.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Giles Laurent",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 23.837,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "d3372d1bae4cfde73e4f94c478b25b8149d74bcc",
+      "source_size_bytes": 54151912,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "downloadable": false,
+      "commons_categories": [
+        "Category:2023 Fagradalsfjall eruption",
+        "Category:Active lava lakes in 2023",
+        "Category:Aerial videos of volcanic eruptions in Iceland",
+        "Category:Awarded pictures by Giles Laurent",
+        "Category:CC-BY-SA-4.0",
+        "Category:Convecting lava lakes",
+        "Category:Drone videos from Iceland",
+        "Category:Drone videos of volcanoes",
+        "Category:Featured media",
+        "Category:Featured media by Giles Laurent",
+        "Category:Featured media of drone videos",
+        "Category:Featured media uploaded by Giles Laurent",
+        "Category:Featured pictures on Wikipedia, English",
+        "Category:Files with Assessments template missing SDC Commons no value quality assessment",
+        "Category:Files with coordinates missing SDC location of creation",
+        "Category:Images from Wiki Science Competition 2023 in the rest of the world",
+        "Category:Language-neutral videos",
+        "Category:Lava dome fountains",
+        "Category:Lava fountains in 2023",
+        "Category:Media of the day",
+        "Category:National finalists for the Non-photographic media category from Wiki Science Competition 2023",
+        "Category:Non-photographic media from Wiki Science Competition 2023",
+        "Category:Self-published work",
+        "Category:Uploaded via Campaign:wsc-int",
+        "Category:Videos by Giles Laurent",
+        "Category:Videos of 2023",
+        "Category:Videos of volcanic eruptions"
+      ],
+      "discovered_categories": [
+        "Category:Drone videos from Iceland"
+      ],
+      "discovery_paths": [
+        [
+          "Category:Drone videos from Iceland"
+        ]
+      ],
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "downloadability_checked": false,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "duration_threshold_pass": false,
+        "minimum_duration_seconds": 120.0,
+        "eligible_for_preflight": false,
+        "failed_requirements": [
+          "downloadability_checked",
+          "duration_threshold_pass"
+        ]
+      }
+    },
+    {
+      "id": "wikimedia-the-destroyer-in-gothenburg-10c008c4fb",
+      "canonical_title": "File:\"The Destroyer\" in Gothenburg.webm",
+      "title": "\"The Destroyer\" in Gothenburg",
+      "provider": "Wikimedia Commons",
+      "regions": [
+        "sweden"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:%22The_Destroyer%22_in_Gothenburg.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/%22The_Destroyer%22_in_Gothenburg.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Swedrone",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 151.965,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "b05afd8dc11977bd42d704f24b25c0296e357ae0",
+      "source_size_bytes": 677541013,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "downloadable": true,
+      "commons_categories": [
+        "Category:CC-BY-3.0",
+        "Category:Drone videos from Sweden",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Uploaded with video2commons",
+        "Category:Videos featuring unidentified music",
+        "Category:Videos from Göteborg",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2017",
+        "Category:Videos of watercraft",
+        "Category:Videos uploaded by Eatcha",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:Drone videos from Sweden"
+      ],
+      "discovery_paths": [
+        [
+          "Category:Drone videos from Sweden"
+        ]
+      ],
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "downloadability_checked": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "duration_threshold_pass": true,
+        "minimum_duration_seconds": 120.0,
+        "eligible_for_preflight": true,
+        "failed_requirements": []
+      }
+    }
   ],
   "discovery_failures": [],
-  "metadata_failures": []
+  "metadata_failures": [
+    {
+      "canonical_title": "File:029 Kronborg, 15 sek.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "denmark"
+      ]
+    },
+    {
+      "canonical_title": "File:Aappilattoq, South Greenland.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "denmark",
+        "greenland"
+      ]
+    },
+    {
+      "canonical_title": "File:Aerial imagery of Sommarøy and surrounding islands, Norway.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Aerial imagery of Sommarøy, Sommarøy Bridge and surrounding islands, Norway.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Aerial imagery of fjords and rivers in Arctic Norway.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Akureyri - Capital of the north Iceland - city drone flight.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "iceland"
+      ]
+    },
+    {
+      "canonical_title": "File:Basmo festning.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Bingen lenser.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Bro på Leirsjøvegen over Leirelva.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Daniel Herskedal – The Hunting Golden Eagle – Nature drone cinematography of snowy landscapes in Norway.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Daniel Herskedal – Time of Water –– Nature cinematography of Svahken Sijte (Svahken reindeer district), Femunden National Park, Norway.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Diving Vøringsfossen waterfall by drone.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Drohnenflug über den Brúarfoss.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "iceland"
+      ]
+    },
+    {
+      "canonical_title": "File:Drone Footage of People Climbing Ice Formation.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Drone seasonal time-lapse video from Norway.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Drone tour around the bay in Stockholm LONG!.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "sweden"
+      ]
+    },
+    {
+      "canonical_title": "File:Drone video of skiing at Haugastøl, Norway.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Eldgos 29 maí 2024.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "iceland"
+      ]
+    },
+    {
+      "canonical_title": "File:Eruption of Fagradalsfjall volcano, 2021-03-24, 2.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "iceland"
+      ]
+    },
+    {
+      "canonical_title": "File:Evening drone footage of Gothenburg harbour.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "sweden"
+      ]
+    },
+    {
+      "canonical_title": "File:Faroe-ferry.ogv",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "faroe-islands"
+      ]
+    },
+    {
+      "canonical_title": "File:Forest in Finland as viewed from FPV drone.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Fornebu 2018-06-07.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Gothenburg downtown dronefly.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "sweden"
+      ]
+    },
+    {
+      "canonical_title": "File:Høgaas batteri.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Iceland-overview-video.ogv",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "iceland"
+      ]
+    },
+    {
+      "canonical_title": "File:Inflygning till Kiruna Station.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "sweden"
+      ]
+    },
+    {
+      "canonical_title": "File:Inflygning till Kiruna station.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "sweden"
+      ]
+    },
+    {
+      "canonical_title": "File:Interchange 8 Pohjantie Oulu 20260307.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Kiikkusaari Oulu 20250714.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Leevi Madetojan katu Oulu 20250216.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Linnanmaa University of Oulu 20260118.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Lysøen.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Merijalinranta Oulu 20250405.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Merikoski Fountains Oulu 20250708.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Mustasalmi Oulu 20250427.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Nes kirkeruiner.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Neteland - Steinsdalsfossen - Grova 12 mai 2018.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Oksval Nesodden (2018-05-26) (no audio).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Oksval Nesodden (2018-05-26).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:One Year. One Tree. One Drone.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Oslo fra Hovedøya.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Pohjantie Oulu 20250715.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Røros mai 2018.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Stockholm Aerial.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "sweden"
+      ]
+    },
+    {
+      "canonical_title": "File:Stockholm epic morning drone flight.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "sweden"
+      ]
+    },
+    {
+      "canonical_title": "File:Summit Camp Greenland, aerial video.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "denmark",
+        "greenland"
+      ]
+    },
+    {
+      "canonical_title": "File:Swiss Camp (Greenland), aerial video.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "denmark",
+        "greenland"
+      ]
+    },
+    {
+      "canonical_title": "File:Söder Stockholm drone patrol.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "sweden"
+      ]
+    },
+    {
+      "canonical_title": "File:Taking off from CPH.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "denmark"
+      ]
+    },
+    {
+      "canonical_title": "File:Tasiusaq - Settlements of South Greenland.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "denmark",
+        "greenland"
+      ]
+    },
+    {
+      "canonical_title": "File:Toppilansalmi Oulu 20250304.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "finland"
+      ]
+    },
+    {
+      "canonical_title": "File:Troldhaugen.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:WIKIMANIA 2021 - OSLO (bid2).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "norway"
+      ]
+    },
+    {
+      "canonical_title": "File:Wulkan Volcano Iceland Islandia Geldingadalir Geldingadalur Fagradalsfjall Eruption 2021 Drone.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests",
+      "regions": [
+        "iceland"
+      ]
+    }
+  ],
+  "generated_at": "2026-08-20T23:31:32.424227Z"
 }

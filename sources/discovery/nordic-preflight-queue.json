@@ -1,5 +1,80 @@
 {
   "schema_version": 1,
   "source_pool": "sources/discovery/nordic-wikimedia.json",
-  "candidates": []
+  "candidates": [
+    {
+      "id": "wikimedia-the-destroyer-in-gothenburg-10c008c4fb",
+      "canonical_title": "File:\"The Destroyer\" in Gothenburg.webm",
+      "title": "\"The Destroyer\" in Gothenburg",
+      "provider": "Wikimedia Commons",
+      "regions": [
+        "sweden"
+      ],
+      "source_page": "https://commons.wikimedia.org/wiki/File:%22The_Destroyer%22_in_Gothenburg.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/c7/%22The_Destroyer%22_in_Gothenburg.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Swedrone",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 151.965,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "b05afd8dc11977bd42d704f24b25c0296e357ae0",
+      "source_size_bytes": 677541013,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "downloadable": true,
+      "commons_categories": [
+        "Category:CC-BY-3.0",
+        "Category:Drone videos from Sweden",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Uploaded with video2commons",
+        "Category:Videos featuring unidentified music",
+        "Category:Videos from Göteborg",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2017",
+        "Category:Videos of watercraft",
+        "Category:Videos uploaded by Eatcha",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:Drone videos from Sweden"
+      ],
+      "discovery_paths": [
+        [
+          "Category:Drone videos from Sweden"
+        ]
+      ],
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "downloadability_checked": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "duration_threshold_pass": true,
+        "minimum_duration_seconds": 120.0,
+        "eligible_for_preflight": true,
+        "failed_requirements": []
+      }
+    }
+  ]
 }
