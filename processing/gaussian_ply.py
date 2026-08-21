@@ -118,6 +118,59 @@ def _infer_sh_degree(names: set[str]) -> int | None:
     return root - 1
 
 
+def _quantiles(values: np.ndarray) -> dict:
+    p50, p95, p99 = np.quantile(values, [0.50, 0.95, 0.99])
+    return {
+        "p50": float(p50),
+        "p95": float(p95),
+        "p99": float(p99),
+        "max": float(np.max(values)),
+    }
+
+
+def _gaussian_metrics_from_vertices(vertices: np.ndarray) -> dict | None:
+    names = set(vertices.dtype.names or ())
+    required = {"opacity", "scale_0", "scale_1", "scale_2"}
+    if not required.issubset(names):
+        return None
+
+    opacity_logits = np.asarray(vertices["opacity"], dtype=np.float64)
+    if not np.all(np.isfinite(opacity_logits)):
+        raise ValueError("PLY opacity contains non-finite values")
+    opacity = np.empty_like(opacity_logits)
+    positive = opacity_logits >= 0
+    opacity[positive] = 1.0 / (1.0 + np.exp(-opacity_logits[positive]))
+    exp_logits = np.exp(opacity_logits[~positive])
+    opacity[~positive] = exp_logits / (1.0 + exp_logits)
+
+    log_scales = np.column_stack(
+        [
+            np.asarray(vertices["scale_0"], dtype=np.float64),
+            np.asarray(vertices["scale_1"], dtype=np.float64),
+            np.asarray(vertices["scale_2"], dtype=np.float64),
+        ]
+    )
+    if not np.all(np.isfinite(log_scales)):
+        raise ValueError("PLY scales contain non-finite values")
+    log_ratio = np.max(log_scales, axis=1) - np.min(log_scales, axis=1)
+    ratio = np.exp(np.minimum(log_ratio, math.log(np.finfo(np.float64).max)))
+
+    low_opacity = opacity < 0.1
+    spiky = ratio > 10.0
+    return {
+        "opacity": {
+            "quantiles": _quantiles(opacity),
+            "below_0_1_count": int(np.count_nonzero(low_opacity)),
+            "below_0_1_ratio": float(np.mean(low_opacity)),
+        },
+        "scale_anisotropy_ratio": {
+            "quantiles": _quantiles(ratio),
+            "above_10_count": int(np.count_nonzero(spiky)),
+            "above_10_ratio": float(np.mean(spiky)),
+        },
+    }
+
+
 def gaussian_ply_inspection(path: str | Path) -> dict:
     """Inspect a Gaussian PLY without modifying it.
 
@@ -155,11 +208,13 @@ def gaussian_ply_inspection(path: str | Path) -> dict:
     minimum = np.min(xyz, axis=0)
     maximum = np.max(xyz, axis=0)
     centroid = np.mean(xyz, axis=0)
+    extent = maximum - minimum
 
     rotation_fields = [f"rot_{index}" for index in range(4)]
     scale_fields = [f"scale_{index}" for index in range(3)]
     dc_fields = sorted(name for name in names if name.startswith("f_dc_"))
     rest_fields = sorted(name for name in names if name.startswith("f_rest_"))
+    gaussian_metrics = _gaussian_metrics_from_vertices(vertices)
 
     return {
         "schema_version": 1,
@@ -175,6 +230,7 @@ def gaussian_ply_inspection(path: str | Path) -> dict:
             "bbox_min": [float(value) for value in minimum],
             "bbox_max": [float(value) for value in maximum],
             "centroid": [float(value) for value in centroid],
+            "extent": [float(value) for value in extent],
         },
         "gaussian_fields": {
             "opacity": "opacity" in names,
@@ -184,6 +240,7 @@ def gaussian_ply_inspection(path: str | Path) -> dict:
             "rest_field_count": len(rest_fields),
             "inferred_sh_degree": _infer_sh_degree(names),
         },
+        "gaussian_metrics": gaussian_metrics,
         "finite_values": True,
     }
 
@@ -217,59 +274,19 @@ def gaussian_ply_metrics(path: str | Path) -> dict:
     Unsupported PLY layouts fail closed instead of producing guessed metrics.
     """
     ply, vertices = _read_vertices(path)
-    required = {"opacity", "scale_0", "scale_1", "scale_2"}
-    missing = required - set(vertices.dtype.names or ())
-    if missing:
+    metrics = _gaussian_metrics_from_vertices(vertices)
+    if metrics is None:
+        required = {"opacity", "scale_0", "scale_1", "scale_2"}
+        missing = required - set(vertices.dtype.names or ())
         raise ValueError(f"PLY is missing Gaussian properties: {sorted(missing)}")
 
-    opacity_logits = np.asarray(vertices["opacity"], dtype=np.float64)
-    if not np.all(np.isfinite(opacity_logits)):
-        raise ValueError("PLY opacity contains non-finite values")
-    opacity = np.empty_like(opacity_logits)
-    positive = opacity_logits >= 0
-    opacity[positive] = 1.0 / (1.0 + np.exp(-opacity_logits[positive]))
-    exp_logits = np.exp(opacity_logits[~positive])
-    opacity[~positive] = exp_logits / (1.0 + exp_logits)
-
-    log_scales = np.column_stack(
-        [
-            np.asarray(vertices["scale_0"], dtype=np.float64),
-            np.asarray(vertices["scale_1"], dtype=np.float64),
-            np.asarray(vertices["scale_2"], dtype=np.float64),
-        ]
-    )
-    if not np.all(np.isfinite(log_scales)):
-        raise ValueError("PLY scales contain non-finite values")
-    log_ratio = np.max(log_scales, axis=1) - np.min(log_scales, axis=1)
-    ratio = np.exp(np.minimum(log_ratio, math.log(np.finfo(np.float64).max)))
-
-    def quantiles(values: np.ndarray) -> dict:
-        p50, p95, p99 = np.quantile(values, [0.50, 0.95, 0.99])
-        return {
-            "p50": float(p50),
-            "p95": float(p95),
-            "p99": float(p99),
-            "max": float(np.max(values)),
-        }
-
-    low_opacity = opacity < 0.1
-    spiky = ratio > 10.0
     return {
         "schema_version": 1,
         "path": str(ply),
         "size_bytes": ply.stat().st_size,
         "sha256": sha256_file(ply),
         "primitive_count": int(len(vertices)),
-        "opacity": {
-            "quantiles": quantiles(opacity),
-            "below_0_1_count": int(np.count_nonzero(low_opacity)),
-            "below_0_1_ratio": float(np.mean(low_opacity)),
-        },
-        "scale_anisotropy_ratio": {
-            "quantiles": quantiles(ratio),
-            "above_10_count": int(np.count_nonzero(spiky)),
-            "above_10_ratio": float(np.mean(spiky)),
-        },
+        **metrics,
     }
 
 
