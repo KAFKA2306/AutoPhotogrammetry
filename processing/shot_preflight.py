@@ -32,7 +32,7 @@ def shot_intervals(
     )
     boundaries = [0.0, *cuts, float(duration_seconds)]
     shots: list[dict[str, float | int | str]] = []
-    for start, end in zip(boundaries, boundaries[1:], strict=True):
+    for start, end in zip(boundaries, boundaries[1:]):
         duration = end - start
         if duration + 1e-9 < minimum_seconds:
             continue
@@ -389,10 +389,13 @@ def measure_shot_geometry(
                 }
             )
     valid_pairs = [row for row in pairs if row["geometry_valid"]]
+    pair_count = len(pairs)
+    geometry_pair_count = len(valid_pairs)
     return {
         "frame_count": len(paths),
-        "pair_count": len(pairs),
-        "geometry_pair_count": len(valid_pairs),
+        "pair_count": pair_count,
+        "geometry_pair_count": geometry_pair_count,
+        "geometry_pair_support_ratio": 0.0 if pair_count == 0 else geometry_pair_count / pair_count,
         "feature_overlap_ratio_median": _median_present(pairs, "feature_overlap_ratio"),
         "parallax_diagonal_ratio_median": _median_present(pairs, "parallax_diagonal_ratio"),
         "essential_inlier_ratio_median": _median_present(valid_pairs, "essential_inlier_ratio"),
@@ -418,26 +421,31 @@ def measure_shot_geometry(
 
 
 def select_shot(shots: Sequence[Mapping[str, Any]]) -> str | None:
-    """Select one measured shot lexicographically from geometry evidence, never metadata score."""
+    """Select one measured shot lexicographically from normalized geometry evidence."""
     eligible = [
         shot
         for shot in shots
         if isinstance(shot.get("geometry"), Mapping)
         and int(shot["geometry"].get("geometry_pair_count") or 0) > 0
+        and int(shot["geometry"].get("pair_count") or 0) > 0
     ]
     if not eligible:
         return None
 
     def evidence_key(shot: Mapping[str, Any]) -> tuple[Any, ...]:
         geometry = shot["geometry"]
+        pair_count = int(geometry.get("pair_count") or 0)
+        geometry_pair_count = int(geometry.get("geometry_pair_count") or 0)
+        support = geometry_pair_count / pair_count
         essential = geometry.get("essential_inlier_ratio_median")
         triangulation = geometry.get("triangulation_angle_degrees_median")
         overlap = geometry.get("feature_overlap_ratio_median")
         return (
-            -int(geometry.get("geometry_pair_count") or 0),
+            -support,
             -float(essential or 0.0),
             -float(triangulation or 0.0),
             -float(overlap or 0.0),
+            -geometry_pair_count,
             -float(shot.get("duration_seconds") or 0.0),
             str(shot["id"]),
         )
