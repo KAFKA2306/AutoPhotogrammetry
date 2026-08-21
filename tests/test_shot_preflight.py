@@ -45,13 +45,14 @@ class ShotPreflightTests(unittest.TestCase):
         self.assertGreater(pose["triangulation_angle_degrees"], 0.0)
         self.assertAlmostEqual(np.linalg.norm(pose["translation_direction"]), 1.0, places=6)
 
-    def test_selection_uses_measured_geometry_without_score_or_rank(self):
+    def test_selection_uses_normalized_geometry_support_without_score_or_rank(self):
         shots = [
             {
                 "id": "shot-0000",
-                "duration_seconds": 100.0,
+                "duration_seconds": 20.0,
                 "geometry": {
-                    "geometry_pair_count": 2,
+                    "pair_count": 10,
+                    "geometry_pair_count": 8,
                     "essential_inlier_ratio_median": 0.7,
                     "triangulation_angle_degrees_median": 2.0,
                     "feature_overlap_ratio_median": 0.5,
@@ -59,17 +60,45 @@ class ShotPreflightTests(unittest.TestCase):
             },
             {
                 "id": "shot-0001",
-                "duration_seconds": 20.0,
+                "duration_seconds": 100.0,
                 "geometry": {
-                    "geometry_pair_count": 8,
-                    "essential_inlier_ratio_median": 0.6,
-                    "triangulation_angle_degrees_median": 1.5,
-                    "feature_overlap_ratio_median": 0.4,
+                    "pair_count": 40,
+                    "geometry_pair_count": 20,
+                    "essential_inlier_ratio_median": 0.8,
+                    "triangulation_angle_degrees_median": 3.0,
+                    "feature_overlap_ratio_median": 0.6,
                 },
             },
         ]
-        self.assertEqual(select_shot(shots), "shot-0001")
+        self.assertEqual(select_shot(shots), "shot-0000")
         self.assertFalse(any("score" in shot or "rank" in shot for shot in shots))
+
+    def test_selection_uses_geometry_quality_after_equal_normalized_support(self):
+        shots = [
+            {
+                "id": "shot-0000",
+                "duration_seconds": 15.0,
+                "geometry": {
+                    "pair_count": 10,
+                    "geometry_pair_count": 8,
+                    "essential_inlier_ratio_median": 0.85,
+                    "triangulation_angle_degrees_median": 2.5,
+                    "feature_overlap_ratio_median": 0.55,
+                },
+            },
+            {
+                "id": "shot-0001",
+                "duration_seconds": 60.0,
+                "geometry": {
+                    "pair_count": 20,
+                    "geometry_pair_count": 16,
+                    "essential_inlier_ratio_median": 0.65,
+                    "triangulation_angle_degrees_median": 1.5,
+                    "feature_overlap_ratio_median": 0.45,
+                },
+            },
+        ]
+        self.assertEqual(select_shot(shots), "shot-0000")
 
     def test_selection_fails_closed_without_valid_geometry(self):
         self.assertIsNone(
@@ -78,7 +107,7 @@ class ShotPreflightTests(unittest.TestCase):
                     {
                         "id": "shot-0000",
                         "duration_seconds": 300.0,
-                        "geometry": {"geometry_pair_count": 0},
+                        "geometry": {"pair_count": 10, "geometry_pair_count": 0},
                     }
                 ]
             )
