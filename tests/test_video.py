@@ -33,6 +33,40 @@ class VideoTests(unittest.TestCase):
             ],
         )
 
+    def test_extract_command_can_bound_one_continuous_shot(self):
+        self.assertEqual(
+            extract_frames_command(
+                "source.webm",
+                "shot",
+                fps=2,
+                width=640,
+                start_seconds=12.5,
+                duration_seconds=30,
+            ),
+            [
+                "ffmpeg",
+                "-hide_banner",
+                "-y",
+                "-ss",
+                "12.5",
+                "-i",
+                "source.webm",
+                "-t",
+                "30",
+                "-vf",
+                "fps=2,scale=640:-2",
+                "-q:v",
+                "2",
+                "shot/frame-%06d.jpg",
+            ],
+        )
+
+    def test_extract_command_rejects_invalid_time_bounds(self):
+        with self.assertRaises(ValueError):
+            extract_frames_command("a.webm", "frames", start_seconds=-1)
+        with self.assertRaises(ValueError):
+            extract_frames_command("a.webm", "frames", duration_seconds=0)
+
     def test_frame_timestamps_follow_sampling_rate(self):
         records = frame_timestamp_records(
             ["frame-000001.jpg", "frame-000002.jpg", "frame-000003.jpg"],
