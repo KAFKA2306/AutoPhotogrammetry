@@ -27,10 +27,6 @@ GPU用のCUDA / PyTorch / gsplat / Nerfstudio環境をbuild/pushする `GPU Imag
 
 Docker CLIまたはDocker daemonが利用できない場合、`./task doctor` / `./task run` / `./task run-all` / `./task quality` は明示的に停止します。このrepositoryのtaskはDocker Desktop、WSL、GPU driver、OS設定、Docker storageを修復・resetしません。host環境の修復はrepository実行とは分離してください。
 
-**2026-08-20時点でrepositoryから確認済みなのはworkflow定義・Dockerfile・runner・通常Test workflowのPASSまでです。GHCR上のtag publish成功や対象PCからのpull成功は、実GPU runのevidenceが残るまで確認済みとは扱いません。**
-
-Docker CLIまたはDocker daemonが利用できない場合、`./task doctor` / `./task run` / `./task run-all` / `./task quality` は明示的に停止します。このrepositoryのtaskはDocker Desktop、WSL、GPU driver、OS設定、Docker storageを修復・resetしません。host環境の修復はrepository実行とは分離してください。
-
 実行入口: [`task`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/task)  
 GPU環境: [`Dockerfile`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/Dockerfile)  
 E2E実装: [`processing/huejotzingo.py`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/processing/huejotzingo.py)
@@ -95,14 +91,18 @@ Zed設定は [`.zed/settings.json`](.zed/settings.json)、タスク定義は [`.
 ```text
 video
   -> SHA-256 verification
-  -> FFmpeg frame extraction
-  -> blur / duplicate filtering
-  -> COLMAP camera poses
+  -> scene-cut segmentation
+  -> continuous-shot selection
+  -> FFmpeg frame extraction / blur・duplicate filtering
+  -> shot-level overlap / parallax / pose preflight
+  -> COLMAP camera poses / sparse reconstruction
   -> Nerfstudio ns-process-data
-  -> Splatfacto training
+  -> Splatfacto training / hold-out evaluation
   -> Gaussian Splat PLY
   -> manifest
 ```
+
+Repository-sideのshot-level Stage B/C routingはPR #125で実装済みです。scene-cutから連続shotを作り、shotごとのpose-aware evidenceで選択してからCOLMAPへ渡します。これは実動画20件のStage B/C/Dが完走済みであることを意味しません。
 
 - [FFmpeg](https://ffmpeg.org/)
 - [COLMAP CLI](https://colmap.github.io/cli.html)
@@ -119,9 +119,10 @@ video
 
 ```text
 metadata
-  -> preflight
-     scene cuts / sharpness / overlap / camera translation
-     dynamic pixels / exposure variation
+  -> continuous shots
+  -> shot-level preflight
+     scene cuts / sharpness / overlap / pose-aware translation / parallax
+     dynamic pixels / exposure variation / triangulation evidence
   -> COLMAP
      registration / largest model / submodels / sparse points
      reprojection error / track length
