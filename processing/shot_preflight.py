@@ -32,7 +32,7 @@ def shot_intervals(
     )
     boundaries = [0.0, *cuts, float(duration_seconds)]
     shots: list[dict[str, float | int | str]] = []
-    for start, end in zip(boundaries, boundaries[1:]):
+    for start, end in zip(boundaries, boundaries[1:], strict=False):
         duration = end - start
         if duration + 1e-9 < minimum_seconds:
             continue
