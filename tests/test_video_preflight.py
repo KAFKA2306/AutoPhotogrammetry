@@ -97,12 +97,27 @@ class VideoPreflightTests(unittest.TestCase):
                     "dynamic_pixel_ratio": 0.1,
                     "exposure_variation": 0.03,
                 },
+                "shot_evidence": {
+                    "selected_shot_id": "shot-0002",
+                    "selected_start_seconds": 10.0,
+                    "selected_end_seconds": 40.0,
+                    "selected_duration_seconds": 30.0,
+                    "selection_basis": ["geometry_pair_count desc"],
+                    "shots": [
+                        {
+                            "id": "shot-0002",
+                            "start_seconds": 10.0,
+                            "end_seconds": 40.0,
+                        }
+                    ],
+                },
             }
             updated = apply_preflight_to_registry(registry, "scene", result)
 
         source = updated["videos"][0]
         self.assertEqual(source["evaluation_stage"], "preflight")
         self.assertEqual(source["measurements"]["preflight"], result["metrics"])
+        self.assertEqual(source["preflight_evidence"]["selected_shot_id"], "shot-0002")
         self.assertFalse({"rank", "score", "expected_success"}.intersection(source))
 
     def test_registry_update_requires_completed_metadata_gate(self):

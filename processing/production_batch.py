@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 import json
 
-from processing.batch import run_all_videos
 from processing.exhibition_manifest import build_final_exhibition_manifest
+from processing.shot_batch import run_all_shot_videos
 
 
 def run_production_batch(
@@ -16,8 +16,8 @@ def run_production_batch(
     timeout: float | None = None,
     fresh: bool = False,
 ) -> dict:
-    """Run the full registry and finalize the downstream handoff only at exact 20/20 success."""
-    batch = run_all_videos(
+    """Run the full registry from selected continuous shots and finalize only at exact 20/20."""
+    batch = run_all_shot_videos(
         registry_path=registry_path,
         input_root=input_root,
         output_root=output_root,
@@ -63,7 +63,8 @@ def run_production_batch(
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Run all registered production videos and emit the final exactly-20 exhibition manifest."
+            "Run all registered production videos from measured continuous shots and emit the "
+            "final exactly-20 exhibition manifest."
         )
     )
     parser.add_argument("--registry", default="sources/videos.json")

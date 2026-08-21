@@ -8,6 +8,7 @@ import tempfile
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from statistics import median
+from typing import Any
 
 import numpy as np
 from PIL import Image
@@ -17,7 +18,12 @@ from skimage.metrics import structural_similarity
 from skimage.registration import phase_cross_correlation
 
 from processing.provenance import sha256_file, write_json
-from processing.video import extract_frames_command, probe_video
+from processing.shot_preflight import (
+    measure_shot_geometry,
+    select_shot,
+    shot_intervals,
+)
+from processing.video import extract_frames_command, probe_video, scene_cut_times
 from processing.video_sources import EVALUATION_STAGES, load_video_registry
 
 PREFLIGHT_FIELDS = (
@@ -85,7 +91,7 @@ def measure_frames(
     sharpness_threshold: float = 0.0015,
     dynamic_threshold: float = 0.12,
 ) -> dict:
-    """Measure video-only suitability from a fixed ordered frame sample without scoring it."""
+    """Measure legacy Stage-B screening metrics from one continuous ordered shot."""
     paths = [Path(path).expanduser().resolve() for path in frame_paths]
     if len(paths) < 2:
         raise ValueError("preflight requires at least two sampled frames")
@@ -152,16 +158,71 @@ def measure_frames(
     }
 
 
+def _extract_shot_frames(
+    source: Path,
+    directory: Path,
+    *,
+    sample_fps: float,
+    width: int,
+    start_seconds: float,
+    duration_seconds: float,
+) -> tuple[list[Path], list[str]]:
+    directory.mkdir(parents=True, exist_ok=True)
+    command = extract_frames_command(
+        source,
+        directory,
+        fps=sample_fps,
+        width=width,
+        start_seconds=start_seconds,
+        duration_seconds=duration_seconds,
+    )
+    completed = subprocess.run(
+        command,
+        shell=False,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        raise subprocess.CalledProcessError(
+            completed.returncode,
+            command,
+            output=completed.stdout,
+            stderr=completed.stderr,
+        )
+    return sorted(directory.glob("frame-*.jpg")), command
+
+
+def _compact_shot(shot: Mapping[str, Any]) -> dict[str, Any]:
+    geometry = dict(shot.get("geometry") or {})
+    geometry.pop("pairs", None)
+    return {
+        "id": shot["id"],
+        "index": shot["index"],
+        "start_seconds": shot["start_seconds"],
+        "end_seconds": shot["end_seconds"],
+        "duration_seconds": shot["duration_seconds"],
+        "frame_count": shot.get("frame_count", 0),
+        "metrics": shot.get("metrics"),
+        "geometry": geometry or None,
+        "error": shot.get("error"),
+    }
+
+
 def run_video_preflight(
     video: str | Path,
     output_path: str | Path,
     *,
-    sample_fps: float = 0.5,
+    sample_fps: float = 2.0,
     width: int = 640,
+    scene_threshold: float = 0.4,
+    minimum_shot_seconds: float = 2.0,
+    pair_strides: Sequence[int] = (1, 2, 4),
     scene_ssim_threshold: float = 0.35,
     sharpness_threshold: float = 0.0015,
     dynamic_threshold: float = 0.12,
 ) -> dict:
+    """Measure Stage B per continuous shot and select one shot from measured geometry evidence."""
     source = Path(video).expanduser().resolve()
     if not source.is_file():
         raise ValueError(f"video does not exist: {source}")
@@ -170,59 +231,137 @@ def run_video_preflight(
 
     destination = Path(output_path).expanduser().resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)
+    probe = probe_video(source)
+    duration_raw = (probe.get("format") or {}).get("duration")
+    if not isinstance(duration_raw, (str, int, float)):
+        raise ValueError("video probe did not provide a finite duration")
+    try:
+        duration_seconds = float(duration_raw)
+    except ValueError as exc:
+        raise ValueError("video probe did not provide a finite duration") from exc
+    if not math.isfinite(duration_seconds) or duration_seconds <= 0:
+        raise ValueError("video probe did not provide a finite duration")
+
+    cuts = scene_cut_times(source, threshold=scene_threshold)
+    intervals = shot_intervals(
+        duration_seconds,
+        cuts,
+        minimum_seconds=minimum_shot_seconds,
+    )
+    if not intervals:
+        raise RuntimeError("scene segmentation produced no usable shot interval")
+
+    measured_shots: list[dict[str, Any]] = []
+    commands: list[list[str]] = []
+    selected_frames: list[Path] = []
+    selected_measured: dict[str, Any] | None = None
     with tempfile.TemporaryDirectory(prefix="autophotogrammetry-preflight-") as tmp:
-        frames_dir = Path(tmp) / "frames"
-        frames_dir.mkdir(parents=True)
-        command = extract_frames_command(source, frames_dir, fps=sample_fps, width=width)
-        completed = subprocess.run(
-            command,
-            shell=False,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if completed.returncode != 0:
-            raise subprocess.CalledProcessError(
-                completed.returncode,
-                command,
-                output=completed.stdout,
-                stderr=completed.stderr,
-            )
-        frames = sorted(frames_dir.glob("frame-*.jpg"))
-        if len(frames) < 2:
-            raise RuntimeError("preflight extraction produced fewer than two frames")
-        measured = measure_frames(
-            frames,
-            scene_ssim_threshold=scene_ssim_threshold,
-            sharpness_threshold=sharpness_threshold,
-            dynamic_threshold=dynamic_threshold,
-        )
+        root = Path(tmp)
+        shot_frames: dict[str, list[Path]] = {}
+        for interval in intervals:
+            shot: dict[str, Any] = dict(interval)
+            shot_id = str(shot["id"])
+            try:
+                frames, command = _extract_shot_frames(
+                    source,
+                    root / shot_id,
+                    sample_fps=sample_fps,
+                    width=width,
+                    start_seconds=float(shot["start_seconds"]),
+                    duration_seconds=float(shot["duration_seconds"]),
+                )
+                commands.append(command)
+                if len(frames) < 2:
+                    raise RuntimeError("shot extraction produced fewer than two frames")
+                legacy = measure_frames(
+                    frames,
+                    scene_ssim_threshold=scene_ssim_threshold,
+                    sharpness_threshold=sharpness_threshold,
+                    dynamic_threshold=dynamic_threshold,
+                )
+                geometry = measure_shot_geometry(
+                    frames,
+                    sample_fps=sample_fps,
+                    strides=pair_strides,
+                )
+                shot.update(
+                    {
+                        "frame_count": len(frames),
+                        "metrics": legacy["metrics"],
+                        "diagnostics": legacy["diagnostics"],
+                        "legacy_method": legacy["method"],
+                        "geometry": geometry,
+                        "error": None,
+                    }
+                )
+                shot_frames[shot_id] = frames
+            except Exception as exc:
+                shot.update(
+                    {
+                        "frame_count": 0,
+                        "metrics": None,
+                        "geometry": None,
+                        "error": f"{type(exc).__name__}: {exc}",
+                    }
+                )
+            measured_shots.append(shot)
+
+        selected_shot_id = select_shot(measured_shots)
+        if selected_shot_id is None:
+            raise RuntimeError("no shot produced valid two-view geometry evidence")
+        selected_measured = next(shot for shot in measured_shots if shot["id"] == selected_shot_id)
+        selected_frames = shot_frames[selected_shot_id]
         frame_records = [
             {
                 "name": path.name,
                 "sha256": sha256_file(path),
                 "size_bytes": path.stat().st_size,
             }
-            for path in frames
+            for path in selected_frames
         ]
 
+    assert selected_measured is not None
     result = {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "success",
         "source": {
             "path": str(source),
             "sha256": sha256_file(source),
             "size_bytes": source.stat().st_size,
-            "probe": probe_video(source),
+            "probe": probe,
         },
         "sampling": {
             "fps": sample_fps,
             "width": width,
-            "command": command,
-            "frame_count": len(frame_records),
-            "frames": frame_records,
+            "pair_strides": list(pair_strides),
+            "pair_delta_seconds": [stride / sample_fps for stride in pair_strides],
+            "commands": commands,
+            "selected_frame_count": len(frame_records),
+            "selected_frames": frame_records,
         },
-        **measured,
+        "metrics": dict(selected_measured["metrics"]),
+        "diagnostics": dict(selected_measured["diagnostics"]),
+        "method": dict(selected_measured["legacy_method"]),
+        "shot_evidence": {
+            "scene_cut_threshold": scene_threshold,
+            "scene_cut_times_seconds": cuts,
+            "minimum_shot_seconds": minimum_shot_seconds,
+            "shot_count": len(measured_shots),
+            "selected_shot_id": selected_measured["id"],
+            "selected_start_seconds": selected_measured["start_seconds"],
+            "selected_end_seconds": selected_measured["end_seconds"],
+            "selected_duration_seconds": selected_measured["duration_seconds"],
+            "selection_basis": [
+                "geometry_pair_count desc",
+                "essential_inlier_ratio_median desc",
+                "triangulation_angle_degrees_median desc",
+                "feature_overlap_ratio_median desc",
+                "shot duration desc",
+                "shot id asc",
+            ],
+            "shots": [_compact_shot(shot) for shot in measured_shots],
+            "selected_geometry": selected_measured["geometry"],
+        },
     }
     write_json(destination, result)
     result["manifest_path"] = str(destination)
@@ -260,6 +399,16 @@ def apply_preflight_to_registry(
     _metadata_gate(source)
 
     source["measurements"]["preflight"] = dict(metrics)
+    shot_evidence = preflight_result.get("shot_evidence")
+    if isinstance(shot_evidence, Mapping):
+        source["preflight_evidence"] = {
+            "selected_shot_id": shot_evidence.get("selected_shot_id"),
+            "selected_start_seconds": shot_evidence.get("selected_start_seconds"),
+            "selected_end_seconds": shot_evidence.get("selected_end_seconds"),
+            "selected_duration_seconds": shot_evidence.get("selected_duration_seconds"),
+            "selection_basis": shot_evidence.get("selection_basis"),
+            "shots": shot_evidence.get("shots"),
+        }
     current_stage = source["evaluation_stage"]
     if EVALUATION_STAGES.index(current_stage) < EVALUATION_STAGES.index("preflight"):
         source["evaluation_stage"] = "preflight"
@@ -272,12 +421,17 @@ def apply_preflight_to_registry(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Measure CPU video preflight evidence for #23 without producing a heuristic reconstruction score."
+        description=(
+            "Measure shot-level CPU preflight evidence for #23 without producing a heuristic "
+            "reconstruction score."
+        )
     )
     parser.add_argument("--video", required=True)
     parser.add_argument("--output", required=True)
-    parser.add_argument("--sample-fps", type=float, default=0.5)
+    parser.add_argument("--sample-fps", type=float, default=2.0)
     parser.add_argument("--width", type=int, default=640)
+    parser.add_argument("--scene-threshold", type=float, default=0.4)
+    parser.add_argument("--minimum-shot-seconds", type=float, default=2.0)
     parser.add_argument("--scene-ssim-threshold", type=float, default=0.35)
     parser.add_argument("--sharpness-threshold", type=float, default=0.0015)
     parser.add_argument("--dynamic-threshold", type=float, default=0.12)
@@ -291,6 +445,8 @@ def main() -> None:
         args.output,
         sample_fps=args.sample_fps,
         width=args.width,
+        scene_threshold=args.scene_threshold,
+        minimum_shot_seconds=args.minimum_shot_seconds,
         scene_ssim_threshold=args.scene_ssim_threshold,
         sharpness_threshold=args.sharpness_threshold,
         dynamic_threshold=args.dynamic_threshold,
