@@ -64,28 +64,38 @@ def extract_frames_command(
     *,
     fps: float = 3.0,
     width: int | None = None,
+    start_seconds: float | None = None,
+    duration_seconds: float | None = None,
     ffmpeg: str = "ffmpeg",
 ) -> list[str]:
     if fps <= 0:
         raise ValueError("fps must be positive")
     if width is not None and width <= 0:
         raise ValueError("width must be positive")
+    if start_seconds is not None and start_seconds < 0:
+        raise ValueError("start_seconds must be non-negative")
+    if duration_seconds is not None and duration_seconds <= 0:
+        raise ValueError("duration_seconds must be positive")
     filters = [f"fps={fps:g}"]
     if width is not None:
         filters.append(f"scale={width}:-2")
     output = Path(output_dir)
-    return [
-        ffmpeg,
-        "-hide_banner",
-        "-y",
-        "-i",
-        str(Path(video_path)),
-        "-vf",
-        ",".join(filters),
-        "-q:v",
-        "2",
-        str(output / "frame-%06d.jpg"),
-    ]
+    command = [ffmpeg, "-hide_banner", "-y"]
+    if start_seconds is not None:
+        command.extend(("-ss", f"{start_seconds:g}"))
+    command.extend(("-i", str(Path(video_path))))
+    if duration_seconds is not None:
+        command.extend(("-t", f"{duration_seconds:g}"))
+    command.extend(
+        (
+            "-vf",
+            ",".join(filters),
+            "-q:v",
+            "2",
+            str(output / "frame-%06d.jpg"),
+        )
+    )
+    return command
 
 
 def frame_timestamp_records(
