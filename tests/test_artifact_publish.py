@@ -210,7 +210,9 @@ class ArtifactPublishTest(unittest.TestCase):
             body = json.loads(manifest.read_text(encoding="utf-8"))
             body.pop("source_revision")
             manifest.write_text(json.dumps(body), encoding="utf-8")
-            with self.assertRaisesRegex(ArtifactPublishError, "must record generation-time source_revision"):
+            with self.assertRaisesRegex(
+                ArtifactPublishError, "must record generation-time source_revision"
+            ):
                 publish_run_splat(
                     manifest,
                     bucket="k4fka/artifacts",
