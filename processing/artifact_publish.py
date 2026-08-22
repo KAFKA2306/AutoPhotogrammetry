@@ -25,22 +25,13 @@ def _validate_revision(value: str, label: str) -> str:
     return revision
 
 
-def _recorded_revision(run_manifest: dict, explicit_revision: str | None) -> str:
+def _recorded_revision(run_manifest: dict) -> str:
     recorded = run_manifest.get("source_revision")
-    if recorded is not None:
-        revision = _validate_revision(str(recorded), "run manifest source_revision")
-        if explicit_revision is not None:
-            explicit = _validate_revision(explicit_revision, "explicit source_revision")
-            if explicit != revision:
-                raise ArtifactPublishError(
-                    "explicit source_revision does not match the generation-time revision recorded in the run manifest"
-                )
-        return revision
-    if explicit_revision is None:
+    if recorded is None:
         raise ArtifactPublishError(
-            "run manifest has no generation-time source_revision; provide --source-revision only for an audited legacy run"
+            "run manifest must record generation-time source_revision before artifact publish"
         )
-    return _validate_revision(explicit_revision, "explicit source_revision")
+    return _validate_revision(str(recorded), "run manifest source_revision")
 
 
 def _resolve_run_artifact_path(run_manifest_path: Path, raw_path: str) -> Path:
@@ -174,7 +165,6 @@ def publish_run_splat(
     *,
     bucket: str,
     hf_cache_hub_root: str | Path | None = None,
-    source_revision: str | None = None,
     runner: Callable[..., subprocess.CompletedProcess] = subprocess.run,
 ) -> dict:
     run_manifest_path = Path(run_manifest_path).expanduser().resolve()
@@ -211,8 +201,6 @@ def publish_run_splat(
     if orientation["ply_sha256"] != expected_sha:
         raise ArtifactPublishError("orientation evidence was generated for a different PLY SHA-256")
 
-    # Keep the artifact manifest portable: hashes are authoritative and local paths
-    # are reduced to sidecar file names inside the run directory.
     orientation_for_manifest = copy.deepcopy(orientation)
     orientation_for_manifest["evidence_path"] = orientation_path.name
     physical = orientation_for_manifest.get("physical_up", {})
@@ -220,7 +208,7 @@ def publish_run_splat(
         physical["evidence_path"] = Path(str(physical["evidence_path"])).name
     run_manifest["orientation"] = orientation_for_manifest
 
-    revision = _recorded_revision(run_manifest, source_revision)
+    revision = _recorded_revision(run_manifest)
     registry = run_manifest.get("registry", {})
     license_info = registry.get("license") or {}
     source_url = registry.get("source_page")

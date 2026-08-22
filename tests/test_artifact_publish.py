@@ -21,7 +21,6 @@ class ArtifactPublishTest(unittest.TestCase):
         self,
         root: Path,
         *,
-        include_revision: bool = True,
         container_path: bool = False,
         orientation_override: str | None = None,
         with_physical_up: bool = False,
@@ -51,6 +50,7 @@ class ArtifactPublishTest(unittest.TestCase):
             "dataset": "demo",
             "status": "success",
             "started_at": "2026-08-20T00:00:00Z",
+            "source_revision": REVISION,
             "registry": {
                 "source_page": "https://commons.wikimedia.org/wiki/File:Demo.webm",
                 "license": {"url": "https://creativecommons.org/publicdomain/zero/1.0/"},
@@ -65,8 +65,6 @@ class ArtifactPublishTest(unittest.TestCase):
                 "ply_size_bytes": len(payload),
             },
         }
-        if include_revision:
-            body["source_revision"] = REVISION
         if with_physical_up:
             physical_path = manifest.parent / "physical-up-evidence.json"
             physical_path.write_text(
@@ -205,36 +203,20 @@ class ArtifactPublishTest(unittest.TestCase):
             self.assertEqual(sha, result["sha256"])
             self.assertTrue(ply.exists())
 
-    def test_legacy_manifest_requires_explicit_audited_revision(self):
-        with tempfile.TemporaryDirectory() as d:
-            root = Path(d)
-            manifest, _, _, hf_root = self._fixture(root, include_revision=False)
-            with self.assertRaisesRegex(ArtifactPublishError, "audited legacy run"):
-                publish_run_splat(
-                    manifest,
-                    bucket="k4fka/artifacts",
-                    hf_cache_hub_root=hf_root,
-                    runner=self._successful_runner,
-                )
-            result = publish_run_splat(
-                manifest,
-                bucket="k4fka/artifacts",
-                hf_cache_hub_root=hf_root,
-                source_revision="b" * 40,
-                runner=self._successful_runner,
-            )
-            self.assertEqual("b" * 40, result["source_revision"])
-
-    def test_explicit_revision_cannot_override_recorded_revision(self):
+    def test_missing_generation_revision_fails(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             manifest, _, _, hf_root = self._fixture(root)
-            with self.assertRaisesRegex(ArtifactPublishError, "does not match"):
+            body = json.loads(manifest.read_text(encoding="utf-8"))
+            body.pop("source_revision")
+            manifest.write_text(json.dumps(body), encoding="utf-8")
+            with self.assertRaisesRegex(
+                ArtifactPublishError, "must record generation-time source_revision"
+            ):
                 publish_run_splat(
                     manifest,
                     bucket="k4fka/artifacts",
                     hf_cache_hub_root=hf_root,
-                    source_revision="b" * 40,
                     runner=self._successful_runner,
                 )
 
