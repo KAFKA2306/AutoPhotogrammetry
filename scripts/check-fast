@@ -9,3 +9,6 @@ uv run ruff check .
 uv run pyrefly check
 bash -n task
 uv run python -m py_compile main.py processing/*.py tests/*.py
+
+test ! -e Makefile
+test ! -e .vscode/tasks.json
