@@ -1,0 +1,104 @@
+name: Photogrammetry service inquiry
+description: Request a free input audit, paid one-object PoC, or batch/private deployment discussion.
+title: "[Photogrammetry inquiry] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this public form only for non-confidential qualification information.
+        Do not attach customer images, personal data, credentials, unpublished contract terms, or other confidential material. A private transfer method must be agreed before any customer image bytes are transferred.
+
+  - type: dropdown
+    id: engagement
+    attributes:
+      label: Engagement
+      description: Choose the smallest engagement that matches the current decision you need to make.
+      options:
+        - Free input-audit sample
+        - Paid one-object PoC
+        - Batch or private deployment discussion
+    validations:
+      required: true
+
+  - type: dropdown
+    id: organization_type
+    attributes:
+      label: Organization type
+      options:
+        - Museum, archive, or research collection
+        - EC, manufacturer, or product team
+        - 3D production or photogrammetry provider
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: asset_type
+    attributes:
+      label: Object or asset type
+      description: Describe the kind of physical object or collection, without confidential identifiers.
+      placeholder: e.g. ceramic artifact, furniture product, architectural detail
+    validations:
+      required: true
+
+  - type: input
+    id: object_count
+    attributes:
+      label: Approximate object count
+      placeholder: e.g. 1, 25, 100+
+    validations:
+      required: true
+
+  - type: input
+    id: image_count
+    attributes:
+      label: Approximate images per object
+      placeholder: e.g. 80-150
+    validations:
+      required: true
+
+  - type: dropdown
+    id: rights
+    attributes:
+      label: Rights to process the submitted images
+      description: Processing can proceed only when the customer controls the images or has a confirmed permission/license basis for the intended use.
+      options:
+        - Confirmed
+        - Needs review
+        - Not confirmed
+    validations:
+      required: true
+
+  - type: dropdown
+    id: intended_use
+    attributes:
+      label: Intended 3D use
+      options:
+        - Web or EC visualization
+        - Museum, archive, or research visualization
+        - Game, VR, or spatial experience
+        - Editing or downstream 3D production
+        - 3D printing
+        - Reconstruction-readiness decision only
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: decision
+    attributes:
+      label: Decision this engagement should support
+      description: State the concrete decision or deliverable you need from the audit or PoC. Do not include confidential information.
+      placeholder: e.g. Decide whether the current 120-image capture is ready for reconstruction or needs recapture.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: public_data_acknowledgement
+    attributes:
+      label: Public issue acknowledgement
+      options:
+        - label: I will not attach private customer images, personal data, credentials, or confidential information to this public issue.
+          required: true
+        - label: I understand that reconstruction quality is not guaranteed when registration, reprojection, geometry completeness, or texture quality have not been measured.
+          required: true
