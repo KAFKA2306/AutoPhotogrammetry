@@ -4,6 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG CUDA_ARCH_LIST=12.0
 ARG NERFSTUDIO_REVISION=50e0e3c70c775e89333256213363badbf074f29d
 ARG GSPLAT_REVISION=v1.4.0
+ARG OPEN3D_VERSION=0.19.0
 ARG AUTOPHOTOGRAMMETRY_REVISION
 ENV CUDA_HOME=/usr/local/cuda \
     TORCH_CUDA_ARCH_LIST=${CUDA_ARCH_LIST} \
@@ -45,6 +46,8 @@ RUN git init /opt/nerfstudio \
     && git -C /opt/nerfstudio checkout --detach FETCH_HEAD \
     && test "$(git -C /opt/nerfstudio rev-parse HEAD)" = "${NERFSTUDIO_REVISION}" \
     && python -m pip install --no-cache-dir /opt/nerfstudio
+
+RUN python -m pip install --no-cache-dir "open3d==${OPEN3D_VERSION}"
 
 COPY requirements.txt /tmp/requirements.txt
 RUN python -m pip install --no-cache-dir -r /tmp/requirements.txt \
