@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import importlib.metadata
 import json
 import resource
@@ -19,10 +20,9 @@ from processing.provenance import sha256_file, write_json
 
 def _open3d():
     try:
-        import open3d as o3d
+        return importlib.import_module("open3d")
     except ImportError as exc:
         raise RuntimeError("Open3D is required for PLY-only mesh reconstruction") from exc
-    return o3d
 
 
 def _point_cloud(path: str | Path):
