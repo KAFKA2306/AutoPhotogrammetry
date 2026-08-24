@@ -9,7 +9,11 @@ from pathlib import Path
 
 import numpy as np
 
-from processing.gaussian_ply import _read_vertices, gaussian_ply_inspection, validate_gaussian_ply_backend
+from processing.gaussian_ply import (
+    _read_vertices,
+    gaussian_ply_inspection,
+    validate_gaussian_ply_backend,
+)
 from processing.provenance import sha256_file, write_json
 
 
@@ -77,7 +81,9 @@ def reconstruct_mesh(
         if normal_max_nn <= 0:
             raise ValueError("normal_max_nn must be positive")
         cloud.estimate_normals(
-            search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=normal_radius, max_nn=normal_max_nn)
+            search_param=o3d.geometry.KDTreeSearchParamHybrid(
+                radius=normal_radius, max_nn=normal_max_nn
+            )
         )
         cloud.orient_normals_consistent_tangent_plane(min(normal_max_nn, len(cloud.points) - 1))
         parameters.update({"normal_radius": normal_radius, "normal_max_nn": normal_max_nn})
@@ -92,7 +98,9 @@ def reconstruct_mesh(
             if depth is None or depth <= 0:
                 raise ValueError("poisson depth must be positive")
             parameters["depth"] = depth
-            mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(cloud, depth=depth)
+            mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
+                cloud, depth=depth
+            )
             parameters["density_min"] = float(np.min(densities)) if len(densities) else None
     else:
         raise ValueError(f"unsupported mesh method: {method}")
@@ -100,7 +108,9 @@ def reconstruct_mesh(
     wall_seconds = time.perf_counter() - started
     stats = _mesh_stats(mesh)
     if max_faces is not None and stats["face_count"] > max_faces:
-        raise ValueError(f"surface reconstruction exceeded max_faces: {stats['face_count']} > {max_faces}")
+        raise ValueError(
+            f"surface reconstruction exceeded max_faces: {stats['face_count']} > {max_faces}"
+        )
 
     output = Path(output_ply).expanduser().resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -113,14 +123,29 @@ def reconstruct_mesh(
         "method": method,
         "parameters": parameters,
         "implementation": {"library": "Open3D", "version": importlib.metadata.version("open3d")},
-        "input": {"path": inspection["path"], "sha256": inspection["sha256"], "size_bytes": inspection["size_bytes"], "point_count": inspection["vertex_count"]},
-        "output": {"path": str(output), "sha256": sha256_file(output), "size_bytes": output.stat().st_size, **stats},
-        "runtime": {"wall_seconds": wall_seconds, "peak_rss_kib": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)},
+        "input": {
+            "path": inspection["path"],
+            "sha256": inspection["sha256"],
+            "size_bytes": inspection["size_bytes"],
+            "point_count": inspection["vertex_count"],
+        },
+        "output": {
+            "path": str(output),
+            "sha256": sha256_file(output),
+            "size_bytes": output.stat().st_size,
+            **stats,
+        },
+        "runtime": {
+            "wall_seconds": wall_seconds,
+            "peak_rss_kib": int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss),
+        },
     }
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Reconstruct a raw triangle mesh from Gaussian PLY centers using Open3D.")
+    parser = argparse.ArgumentParser(
+        description="Reconstruct a raw triangle mesh from Gaussian PLY centers using Open3D."
+    )
     parser.add_argument("input_ply")
     parser.add_argument("output_ply")
     parser.add_argument("--method", required=True, choices=["alpha", "ball-pivoting", "poisson"])
