@@ -5,9 +5,9 @@ import importlib
 import importlib.metadata
 import json
 import os
-from pathlib import Path
 import subprocess
 import tempfile
+from pathlib import Path
 
 import numpy as np
 
