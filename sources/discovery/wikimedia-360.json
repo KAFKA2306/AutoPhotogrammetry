@@ -1,0 +1,815 @@
+{
+  "schema_version": 1,
+  "snapshot_state": "api",
+  "authority": {
+    "category_discovery": "Wikimedia Commons categorymembers",
+    "video_metadata": "Wikimedia Commons videoinfo/categories",
+    "duration_fallback": "MediaWiki REST API file information"
+  },
+  "root_category": "Category:360-degree videos",
+  "discovered_file_count": 70,
+  "candidate_count": 8,
+  "candidates": [
+    {
+      "canonical_title": "File:(361VR) Superwoman 주이형의 비키니몸매 만들기 운동법 대공개!.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:(361VR)_Superwoman_%EC%A3%BC%EC%9D%B4%ED%98%95%EC%9D%98_%EB%B9%84%ED%82%A4%EB%8B%88%EB%AA%B8%EB%A7%A4_%EB%A7%8C%EB%93%A4%EA%B8%B0_%EC%9A%B4%EB%8F%99%EB%B2%95_%EB%8C%80%EA%B3%B5%EA%B0%9C%21.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/34/%28361VR%29_Superwoman_%EC%A3%BC%EC%9D%B4%ED%98%95%EC%9D%98_%EB%B9%84%ED%82%A4%EB%8B%88%EB%AA%B8%EB%A7%A4_%EB%A7%8C%EB%93%A4%EA%B8%B0_%EC%9A%B4%EB%8F%99%EB%B2%95_%EB%8C%80%EA%B3%B5%EA%B0%9C%21.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "HiCC (하이씨씨)",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 213.501,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "2a15e6148fcab6cd3fbc3736a91a5213f11105d3",
+      "source_size_bytes": 324021996,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos of fitness training",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos",
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ],
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:20180407 132600 Ess-Na-Crub Waterfall.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:20180407_132600_Ess-Na-Crub_Waterfall.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/0/03/20180407_132600_Ess-Na-Crub_Waterfall.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Bernard Ladenthin",
+      "license": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 10.013,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        2560,
+        1280
+      ],
+      "source_sha1": "f6eec41fd6ebfac6269a25d7ac7607619b89b4eb",
+      "source_size_bytes": 33224194,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-4.0",
+        "Category:Ess-Na-Crub Waterfall",
+        "Category:Files with coordinates missing SDC location of creation",
+        "Category:Self-published work",
+        "Category:Uploaded with video2commons",
+        "Category:Videos by User:Bernard Ladenthin/2018/Northern Ireland",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:2021 06 12 PARA 360 Tolmin SokoleONE - UP Kangri.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:2021_06_12_PARA_360_Tolmin_SokoleONE_-_UP_Kangri.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/33/2021_06_12_PARA_360_Tolmin_SokoleONE_-_UP_Kangri.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Sokole ONE",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 274.581,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        5760,
+        2880
+      ],
+      "source_sha1": "b790722839cdb61abd0aa07045cdd7469264a791",
+      "source_size_bytes": 396618298,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Tolmin",
+        "Category:Videos of 2021 from Slovenia",
+        "Category:Videos of paragliding in Slovenia"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:2021 06 12 PARA 360 Tolmin SokoleONE 2 - UP Kangri.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:2021_06_12_PARA_360_Tolmin_SokoleONE_2_-_UP_Kangri.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/a/a3/2021_06_12_PARA_360_Tolmin_SokoleONE_2_-_UP_Kangri.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Sokole ONE",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 50.561,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        5760,
+        2880
+      ],
+      "source_sha1": "f54f7ff8c49be60508e52e5d8143dfc653fc7a4d",
+      "source_size_bytes": 71438393,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2021 from Slovenia",
+        "Category:Videos of paragliding in Slovenia"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:3-mins-in-360 on The Old Ghost Road.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:3-mins-in-360_on_The_Old_Ghost_Road.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/3-mins-in-360_on_The_Old_Ghost_Road.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "360 New Zealand Ltd",
+      "license": {
+        "name": "CC BY-SA 3.0",
+        "url": "https://creativecommons.org/licenses/by-sa/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 225.453,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        4096,
+        2048
+      ],
+      "source_sha1": "ba9e1679c4f0981f771754d34a4550c17ac8cf78",
+      "source_size_bytes": 868740794,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-SA-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Old Ghost Road",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 4096 x 2048",
+        "Category:Videos from Vimeo"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 SKIING MAY 2019.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_SKIING_MAY_2019.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/360_SKIING_MAY_2019.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Medical News Minute",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 616.392,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        5120,
+        2560
+      ],
+      "source_sha1": "ae8a8637a908fa8570c325fd2c8e679f357f1337",
+      "source_size_bytes": 1608220326,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2019",
+        "Category:Videos of skiing",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 VR Video - The Swellies Menai Straits - Yacht Testa Rossa.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_VR_Video_-_The_Swellies_Menai_Straits_-_Yacht_Testa_Rossa.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/360_VR_Video_-_The_Swellies_Menai_Straits_-_Yacht_Testa_Rossa.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Eddy Jackson",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 1148.914,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "322dbf835881c3c025d34ed81e3f41857ca779d2",
+      "source_size_bytes": 2625059492,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Menai Strait",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2017",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 Video Syrians \"Have to Survive Having No Rights\" in Lebanon.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_Video_Syrians_%22Have_to_Survive_Having_No_Rights%22_in_Lebanon.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/360_Video_Syrians_%22Have_to_Survive_Having_No_Rights%22_in_Lebanon.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Doctors Without Borders / MSF-USA",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 137.261,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "32f04391508c668c49abd0d993b741c579ea4481",
+      "source_size_bytes": 339335453,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Media of the day",
+        "Category:Médecins sans frontières",
+        "Category:Refugees in Lebanon from Syria",
+        "Category:Refugees of the Syrian Civil War",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos of 2016 from Lebanon",
+        "Category:Videos taken on 2016-05-11",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    }
+  ],
+  "discovery_failures": [],
+  "metadata_failures": [
+    {
+      "canonical_title": "File:360 Video of LCS-15 Christening and Launch.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:360 Video of a short flight in Newport and Laguna by Don Ramey Logan.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:360 Video of the total eclipse Aug 21 2017 at Mud lake Idaho.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:360 Video- Senator Bernie Sanders discusses economic issues.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:360 Video- They've Lost Everything- Burundian Refugees in Tanzania.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:360 degree video, view in app - 2017.Jan.21 - Chicago Women's March.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:360-degree Simulated View of the Sky Between Two Supermassive Black Holes Em4OFLjMux0.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:360VR Lotte Tower Grand Opening Fireworks(South korea).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:3D 360 4K Motion TIme-lapse - Oceanside Beach.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:An Introduction to the Equatorial Coordinate System (360VR).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Anıtkabir ( Atatürk ) 360 Derece Video Panorama Gezinti - 360 Degree Video.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Coriolis on the Playground (360VR).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Curiosity Mars Rover’s 1.8 Billion-Pixel Pano (360 View) (720p).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:EPm interior.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Earth 360 Video The Call of Science.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Esino Lario 360.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Fly Above Alaskan Glaciers in 360 Y2eysSmn9VU.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:FromDover to Dunkirk A 360 Spitfire-Experience.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:GOES-S Atlas V Launch in 360 FfLIVGxNhxY.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Gaudeamus Igitur.ogv",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Hundra knektars marsch på Forum Vulgaris.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Hundra knektars marsch utanför Kapitelhusgården.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Innerhalb des Menger-Schwammes VR-Testvideo 20201001 (Diffuse-Kanal & Tiefenkarte).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Innerhalb des Menger-Schwammes VR-Testvideo 20201001.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Inside Hurricane Maria in 360° A7MIVsE2oMM.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Juno - Mission to Jupiter 360 Video (Narrated).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:La procesión del Domingo de Ramos de Marbella 2017 en 360º.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Lightning like Structures from Diffusion Limited Aggregation (360 VR).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Magnetic Confinement (360-VR).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:March for Our Lives in Northampton - Immersive 360°.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:March for Our Lives in Northampton Immersive 360°.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Menger16KVR 16000x8000p60 20220106 VP9 fast wiki.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:MengergleichwinkligDurchgang11082019x265 8K FUHD original.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Moscow metro train Sokolniki interior shot on spherical camera 2023-03.MP4.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:NASA 360 Video of Parker Solar Probe Mission to \"Touch\" the Sun.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:NASA VR-360 Astronaut Training- Space Walk.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:NYC 360 COVID. 2.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:NYC in 360 - Surviving COVID.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Nearly Uniform Electric Fields in a Parallel Plate Capacitor (360 VR).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Nearly Uniform Electric Fields in a Parallel Plate Capacitor 360 VR.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:NeuroMat em 360° - assinaturas do cérebro (realidade virtual)-oEtNBNAPzp8.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Norah Head Insta360 X5 Virtual Tour OHNE TON.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Não veja este video 360 se tiver vertigens! Madeira - Cabo Girão.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Part of State of Video 2017.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Porto Moniz - animoitu 360-kuva.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Protest Alt Left & Right in Berkeley (360° VR).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Protest Alt Left & Right in Berkeley 360° VR.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Refugees 360 VR documentary - Awarded Best Independent film by Scopic..webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:See Why New York’s Ferries Are So Popular (360 degrees).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Simulation of a Supermassive Black Hole (VR).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Smoke and Fire with a 360 View of RS-25 Engine Test.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Test Insta360 Pro2 on DJI Inspire2 8K 59,9 fps - YouTube.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:VR 360 Bernie Sanders 2016 Presidential Campaign.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Video 360 VR on board de Raul Sanchez en Bellpuig.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Video 360°. Timelapse. Bled Lake in Slovenia..webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Virtual Plant Cell- Cell Explore, 2018. VPC 360° video by Plant Energy Biology.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Wikimania 2016 Hackathon 360.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Wikimania 2016 Wikidata meetup Data.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Wikimania 2016 Wikidata meetup.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Wind Tunnel Test of NASA’s Most Powerful Rocket (360° Animation).webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:World's First Live 360 Rocket Launch- Orbital ATK CRS-7.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    },
+    {
+      "canonical_title": "File:Škraltica 360.webm",
+      "error": "HTTPError: HTTP Error 429: Too Many Requests"
+    }
+  ],
+  "policy": {
+    "quality_is_not_inferred_from_metadata": true,
+    "aspect_ratio_does_not_prove_equirectangular": true,
+    "title_does_not_prove_equirectangular": true,
+    "production_promotion_requires_stage_c_and_d_evidence": true
+  }
+}
