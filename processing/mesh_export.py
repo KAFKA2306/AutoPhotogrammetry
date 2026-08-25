@@ -43,6 +43,13 @@ def _legacy_mesh_stats(mesh) -> dict:
     }
 
 
+def _vertex_normals_are_valid(normals: np.ndarray, vertex_count: int) -> bool:
+    if normals.shape != (vertex_count, 3) or not np.isfinite(normals).all():
+        return False
+    lengths = np.linalg.norm(normals, axis=1)
+    return bool(np.all(lengths > 1e-12))
+
+
 def _belongs_to_obj_group(path: Path, output: Path) -> bool:
     if path == output:
         return True
@@ -82,6 +89,9 @@ def _write_mesh(o3d, legacy, output_path: Path, output_format: str) -> None:
             write_triangle_uvs=False,
         )
     else:
+        normals = np.asarray(legacy.vertex_normals)
+        if not _vertex_normals_are_valid(normals, len(legacy.vertices)):
+            legacy.vertex_normals = o3d.utility.Vector3dVector()
         tensor_mesh = o3d.t.geometry.TriangleMesh.from_legacy(legacy)
         written = o3d.t.io.write_triangle_mesh(str(output_path), tensor_mesh)
     if not written:
