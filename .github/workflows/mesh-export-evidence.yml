@@ -134,6 +134,103 @@ jobs:
             process.exit(1);
           });
           NODE
+      - name: Import GLB in Blender 4.5.12 LTS and verify consumer geometry
+        shell: bash
+        run: |
+          set -euo pipefail
+          blender_version=4.5.12
+          archive="blender-${blender_version}-linux-x64.tar.xz"
+          url="https://download.blender.org/release/Blender4.5/${archive}"
+          curl --fail --location --retry 3 "$url" --output "/tmp/$archive"
+          archive_sha256="$(sha256sum "/tmp/$archive" | cut -d' ' -f1)"
+          tar -xf "/tmp/$archive" -C /tmp
+          cat > /tmp/verify_blender_glb.py <<'PY'
+          import hashlib
+          import json
+          import math
+          from pathlib import Path
+
+          import bpy
+          from mathutils import Vector
+
+          glb = Path('mesh-export-evidence/asset.glb').resolve()
+          export_manifest = json.loads(Path('mesh-export-evidence/glb-manifest.json').read_text())
+          expected = export_manifest['output']['readback']
+
+          bpy.ops.wm.read_factory_settings(use_empty=True)
+          result = bpy.ops.import_scene.gltf(filepath=str(glb))
+          if 'FINISHED' not in result:
+              raise RuntimeError(f'Blender glTF import did not finish: {result}')
+
+          mesh_objects = [obj for obj in bpy.context.scene.objects if obj.type == 'MESH']
+          if not mesh_objects:
+              raise RuntimeError('Blender imported no mesh objects')
+
+          vertex_count = sum(len(obj.data.vertices) for obj in mesh_objects)
+          face_count = sum(len(obj.data.polygons) for obj in mesh_objects)
+          if vertex_count != expected['vertex_count'] or face_count != expected['face_count']:
+              raise RuntimeError(
+                  f'geometry count drift: expected {expected["vertex_count"]}/{expected["face_count"]}, '
+                  f'got {vertex_count}/{face_count}'
+              )
+
+          corners = [obj.matrix_world @ Vector(corner) for obj in mesh_objects for corner in obj.bound_box]
+          bbox_min = [min(point[i] for point in corners) for i in range(3)]
+          bbox_max = [max(point[i] for point in corners) for i in range(3)]
+          if not all(math.isfinite(v) for v in bbox_min + bbox_max):
+              raise RuntimeError('Blender import produced non-finite bounds')
+
+          source_extent = sorted(expected['bbox_max'][i] - expected['bbox_min'][i] for i in range(3))
+          imported_extent = sorted(bbox_max[i] - bbox_min[i] for i in range(3))
+          tolerance = max(1e-5, max(source_extent) * 1e-5)
+          if any(abs(a - b) > tolerance for a, b in zip(source_extent, imported_extent)):
+              raise RuntimeError(
+                  f'extent drift after basis conversion: source={source_extent}, imported={imported_extent}'
+              )
+
+          material_names = sorted({slot.material.name for obj in mesh_objects for slot in obj.material_slots if slot.material})
+          image_names = sorted(image.name for image in bpy.data.images)
+          report = {
+              'schema_version': 1,
+              'status': 'success',
+              'consumer': {'name': 'Blender', 'version': bpy.app.version_string, 'importer': 'bpy.ops.import_scene.gltf'},
+              'source_glb': {
+                  'path': str(glb),
+                  'sha256': hashlib.sha256(glb.read_bytes()).hexdigest(),
+                  'size_bytes': glb.stat().st_size,
+              },
+              'import': {
+                  'mesh_object_count': len(mesh_objects),
+                  'vertex_count': vertex_count,
+                  'face_count': face_count,
+                  'bbox_min': bbox_min,
+                  'bbox_max': bbox_max,
+                  'material_names': material_names,
+                  'image_names': image_names,
+              },
+              'comparison': {
+                  'expected_vertex_count': expected['vertex_count'],
+                  'expected_face_count': expected['face_count'],
+                  'source_extent_sorted': source_extent,
+                  'imported_extent_sorted': imported_extent,
+                  'extent_tolerance': tolerance,
+              },
+              'metric_scale': {'status': 'unverified', 'unit': None},
+          }
+          Path('mesh-export-evidence/blender-import.json').write_text(json.dumps(report, indent=2) + '\n')
+          print(json.dumps(report, indent=2))
+          PY
+          BLENDER_ARCHIVE_SHA256="$archive_sha256" "/tmp/blender-${blender_version}-linux-x64/blender" \
+            --background --factory-startup --python /tmp/verify_blender_glb.py
+          python - <<PY
+          import json
+          from pathlib import Path
+          path = Path('mesh-export-evidence/blender-import.json')
+          report = json.loads(path.read_text())
+          report['consumer']['download_url'] = '$url'
+          report['consumer']['archive_sha256'] = '$archive_sha256'
+          path.write_text(json.dumps(report, indent=2) + '\n')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
