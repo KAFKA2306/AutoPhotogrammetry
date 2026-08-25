@@ -1,0 +1,111 @@
+name: Mesh baseline evidence
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/mesh-baseline-evidence.yml'
+      - 'processing/gaussian_ply.py'
+      - 'processing/mesh_from_points.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install mesh runtime
+        run: python -m pip install --disable-pip-version-check numpy open3d==0.19.0
+      - name: Materialize historical real Gaussian PLYs
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_commit=1fa7f35b1fc9fce669f97d5ec7c7f46ce4601206
+          mkdir -p benchmark-inputs
+          git ls-tree -r --name-only "$source_commit" | grep '^output/.*/export/splat\.ply$' > /tmp/ply-paths.txt
+          while read -r path; do
+            scene="$(printf '%s' "$path" | cut -d/ -f2)"
+            git show "$source_commit:$path" > "benchmark-inputs/$scene.ply"
+          done < /tmp/ply-paths.txt
+      - name: Inspect, select, reconstruct, and verify repeatability
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import numpy as np
+          import open3d as o3d
+          from processing.gaussian_ply import gaussian_ply_metrics, _read_vertices
+          from processing.mesh_from_points import _opacity_probabilities, reconstruct_mesh
+
+          root = Path('mesh-baseline-evidence')
+          root.mkdir(exist_ok=True)
+          inputs = []
+          for ply in sorted(Path('benchmark-inputs').glob('*.ply')):
+              metrics = gaussian_ply_metrics(ply)
+              metrics['scene'] = ply.stem
+              inputs.append(metrics)
+          (root / 'input-inspection.json').write_text(json.dumps(inputs, indent=2), encoding='utf-8')
+
+          control = min(inputs, key=lambda x: x['scale_anisotropy_ratio']['above_10_ratio'])
+          difficult = max(inputs, key=lambda x: x['scale_anisotropy_ratio']['above_10_ratio'])
+          selected = {'control': control['scene'], 'difficult': difficult['scene']}
+          (root / 'selection.json').write_text(json.dumps(selected, indent=2), encoding='utf-8')
+
+          summary = []
+          for role, scene in selected.items():
+              ply = Path('benchmark-inputs') / f'{scene}.ply'
+              _, vertices = _read_vertices(ply)
+              probs = _opacity_probabilities(vertices['opacity'])
+              target = min(50000, len(probs))
+              threshold = float(np.partition(probs, len(probs) - target)[len(probs) - target]) if len(probs) > target else 0.0
+              mask = probs >= threshold
+              points = np.column_stack([vertices['x'][mask], vertices['y'][mask], vertices['z'][mask]]).astype(np.float64)
+              cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
+              nn = np.asarray(cloud.compute_nearest_neighbor_distance())
+              spacing = float(np.median(nn[nn > 0]))
+              configs = {
+                  'alpha': dict(method='alpha', alpha=4.0 * spacing),
+                  'ball-pivoting': dict(method='ball-pivoting', radii=[2.0 * spacing, 4.0 * spacing, 8.0 * spacing], normal_radius=8.0 * spacing),
+                  'poisson': dict(method='poisson', depth=7, normal_radius=8.0 * spacing),
+              }
+              for method, config in configs.items():
+                  records = []
+                  for repeat in (1, 2):
+                      out = root / f'{role}-{scene}-{method}-r{repeat}.ply'
+                      try:
+                          result = reconstruct_mesh(ply, out, opacity_threshold=threshold, max_faces=1000000, **config)
+                          result['role'] = role
+                          result['scene'] = scene
+                          result['repeat'] = repeat
+                          result['derived_spacing'] = spacing
+                          result['status'] = 'success'
+                      except Exception as exc:
+                          result = {'role': role, 'scene': scene, 'method': method, 'repeat': repeat, 'status': 'failed', 'error': f'{type(exc).__name__}: {exc}', 'opacity_threshold': threshold, 'derived_spacing': spacing}
+                      records.append(result)
+                      (root / f'{role}-{scene}-{method}-r{repeat}.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
+                  if all(r['status'] == 'success' for r in records):
+                      reproducible_hash = records[0]['output']['sha256'] == records[1]['output']['sha256']
+                      reproducible_stats = all(records[0]['output'][k] == records[1]['output'][k] for k in ('vertex_count','face_count','connected_components','bbox_min','bbox_max'))
+                      Path(records[1]['output']['path']).unlink(missing_ok=True)
+                  else:
+                      reproducible_hash = False
+                      reproducible_stats = False
+                  summary.append({'role': role, 'scene': scene, 'method': method, 'opacity_threshold': threshold, 'derived_spacing': spacing, 'repeatability': {'hash_equal': reproducible_hash, 'stats_equal': reproducible_stats}, 'runs': records})
+          (root / 'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
+          if not any(row['runs'][0]['status'] == 'success' for row in summary):
+              raise SystemExit('all mesh methods failed')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mesh-baseline-real-ply-evidence
+          path: mesh-baseline-evidence/
+          retention-days: 30
