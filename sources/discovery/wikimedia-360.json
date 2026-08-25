@@ -1,0 +1,4818 @@
+{
+  "schema_version": 1,
+  "snapshot_state": "api",
+  "authority": {
+    "category_discovery": "Wikimedia Commons categorymembers",
+    "video_metadata": "Wikimedia Commons videoinfo/categories",
+    "duration_fallback": "MediaWiki REST API file information"
+  },
+  "root_category": "Category:360-degree videos",
+  "discovered_file_count": 70,
+  "candidate_count": 70,
+  "candidates": [
+    {
+      "canonical_title": "File:(361VR) Superwoman 주이형의 비키니몸매 만들기 운동법 대공개!.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:(361VR)_Superwoman_%EC%A3%BC%EC%9D%B4%ED%98%95%EC%9D%98_%EB%B9%84%ED%82%A4%EB%8B%88%EB%AA%B8%EB%A7%A4_%EB%A7%8C%EB%93%A4%EA%B8%B0_%EC%9A%B4%EB%8F%99%EB%B2%95_%EB%8C%80%EA%B3%B5%EA%B0%9C%21.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/34/%28361VR%29_Superwoman_%EC%A3%BC%EC%9D%B4%ED%98%95%EC%9D%98_%EB%B9%84%ED%82%A4%EB%8B%88%EB%AA%B8%EB%A7%A4_%EB%A7%8C%EB%93%A4%EA%B8%B0_%EC%9A%B4%EB%8F%99%EB%B2%95_%EB%8C%80%EA%B3%B5%EA%B0%9C%21.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "HiCC (하이씨씨)",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 213.501,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "2a15e6148fcab6cd3fbc3736a91a5213f11105d3",
+      "source_size_bytes": 324021996,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos of fitness training",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos",
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ],
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:20180407 132600 Ess-Na-Crub Waterfall.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:20180407_132600_Ess-Na-Crub_Waterfall.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/0/03/20180407_132600_Ess-Na-Crub_Waterfall.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Bernard Ladenthin",
+      "license": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 10.013,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        2560,
+        1280
+      ],
+      "source_sha1": "f6eec41fd6ebfac6269a25d7ac7607619b89b4eb",
+      "source_size_bytes": 33224194,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-4.0",
+        "Category:Ess-Na-Crub Waterfall",
+        "Category:Files with coordinates missing SDC location of creation",
+        "Category:Self-published work",
+        "Category:Uploaded with video2commons",
+        "Category:Videos by User:Bernard Ladenthin/2018/Northern Ireland",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:2021 06 12 PARA 360 Tolmin SokoleONE - UP Kangri.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:2021_06_12_PARA_360_Tolmin_SokoleONE_-_UP_Kangri.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/33/2021_06_12_PARA_360_Tolmin_SokoleONE_-_UP_Kangri.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Sokole ONE",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 274.581,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        5760,
+        2880
+      ],
+      "source_sha1": "b790722839cdb61abd0aa07045cdd7469264a791",
+      "source_size_bytes": 396618298,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Tolmin",
+        "Category:Videos of 2021 from Slovenia",
+        "Category:Videos of paragliding in Slovenia"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:2021 06 12 PARA 360 Tolmin SokoleONE 2 - UP Kangri.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:2021_06_12_PARA_360_Tolmin_SokoleONE_2_-_UP_Kangri.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/a/a3/2021_06_12_PARA_360_Tolmin_SokoleONE_2_-_UP_Kangri.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Sokole ONE",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 50.561,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        5760,
+        2880
+      ],
+      "source_sha1": "f54f7ff8c49be60508e52e5d8143dfc653fc7a4d",
+      "source_size_bytes": 71438393,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2021 from Slovenia",
+        "Category:Videos of paragliding in Slovenia"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:3-mins-in-360 on The Old Ghost Road.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:3-mins-in-360_on_The_Old_Ghost_Road.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/3-mins-in-360_on_The_Old_Ghost_Road.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "360 New Zealand Ltd",
+      "license": {
+        "name": "CC BY-SA 3.0",
+        "url": "https://creativecommons.org/licenses/by-sa/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 225.453,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        4096,
+        2048
+      ],
+      "source_sha1": "ba9e1679c4f0981f771754d34a4550c17ac8cf78",
+      "source_size_bytes": 868740794,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-SA-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Old Ghost Road",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 4096 x 2048",
+        "Category:Videos from Vimeo"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 SKIING MAY 2019.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_SKIING_MAY_2019.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/360_SKIING_MAY_2019.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Medical News Minute",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 616.392,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        5120,
+        2560
+      ],
+      "source_sha1": "ae8a8637a908fa8570c325fd2c8e679f357f1337",
+      "source_size_bytes": 1608220326,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2019",
+        "Category:Videos of skiing",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 VR Video - The Swellies Menai Straits - Yacht Testa Rossa.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_VR_Video_-_The_Swellies_Menai_Straits_-_Yacht_Testa_Rossa.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/360_VR_Video_-_The_Swellies_Menai_Straits_-_Yacht_Testa_Rossa.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Eddy Jackson",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 1148.914,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "322dbf835881c3c025d34ed81e3f41857ca779d2",
+      "source_size_bytes": 2625059492,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Menai Strait",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2017",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 Video Syrians \"Have to Survive Having No Rights\" in Lebanon.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_Video_Syrians_%22Have_to_Survive_Having_No_Rights%22_in_Lebanon.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/360_Video_Syrians_%22Have_to_Survive_Having_No_Rights%22_in_Lebanon.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Doctors Without Borders / MSF-USA",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 137.261,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "32f04391508c668c49abd0d993b741c579ea4481",
+      "source_size_bytes": 339335453,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Media of the day",
+        "Category:Médecins sans frontières",
+        "Category:Refugees in Lebanon from Syria",
+        "Category:Refugees of the Syrian Civil War",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos of 2016 from Lebanon",
+        "Category:Videos taken on 2016-05-11",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 Video of LCS-15 Christening and Launch.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_Video_of_LCS-15_Christening_and_Launch.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/360_Video_of_LCS-15_Christening_and_Launch.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "U.S. Navy",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 70.961,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "23ffdeccd671b4e5e7d8711d51ca1110efd7ba55",
+      "source_size_bytes": 122876221,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:USS Billings (LCS-15)",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 1920",
+        "Category:Videos of 2017",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 Video of a short flight in Newport and Laguna by Don Ramey Logan.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_Video_of_a_short_flight_in_Newport_and_Laguna_by_Don_Ramey_Logan.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/5/5e/360_Video_of_a_short_flight_in_Newport_and_Laguna_by_Don_Ramey_Logan.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Don Ramey Logan",
+      "license": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 143.24,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "c25bb35269ff708e5badb11215da6e673f7d6797",
+      "source_size_bytes": 446897269,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Aerial photographs by Don Ramey Logan",
+        "Category:CC-BY-4.0",
+        "Category:Creative Commons Attribution 4.0 with different SDC copyright license",
+        "Category:Video display resolution 3840 x 2160",
+        "Category:Videos by Don Ramey Logan",
+        "Category:Videos of 2016 from the United States",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 Video of the total eclipse Aug 21 2017 at Mud lake Idaho.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_Video_of_the_total_eclipse_Aug_21_2017_at_Mud_lake_Idaho.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/1/10/360_Video_of_the_total_eclipse_Aug_21_2017_at_Mud_lake_Idaho.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Alejandro Sanchez",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "needs_review"
+      },
+      "duration_seconds": 229.285,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        954
+      ],
+      "source_sha1": "05efd2b1167b69cadf04b9e7ac0b8e5e73d0e6e6",
+      "source_size_bytes": 45040138,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License review needed (video)",
+        "Category:Videos of eclipses",
+        "Category:Videos of the solar eclipse of 2017 August 21"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:360 Video- Senator Bernie Sanders discusses economic issues.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_Video-_Senator_Bernie_Sanders_discusses_economic_issues.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/c6/360_Video-_Senator_Bernie_Sanders_discusses_economic_issues.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "UC Berkeley",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 59.376000000000005,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "caf7a1dd072e40e89e2641e77a2e0cfe8dc64998",
+      "source_size_bytes": 17109417,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Videos of 2016",
+        "Category:Videos of Bernie Sanders",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 Video- They've Lost Everything- Burundian Refugees in Tanzania.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_Video-_They%27ve_Lost_Everything-_Burundian_Refugees_in_Tanzania.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/360_Video-_They%27ve_Lost_Everything-_Burundian_Refugees_in_Tanzania.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Doctors Without Borders / MSF-USA",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 129.641,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "546181265c4d45f135386a08aa3bef9f358bd3ec",
+      "source_size_bytes": 358523351,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:2016 in Tanzania",
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Médecins sans frontières",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2016"
+      ],
+      "discovered_categories": [
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 degree video, view in app - 2017.Jan.21 - Chicago Women's March.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_degree_video,_view_in_app_-_2017.Jan.21_-_Chicago_Women%27s_March.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/360_degree_video%2C_view_in_app_-_2017.Jan.21_-_Chicago_Women%27s_March.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "LifeOpenSourced dotcom",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 106.126,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "a8018bf945d076343433d5a1cd4dc0a2a272b220",
+      "source_size_bytes": 295402001,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:2017 Chicago Women's March",
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360-degree Simulated View of the Sky Between Two Supermassive Black Holes Em4OFLjMux0.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360-degree_Simulated_View_of_the_Sky_Between_Two_Supermassive_Black_Holes_Em4OFLjMux0.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/1/11/360-degree_Simulated_View_of_the_Sky_Between_Two_Supermassive_Black_Holes_Em4OFLjMux0.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA Goddard",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 100.021,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "8980f564d36e31b23f2118e78415712425b9f4cd",
+      "source_size_bytes": 193043360,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Files from NASA Goddard Space Flight Center Flickr stream",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2018",
+        "Category:NASA videos in 2020",
+        "Category:PD NASA",
+        "Category:Videos from the NASA Goddard YouTube channel",
+        "Category:Videos of 2020"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:360VR Lotte Tower Grand Opening Fireworks(South korea).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360VR_Lotte_Tower_Grand_Opening_Fireworks(South_korea).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/360VR_Lotte_Tower_Grand_Opening_Fireworks%28South_korea%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "jaesung ,KIM",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 740.082,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        4096,
+        2048
+      ],
+      "source_sha1": "1d4d922fd10715618cd22b3c454ecde8acd00393",
+      "source_size_bytes": 839145832,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:De minimis",
+        "Category:Fireworks in South Korea",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Lotte World Tower",
+        "Category:NoFoP-South Korea",
+        "Category:Parks in South Korea in 2017",
+        "Category:Seokchon Lake",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 4096 x 2048",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2017",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:3D 360 4K Motion TIme-lapse - Oceanside Beach.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:3D_360_4K_Motion_TIme-lapse_-_Oceanside_Beach.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/2/21/3D_360_4K_Motion_TIme-lapse_-_Oceanside_Beach.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "2FILMZ Studios",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 41.416000000000004,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "4eb70355392d85798848750a690980a9acdce671",
+      "source_size_bytes": 60272823,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Video display resolution 3840 x 2160",
+        "Category:Videos from Vimeo"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:An Introduction to the Equatorial Coordinate System (360VR).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:An_Introduction_to_the_Equatorial_Coordinate_System_(360VR).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/8/88/An_Introduction_to_the_Equatorial_Coordinate_System_%28360VR%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Animations for Physics and Astronomy",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 106.021,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3600,
+        1800
+      ],
+      "source_sha1": "2914dac0bc076562c4196498a9c804d23f57e69c",
+      "source_size_bytes": 92212774,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Equatorial coordinate system",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2160",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Anıtkabir ( Atatürk ) 360 Derece Video Panorama Gezinti - 360 Degree Video.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:An%C4%B1tkabir_(_Atat%C3%BCrk_)_360_Derece_Video_Panorama_Gezinti_-_360_Degree_Video.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/An%C4%B1tkabir_%28_Atat%C3%BCrk_%29_360_Derece_Video_Panorama_Gezinti_-_360_Degree_Video.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "360TR",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 131.461,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "518315ce6bb69420ac8fd13fa26c50bd595abda5",
+      "source_size_bytes": 291173234,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos of Anıtkabir",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Coriolis on the Playground (360VR).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Coriolis_on_the_Playground_(360VR).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Coriolis_on_the_Playground_%28360VR%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Animations for Physics and Astronomy",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 70.057,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3600,
+        2160
+      ],
+      "source_sha1": "0ae56c34d2634d7aab0a2073167f3f46e6850ec5",
+      "source_size_bytes": 53543674,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:CC-BY-3.0",
+        "Category:Coriolis force",
+        "Category:EAC Video",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2017"
+      ],
+      "discovered_categories": [
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Curiosity Mars Rover’s 1.8 Billion-Pixel Pano (360 View) (720p).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Curiosity_Mars_Rover%E2%80%99s_1.8_Billion-Pixel_Pano_(360_View)_(720p).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Curiosity_Mars_Rover%E2%80%99s_1.8_Billion-Pixel_Pano_%28360_View%29_%28720p%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA Jet Propulsion Laboratory",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 71.66,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1280,
+        720
+      ],
+      "source_sha1": "816c7c6ced08251390944caaaaf601c5356ec797",
+      "source_size_bytes": 14123517,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2020",
+        "Category:PD NASA",
+        "Category:Video display resolution 1280 x 720",
+        "Category:Videos by the Curiosity rover",
+        "Category:Videos from the NASA Jet Propulsion Laboratory YouTube channel",
+        "Category:Videos of Mars",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:EPm interior.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:EPm_interior.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/EPm_interior.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "IGOR BANKET",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 118.174,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "c6e47792b608e68558261431a5b5a3ac3ed14467",
+      "source_size_bytes": 200815472,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:BCh Class EPM interior",
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Videos from YouTube by channel (assorted)",
+        "Category:Videos of 2018 from Belarus",
+        "Category:Videos of rail transport in Belarus"
+      ],
+      "discovered_categories": [
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Earth 360 Video The Call of Science.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Earth_360_Video_The_Call_of_Science.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Earth_360_Video_The_Call_of_Science.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA Jet Propulsion Laboratory",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 517.9010000000001,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "0da393f73cbe14207053d57752d0b1219150d7a5",
+      "source_size_bytes": 978155026,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Kaneohe Bay",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2018",
+        "Category:PD NASA",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos from Greenland",
+        "Category:Videos from Hawaii",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:Esino Lario 360.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Esino_Lario_360.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Esino_Lario_360.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Jan Ainali",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 14.016,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "579d6840aaffffd8125650e21daa9ddc6d01b3df",
+      "source_size_bytes": 1938218,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:360° panoramas",
+        "Category:360° panoramics in Italy",
+        "Category:CC-BY-SA-4.0",
+        "Category:Esino Lario",
+        "Category:Self-published work",
+        "Category:Taken with Ricoh Theta S",
+        "Category:Uploaded with videoconvert",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Videos of 2016 from Italy",
+        "Category:Wikimania 2016 by Jan Ainali",
+        "Category:Wikimania 2016 pre-conference - Day 2",
+        "Category:Wikimania 2016 videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Fly Above Alaskan Glaciers in 360 Y2eysSmn9VU.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Fly_Above_Alaskan_Glaciers_in_360_Y2eysSmn9VU.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/9/95/Fly_Above_Alaskan_Glaciers_in_360_Y2eysSmn9VU.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA Goddard",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 259.781,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "77bd0fd9283d1fabe0c018b40227ebc1e3edfa73",
+      "source_size_bytes": 431641876,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Files from NASA Goddard Space Flight Center Flickr stream",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2020",
+        "Category:PD NASA",
+        "Category:Videos from the NASA Goddard YouTube channel",
+        "Category:Videos of 2020"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:FromDover to Dunkirk A 360 Spitfire-Experience.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:FromDover_to_Dunkirk_A_360_Spitfire-Experience.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/6/62/FromDover_to_Dunkirk_A_360_Spitfire-Experience.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "World of Warplanes",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 2898.301,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "source_sha1": "2011149dd103a4f4f4af69e72d10271e8cb90c2f",
+      "source_size_bytes": 903180613,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 1920 x 1080",
+        "Category:Videos from France",
+        "Category:Videos of Supermarine Spitfire",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:GOES-S Atlas V Launch in 360 FfLIVGxNhxY.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:GOES-S_Atlas_V_Launch_in_360_FfLIVGxNhxY.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/GOES-S_Atlas_V_Launch_in_360_FfLIVGxNhxY.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASAKennedy",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 184.141,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "ad3bd83c6e70325ff6af28efe49f5e7c8b3f511b",
+      "source_size_bytes": 331126026,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:GOES S",
+        "Category:Launch of AV-077",
+        "Category:Launches of Atlas V",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2018",
+        "Category:NASA videos in 2020",
+        "Category:PD NASA",
+        "Category:Videos from the NASAKennedy YouTube channel"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:Gaudeamus Igitur.ogv",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Gaudeamus_Igitur.ogv",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Gaudeamus_Igitur.ogv?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Galopax",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 128.1015873015873,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "eb128a92c3144abf98dbb78553752f3be3535a95",
+      "source_size_bytes": 14253040,
+      "mime": "application/ogg",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-SA-4.0",
+        "Category:Files by User:Galopax",
+        "Category:Files with coordinates missing SDC location of creation",
+        "Category:GFDL",
+        "Category:Gaudeamus igitur",
+        "Category:License migration redundant",
+        "Category:Omniovideo",
+        "Category:Omniovideo by Galopax",
+        "Category:Self-published work",
+        "Category:University of Murcia",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Videos from the Region of Murcia"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Hundra knektars marsch på Forum Vulgaris.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Hundra_knektars_marsch_p%C3%A5_Forum_Vulgaris.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Hundra_knektars_marsch_p%C3%A5_Forum_Vulgaris.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Jan Ainali",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 227.232,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "68edb80d78e3a736d20c98a4c503f13cd35d656c",
+      "source_size_bytes": 118721727,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-SA-4.0",
+        "Category:Forum Vulgaris",
+        "Category:Hundra knektars marsch 2016",
+        "Category:Photos by Jan Ainali during Medeltidsveckan 2016",
+        "Category:Self-published work",
+        "Category:Uploaded with videoconvert",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Videos of 2016 from Sweden",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Hundra knektars marsch utanför Kapitelhusgården.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Hundra_knektars_marsch_utanf%C3%B6r_Kapitelhusg%C3%A5rden.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Hundra_knektars_marsch_utanf%C3%B6r_Kapitelhusg%C3%A5rden.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Jan Ainali",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 87.087,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "56496c3e24b6bc8c240067434abeaf251e8d385b",
+      "source_size_bytes": 40180340,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:360° panoramas",
+        "Category:CC-BY-SA-4.0",
+        "Category:Hundra knektars marsch 2016",
+        "Category:Photos by Jan Ainali during Medeltidsveckan 2016",
+        "Category:Self-published work",
+        "Category:Uploaded with videoconvert",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Videos of 2016 from Sweden",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Innerhalb des Menger-Schwammes VR-Testvideo 20201001 (Diffuse-Kanal & Tiefenkarte).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Innerhalb_des_Menger-Schwammes_VR-Testvideo_20201001_(Diffuse-Kanal_%26_Tiefenkarte).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/31/Innerhalb_des_Menger-Schwammes_VR-Testvideo_20201001_%28Diffuse-Kanal_%26_Tiefenkarte%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "PantheraLeo1359531",
+      "license": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 40.0,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        4000,
+        2000
+      ],
+      "source_sha1": "d8a5a8fe244271236610c3a932efb531d1e83cb7",
+      "source_size_bytes": 561425305,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-4.0",
+        "Category:Created with Mandelbulber",
+        "Category:Menger sponges",
+        "Category:Self-published work",
+        "Category:Videos of 2020",
+        "Category:Videos of fractals",
+        "Category:Videos uploaded by PantheraLeo1359531"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Innerhalb des Menger-Schwammes VR-Testvideo 20201001.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Innerhalb_des_Menger-Schwammes_VR-Testvideo_20201001.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Innerhalb_des_Menger-Schwammes_VR-Testvideo_20201001.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "PantheraLeo1359531",
+      "license": {
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 19.98,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        4000,
+        2000
+      ],
+      "source_sha1": "7fa8381d869fbc1a13a161aded32a6d3e67a169f",
+      "source_size_bytes": 204240782,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-4.0",
+        "Category:Created with Mandelbulber",
+        "Category:Menger sponges",
+        "Category:Self-published work",
+        "Category:Videos of 2020",
+        "Category:Videos of fractals",
+        "Category:Videos uploaded by PantheraLeo1359531"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Inside Hurricane Maria in 360° A7MIVsE2oMM.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Inside_Hurricane_Maria_in_360%C2%B0_A7MIVsE2oMM.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Inside_Hurricane_Maria_in_360%C2%B0_A7MIVsE2oMM.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA Goddard",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 308.341,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "b916351dc468f4fde18c5350b060518f942f5d9e",
+      "source_size_bytes": 676590457,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Files from NASA Goddard Space Flight Center Flickr stream",
+        "Category:Files with closed captioning in English",
+        "Category:Goddard Space Flight Center",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2018",
+        "Category:NASA videos in 2020",
+        "Category:PD NASA",
+        "Category:Videos from the NASA Goddard YouTube channel",
+        "Category:Videos of 2020"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:Juno - Mission to Jupiter 360 Video (Narrated).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Juno_-_Mission_to_Jupiter_360_Video_(Narrated).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Juno_-_Mission_to_Jupiter_360_Video_%28Narrated%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA Jet Propulsion Laboratory",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 253.84300000000002,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1280,
+        640
+      ],
+      "source_sha1": "2827b4be1f67365ffe94cb02c6bc2b1f205efa72",
+      "source_size_bytes": 13914074,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Illustrations of Juno (spacecraft)",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2016",
+        "Category:NASA videos in English",
+        "Category:PD NASA",
+        "Category:Video display resolution 1280 x 640",
+        "Category:Videos from the NASA Jet Propulsion Laboratory YouTube channel",
+        "Category:Videos of Jet Propulsion Laboratory"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:La procesión del Domingo de Ramos de Marbella 2017 en 360º.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:La_procesi%C3%B3n_del_Domingo_de_Ramos_de_Marbella_2017_en_360%C2%BA.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/La_procesi%C3%B3n_del_Domingo_de_Ramos_de_Marbella_2017_en_360%C2%BA.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Robe Román Ortiz",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 1413.96,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1280,
+        640
+      ],
+      "source_sha1": "1e043f8235025298cab81989f0f55a1038ec50cc",
+      "source_size_bytes": 280511311,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 1280 x 640",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2017",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Lightning like Structures from Diffusion Limited Aggregation (360 VR).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Lightning_like_Structures_from_Diffusion_Limited_Aggregation_(360_VR).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Lightning_like_Structures_from_Diffusion_Limited_Aggregation_%28360_VR%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Animations for Physics and Astronomy",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 110.521,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "f8f8b1e23194ab17ff625150b358071aed191f07",
+      "source_size_bytes": 34299147,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Diffusion-limited aggregation",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Magnetic Confinement (360-VR).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Magnetic_Confinement_(360-VR).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Magnetic_Confinement_%28360-VR%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Animations for Physics and Astronomy",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 90.021,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "source_sha1": "27d8272dbf39a150ab6ba7d9e821fd6ad54bff0b",
+      "source_size_bytes": 173839896,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 1920 x 1080",
+        "Category:Videos of electromagnetism",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:March for Our Lives in Northampton - Immersive 360°.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:March_for_Our_Lives_in_Northampton_-_Immersive_360%C2%B0.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/March_for_Our_Lives_in_Northampton_-_Immersive_360%C2%B0.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Northampton Community Television",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 805.801,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "fc80625e07def23e5834aca0fd935422b6d97278",
+      "source_size_bytes": 1534693227,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from March For Our Lives"
+      ],
+      "discovered_categories": [
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:March for Our Lives in Northampton Immersive 360°.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:March_for_Our_Lives_in_Northampton_Immersive_360%C2%B0.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/3d/March_for_Our_Lives_in_Northampton_Immersive_360%C2%B0.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Northampton Community Television",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 805.801,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "dca99e1b67be32cd632bf50c2eea136460ee0b3d",
+      "source_size_bytes": 1573822418,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2160",
+        "Category:Videos from March For Our Lives",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Menger16KVR 16000x8000p60 20220106 VP9 fast wiki.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Menger16KVR_16000x8000p60_20220106_VP9_fast_wiki.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/4/47/Menger16KVR_16000x8000p60_20220106_VP9_fast_wiki.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "PantheraLeo1359531 😺 ( talk )",
+      "license": {
+        "name": "CC0",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "status": "verified"
+      },
+      "duration_seconds": 15.997,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        16000,
+        8000
+      ],
+      "source_sha1": "b2d9be945a482f4c47c8ce6f9dcc6ed4c096e37e",
+      "source_size_bytes": 3846999684,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:3D fractals",
+        "Category:CC-Zero",
+        "Category:CC0 files by PantheraLeo1359531",
+        "Category:Created with Mandelbulber",
+        "Category:Fractals by PantheraLeo1359531",
+        "Category:Self-published work",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 16000 x 8000",
+        "Category:Videos of fractals"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:MengergleichwinkligDurchgang11082019x265 8K FUHD original.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:MengergleichwinkligDurchgang11082019x265_8K_FUHD_original.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/MengergleichwinkligDurchgang11082019x265_8K_FUHD_original.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "PantheraLeo1359531",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 79.98100000000001,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        8000,
+        4500
+      ],
+      "source_sha1": "6ba4b828f8df9735b12959bf602098603b69092f",
+      "source_size_bytes": 192595433,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-SA-4.0",
+        "Category:Fractals by PantheraLeo1359531",
+        "Category:Menger sponges",
+        "Category:Self-published work",
+        "Category:Videos of fractals created with Mandelbulber"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Moscow metro train Sokolniki interior shot on spherical camera 2023-03.MP4.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Moscow_metro_train_Sokolniki_interior_shot_on_spherical_camera_2023-03.MP4.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/5/55/Moscow_metro_train_Sokolniki_interior_shot_on_spherical_camera_2023-03.MP4.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Svetlov Artem",
+      "license": {
+        "name": "CC0",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "status": "verified"
+      },
+      "duration_seconds": 30.04,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "a4885d701d10a0824173869553f4495bd3489694",
+      "source_size_bytes": 42117833,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:2023-03-05",
+        "Category:360-degree videos",
+        "Category:81-717.5A/714.5A Sokolniki interior",
+        "Category:CC-Zero",
+        "Category:Files with coordinates missing SDC location of creation",
+        "Category:Photographs by Artem Svetlov/Moscow",
+        "Category:Self-published work",
+        "Category:Videos of 2023 from Moscow",
+        "Category:Videos of 81-717/714"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:NASA 360 Video of Parker Solar Probe Mission to \"Touch\" the Sun.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:NASA_360_Video_of_Parker_Solar_Probe_Mission_to_%22Touch%22_the_Sun.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/NASA_360_Video_of_Parker_Solar_Probe_Mission_to_%22Touch%22_the_Sun.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 207.561,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "7df65d6686020f106208c9e08af711855e9dbd1a",
+      "source_size_bytes": 387364010,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Delta 380",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2018",
+        "Category:NASA videos in 2019",
+        "Category:PD NASA",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos from the NASA YouTube channel",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:NASA VR-360 Astronaut Training- Space Walk.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:NASA_VR-360_Astronaut_Training-_Space_Walk.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/NASA_VR-360_Astronaut_Training-_Space_Walk.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 176.893,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "d5b019a65fcb69b89d83b6a1a47b0d9e08582e70",
+      "source_size_bytes": 583260482,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2016",
+        "Category:PD NASA",
+        "Category:Underwater photographs at the Neutral Buoyancy Laboratory",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos from the NASA YouTube channel",
+        "Category:Videos of 2016 from the United States",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:NYC 360 COVID. 2.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:NYC_360_COVID._2.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/e/e3/NYC_360_COVID._2.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Joseph A. Eulo",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 771.4,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "bbadf31708ee07abb644e58d17ffe7f2e9d59d5e",
+      "source_size_bytes": 2606138231,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:360° panoramas",
+        "Category:April 2020 in New York City",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Uploaded with video2commons/Server-side uploads",
+        "Category:Videos from New York City",
+        "Category:Videos from Vimeo",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:NYC in 360 - Surviving COVID.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:NYC_in_360_-_Surviving_COVID.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/2/25/NYC_in_360_-_Surviving_COVID.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Joseph A. Eulo",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 678.72,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        4096,
+        2048
+      ],
+      "source_sha1": "98bdec250c19d45d1c3e55e53bf0d5954f21706d",
+      "source_size_bytes": 2224780682,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:April 2020 in New York City",
+        "Category:CC-BY-3.0",
+        "Category:COVID-19 pandemic in Manhattan, New York City",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Vimeo",
+        "Category:Videos of 2020"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Nearly Uniform Electric Fields in a Parallel Plate Capacitor (360 VR).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Nearly_Uniform_Electric_Fields_in_a_Parallel_Plate_Capacitor_(360_VR).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Nearly_Uniform_Electric_Fields_in_a_Parallel_Plate_Capacitor_%28360_VR%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Animations for Physics and Astronomy",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 80.065,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "401c5ce71209f6e689bc864427565e8b72a80b7e",
+      "source_size_bytes": 56116475,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Unidentified physics",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2017",
+        "Category:Videos of physics"
+      ],
+      "discovered_categories": [
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Nearly Uniform Electric Fields in a Parallel Plate Capacitor 360 VR.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Nearly_Uniform_Electric_Fields_in_a_Parallel_Plate_Capacitor_360_VR.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Nearly_Uniform_Electric_Fields_in_a_Parallel_Plate_Capacitor_360_VR.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Animations for Physics and Astronomy",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 80.021,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        1080
+      ],
+      "source_sha1": "59752451211d43340feeca0e160b85c3d3bda7f9",
+      "source_size_bytes": 11315802,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 1920 x 1080",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:NeuroMat em 360° - assinaturas do cérebro (realidade virtual)-oEtNBNAPzp8.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:NeuroMat_em_360%C2%B0_-_assinaturas_do_c%C3%A9rebro_(realidade_virtual)-oEtNBNAPzp8.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/7/79/NeuroMat_em_360%C2%B0_-_assinaturas_do_c%C3%A9rebro_%28realidade_virtual%29-oEtNBNAPzp8.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Comunicação NeuroMat",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 742.094,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1280,
+        720
+      ],
+      "source_sha1": "4fea789e053249cca47d631e347981efa3a4d2cb",
+      "source_size_bytes": 71700102,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:All files by NeuroMat",
+        "Category:CC-BY-SA-4.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:NeuroMat videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Norah Head Insta360 X5 Virtual Tour OHNE TON.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Norah_Head_Insta360_X5_Virtual_Tour_OHNE_TON.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Norah_Head_Insta360_X5_Virtual_Tour_OHNE_TON.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "GlennsYouTube",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 488.6,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        7680,
+        3840
+      ],
+      "source_sha1": "b3951962032f43c5d4886f73a2d2b3ae2990824a",
+      "source_size_bytes": 2469583885,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files uploaded by PantheraLeo1359531",
+        "Category:Media from YouTube",
+        "Category:Norah Head",
+        "Category:Taken with Insta360 X5",
+        "Category:Video display resolution 7680 x 3840",
+        "Category:Videos uploaded by PantheraLeo1359531"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Não veja este video 360 se tiver vertigens! Madeira - Cabo Girão.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:N%C3%A3o_veja_este_video_360_se_tiver_vertigens%21_Madeira_-_Cabo_Gir%C3%A3o.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/a/a6/N%C3%A3o_veja_este_video_360_se_tiver_vertigens%21_Madeira_-_Cabo_Gir%C3%A3o.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Vasco Marques",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 33.061,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "9c1795fda0890b935cfd0e31e9ecbd9b5d2f3a15",
+      "source_size_bytes": 10943957,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Portugal"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Part of State of Video 2017.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Part_of_State_of_Video_2017.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Part_of_State_of_Video_2017.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Jan Ainali",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 644.648,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "ec401f1095c0a83118c60dceacd63c855e5076f2",
+      "source_size_bytes": 103357258,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:360° panoramas",
+        "Category:CC-BY-3.0",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Videos in English",
+        "Category:Wikimania 2017 - Day 2",
+        "Category:Wikimania 2017 videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Porto Moniz - animoitu 360-kuva.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Porto_Moniz_-_animoitu_360-kuva.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Porto_Moniz_-_animoitu_360-kuva.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Matleena Laakso",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 12.701,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1278,
+        720
+      ],
+      "source_sha1": "1166015649ebc9075315de0cb00d900fe2e0cdea",
+      "source_size_bytes": 1634861,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Files self-reviewed by DarwIn (re-review needed)",
+        "Category:Media from YouTube",
+        "Category:Piscinas naturais do Porto Moniz",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2019 from Madeira",
+        "Category:Videos of beaches"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Protest Alt Left & Right in Berkeley (360° VR).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Protest_Alt_Left_%26_Right_in_Berkeley_(360%C2%B0_VR).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/32/Protest_Alt_Left_%26_Right_in_Berkeley_%28360%C2%B0_VR%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Kevin Kunze",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 352.781,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "e17325d0aaa3d6cf636de31a03d671a22f837408",
+      "source_size_bytes": 822386753,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Protest in Berkeley (27 August 2017)",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2017"
+      ],
+      "discovered_categories": [
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Protest Alt Left & Right in Berkeley 360° VR.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Protest_Alt_Left_%26_Right_in_Berkeley_360%C2%B0_VR.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Protest_Alt_Left_%26_Right_in_Berkeley_360%C2%B0_VR.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Kevin Kunze",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 352.781,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "1a03f927ffc86bdc7a915d02eb639079aa74ef16",
+      "source_size_bytes": 822722794,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Protest in Berkeley (27 August 2017)",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2160",
+        "Category:Videos of 2017",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Refugees 360 VR documentary - Awarded Best Independent film by Scopic..webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Refugees_360_VR_documentary_-_Awarded_Best_Independent_film_by_Scopic..webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Refugees_360_VR_documentary_-_Awarded_Best_Independent_film_by_Scopic..webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Scopic",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 399.347,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "f1c059ec09a8ac1a94a7cae637b3c11d9d9d69e7",
+      "source_size_bytes": 924949000,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Refugees of the Syrian Civil War",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:See Why New York’s Ferries Are So Popular (360 degrees).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:See_Why_New_York%E2%80%99s_Ferries_Are_So_Popular_(360_degrees).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/6/6e/See_Why_New_York%E2%80%99s_Ferries_Are_So_Popular_%28360_degrees%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "The New York Times",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 81.605,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "c797d984f10b0694e0638c46dafae2592293197e",
+      "source_size_bytes": 165569305,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:2017 in Astoria, Queens",
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:December 2017 in New York City",
+        "Category:EAC Video",
+        "Category:Ferries across the East River",
+        "Category:Ferries in New York Harbor",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:The New York Times",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 1920",
+        "Category:Videos of 2017 from the United States"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos",
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ],
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Simulation of a Supermassive Black Hole (VR).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Simulation_of_a_Supermassive_Black_Hole_(VR).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Simulation_of_a_Supermassive_Black_Hole_%28VR%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "European Southern Observatory (ESO)",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 53.361000000000004,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "204870019d5522b8ce01f0ffebce6cb1e2b7c82d",
+      "source_size_bytes": 89811678,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2019",
+        "Category:Videos of black holes"
+      ],
+      "discovered_categories": [
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Smoke and Fire with a 360 View of RS-25 Engine Test.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Smoke_and_Fire_with_a_360_View_of_RS-25_Engine_Test.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Smoke_and_Fire_with_a_360_View_of_RS-25_Engine_Test.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA's Marshall Center",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 149.941,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "6b720339d4f103c4717da1c333d584d982a4e563",
+      "source_size_bytes": 281913793,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:A-1/A-2 Test stands of Stennis Space Center",
+        "Category:February 2017 in Mississippi",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2017",
+        "Category:PD NASA",
+        "Category:Remote views of RS-25 firing tests at Stennis Space Center",
+        "Category:Stennis Space Center in 2017",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 1920",
+        "Category:Videos of 2017 from the United States",
+        "Category:Videos taken on 2017-02-22",
+        "Category:WebM videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:Test Insta360 Pro2 on DJI Inspire2 8K 59,9 fps - YouTube.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Test_Insta360_Pro2_on_DJI_Inspire2_8K_59,9_fps_-_YouTube.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Test_Insta360_Pro2_on_DJI_Inspire2_8K_59%2C9_fps_-_YouTube.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "KinoLet",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 230.781,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        7680,
+        3840
+      ],
+      "source_sha1": "199b10ee638c32a42878ee39eaa31cfdf5bb793f",
+      "source_size_bytes": 589802166,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:DJI Inspire 2",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Taken with Insta360 Pro 2",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 7680 x 3840",
+        "Category:Videos by KinoLet",
+        "Category:Videos of 2018"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:VR 360 Bernie Sanders 2016 Presidential Campaign.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:VR_360_Bernie_Sanders_2016_Presidential_Campaign.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/8/8b/VR_360_Bernie_Sanders_2016_Presidential_Campaign.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "virtualitylab.com",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 369.339,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2160
+      ],
+      "source_sha1": "1765207f676203d327132d187b76149eb1a7bc64",
+      "source_size_bytes": 646666363,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:Bernie Sanders in June 2015",
+        "Category:Bernie Sanders presidential campaign, 2016 in California",
+        "Category:CC-BY-3.0",
+        "Category:EAC Video",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:June 2015 in California",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2015"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos",
+        "Category:EAC Video"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ],
+        [
+          "Category:360-degree videos",
+          "Category:EAC Video"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "eac",
+      "projection_authority": "Wikimedia Commons Category:EAC Video",
+      "projection_review_required": false,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Video 360 VR on board de Raul Sanchez en Bellpuig.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Video_360_VR_on_board_de_Raul_Sanchez_en_Bellpuig.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Video_360_VR_on_board_de_Raul_Sanchez_en_Bellpuig.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Fotos, Joel Molina",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 282.38100000000003,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "e97bf809689f06c765944977ea394ad1219bec04",
+      "source_size_bytes": 591230676,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Video 360°. Timelapse. Bled Lake in Slovenia..webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Video_360%C2%B0._Timelapse._Bled_Lake_in_Slovenia..webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Video_360%C2%B0._Timelapse._Bled_Lake_in_Slovenia..webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Fabio Casati",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 8.514,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "02e403f6fd2143e7ed1c08759af72221d93dd140",
+      "source_size_bytes": 17254262,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Time-lapse videos from Slovenia",
+        "Category:Uploaded with video2commons",
+        "Category:Videos from Bled",
+        "Category:Videos of 2018 from Slovenia",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Virtual Plant Cell- Cell Explore, 2018. VPC 360° video by Plant Energy Biology.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Virtual_Plant_Cell-_Cell_Explore,_2018._VPC_360%C2%B0_video_by_Plant_Energy_Biology.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Virtual_Plant_Cell-_Cell_Explore%2C_2018._VPC_360%C2%B0_video_by_Plant_Energy_Biology.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Plant Energy Biology",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 357.541,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "ed2e27eff3be11da978cb1a9b834d45f38c83eee",
+      "source_size_bytes": 628488714,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:License reviewed by YouTubeReviewBot",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos of cryobiology",
+        "Category:Videos of virtual reality",
+        "Category:Videos uploaded by Eatcha"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Wikimania 2016 Hackathon 360.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Wikimania_2016_Hackathon_360.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Wikimania_2016_Hackathon_360.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Jan Ainali",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 18.018,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "119d7f4667f4f54f7712d8abbf3d71d5b0f7de3f",
+      "source_size_bytes": 5396302,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:360° panoramas",
+        "Category:CC-BY-SA-4.0",
+        "Category:Nicolas Vigneron at Wikimania 2016",
+        "Category:Self-published work",
+        "Category:Taken with Ricoh Theta S",
+        "Category:Uploaded with videoconvert",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Videos of 2016 from Italy",
+        "Category:Wikimania 2016 Hackathon",
+        "Category:Wikimania 2016 by Jan Ainali",
+        "Category:Wikimania 2016 pre-conference - Day 2",
+        "Category:Wikimania 2016 videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Wikimania 2016 Wikidata meetup Data.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Wikimania_2016_Wikidata_meetup_Data.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Wikimania_2016_Wikidata_meetup_Data.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Jan Ainali",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 6.072,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "33ebd14f993d2e032aa4bcb1bf940419f45b1bc7",
+      "source_size_bytes": 748311,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:360° panoramas",
+        "Category:CC-BY-SA-4.0",
+        "Category:Self-published work",
+        "Category:Taken with Ricoh Theta S",
+        "Category:Uploaded with videoconvert",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Wikimania 2016 - Wikidata meetup",
+        "Category:Wikimania 2016 by Jan Ainali",
+        "Category:Wikimania 2016 videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Wikimania 2016 Wikidata meetup.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Wikimania_2016_Wikidata_meetup.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Wikimania_2016_Wikidata_meetup.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Jan Ainali",
+      "license": {
+        "name": "CC BY-SA 4.0",
+        "url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "status": "verified"
+      },
+      "duration_seconds": 4.0040000000000004,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        1920,
+        960
+      ],
+      "source_sha1": "8c46a0fda3307b102afbfe5849a26722f0df8eca",
+      "source_size_bytes": 652465,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:360° panoramas",
+        "Category:CC-BY-SA-4.0",
+        "Category:Self-published work",
+        "Category:Taken with Ricoh Theta S",
+        "Category:Uploaded with videoconvert",
+        "Category:Video display resolution 1920 x 960",
+        "Category:Wikimania 2016 - Wikidata meetup",
+        "Category:Wikimania 2016 by Jan Ainali",
+        "Category:Wikimania 2016 videos"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:Wind Tunnel Test of NASA’s Most Powerful Rocket (360° Animation).webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Wind_Tunnel_Test_of_NASA%E2%80%99s_Most_Powerful_Rocket_(360%C2%B0_Animation).webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Wind_Tunnel_Test_of_NASA%E2%80%99s_Most_Powerful_Rocket_%28360%C2%B0_Animation%29.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "NASA, USGov",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 165.341,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "9b071f266f4d9195da6eb33331a12c15dd293c32",
+      "source_size_bytes": 26090578,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:NASA videos in 2018",
+        "Category:PD NASA",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 1920"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:World's First Live 360 Rocket Launch- Orbital ATK CRS-7.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:World%27s_First_Live_360_Rocket_Launch-_Orbital_ATK_CRS-7.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/8/83/World%27s_First_Live_360_Rocket_Launch-_Orbital_ATK_CRS-7.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "National Aeronautics and Space Administration",
+      "license": {
+        "name": "Public domain",
+        "url": null,
+        "status": "unknown"
+      },
+      "duration_seconds": 788.924,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        2048
+      ],
+      "source_sha1": "d5459b8652d624b5e54d51327d4dc75c2f5b582a",
+      "source_size_bytes": 272745595,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:AV-070",
+        "Category:April 2017 in Florida",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:NASA videos in 2017",
+        "Category:PD NASA",
+        "Category:Uploaded with video2commons",
+        "Category:Video display resolution 3840 x 2048",
+        "Category:Videos in American English",
+        "Category:Videos of 2017 from the United States",
+        "Category:Videos of rocket launches",
+        "Category:Videos taken on 2017-04-18",
+        "Category:Videos with text in English",
+        "Category:WebM videos",
+        "Category:YouTube live streams by NASA"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": false,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": false,
+        "failed_requirements": [
+          "license_verified"
+        ]
+      }
+    },
+    {
+      "canonical_title": "File:Škraltica 360.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:%C5%A0kraltica_360.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/8/80/%C5%A0kraltica_360.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Bojan Pintar",
+      "license": {
+        "name": "CC BY 3.0",
+        "url": "https://creativecommons.org/licenses/by/3.0",
+        "status": "verified"
+      },
+      "duration_seconds": 113.765,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        3840,
+        1920
+      ],
+      "source_sha1": "45a73f394fd1b90864b6ce7ef3848b80a96ed8f5",
+      "source_size_bytes": 304140347,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-BY-3.0",
+        "Category:Files from external sources with reviewed licenses",
+        "Category:Media from YouTube",
+        "Category:Uploaded with video2commons",
+        "Category:Videos of 2016 from Slovenia",
+        "Category:Videos of mountains of Slovenia",
+        "Category:Škrlatica"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    }
+  ],
+  "discovery_failures": [],
+  "metadata_failures": [],
+  "policy": {
+    "quality_is_not_inferred_from_metadata": true,
+    "aspect_ratio_does_not_prove_equirectangular": true,
+    "title_does_not_prove_equirectangular": true,
+    "production_promotion_requires_stage_c_and_d_evidence": true
+  }
+}
