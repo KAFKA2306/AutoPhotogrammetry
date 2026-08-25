@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "authority": "Wikimedia Commons source pages",
+  "purpose": "Initial materialization/projection review queue for issue #140. This is not a reconstruction-quality ranking.",
+  "candidates": [
+    {
+      "canonical_title": "File:Norah Head Insta360 X5 Virtual Tour OHNE TON.webm",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Norah_Head_Insta360_X5_Virtual_Tour_OHNE_TON.webm",
+      "source_evidence": {
+        "capture_device": "Insta360 X5",
+        "camera_motion": "source_description_supported",
+        "description_basis": "Source page describes a virtual tour beginning at Norah Head lighthouse, continuing down stairs and across rocks.",
+        "resolution": [
+          7680,
+          3840
+        ],
+        "license": "CC BY 3.0"
+      },
+      "projection_type": "unknown",
+      "projection_review_required": true,
+      "stage_c_or_d_quality_evaluated": false
+    },
+    {
+      "canonical_title": "File:Test Insta360 Pro2 on DJI Inspire2 8K 59,9 fps - YouTube.webm",
+      "source_page": "https://commons.wikimedia.org/wiki/File:Test_Insta360_Pro2_on_DJI_Inspire2_8K_59,9_fps_-_YouTube.webm",
+      "source_evidence": {
+        "capture_device": "Insta360 Pro 2 + DJI Inspire 2",
+        "camera_motion": "source_description_supported",
+        "description_basis": "Source page describes a 360-degree drone video over an industrial area.",
+        "resolution": [
+          7680,
+          3840
+        ],
+        "license": "CC BY 3.0"
+      },
+      "projection_type": "unknown",
+      "projection_review_required": true,
+      "stage_c_or_d_quality_evaluated": false
+    }
+  ]
+}
