@@ -4,7 +4,10 @@ import argparse
 import importlib
 import importlib.metadata
 import json
+import os
 from pathlib import Path
+import subprocess
+import tempfile
 
 import numpy as np
 
@@ -77,6 +80,35 @@ def _artifact_files(output: Path) -> list[dict]:
     ]
 
 
+def _write_glb_with_blender(o3d, legacy, output_path: Path) -> None:
+    blender = os.environ.get("BLENDER_EXECUTABLE", "blender")
+    with tempfile.TemporaryDirectory() as temporary:
+        temporary_path = Path(temporary)
+        source_ply = temporary_path / "source.ply"
+        script = temporary_path / "export_glb.py"
+        if not o3d.io.write_triangle_mesh(str(source_ply), legacy, write_ascii=False):
+            raise RuntimeError("failed to stage mesh for Blender GLB export")
+        script.write_text(
+            "import bpy, sys\n"
+            "source, output = sys.argv[sys.argv.index('--') + 1:]\n"
+            "bpy.ops.wm.read_factory_settings(use_empty=True)\n"
+            "result = bpy.ops.wm.ply_import(filepath=source)\n"
+            "if 'FINISHED' not in result: raise RuntimeError(f'PLY import failed: {result}')\n"
+            "result = bpy.ops.export_scene.gltf(filepath=output, export_format='GLB')\n"
+            "if 'FINISHED' not in result: raise RuntimeError(f'GLB export failed: {result}')\n",
+            encoding="utf-8",
+        )
+        completed = subprocess.run(
+            [blender, "--background", "--factory-startup", "--python", str(script), "--", str(source_ply), str(output_path)],
+            check=False,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        if completed.returncode != 0:
+            raise RuntimeError(f"Blender GLB export failed ({completed.returncode}): {completed.stdout[-4000:]}")
+
+
 def _write_mesh(o3d, legacy, output_path: Path, output_format: str) -> None:
     if output_format == "stl":
         if not legacy.has_triangle_normals():
@@ -89,19 +121,8 @@ def _write_mesh(o3d, legacy, output_path: Path, output_format: str) -> None:
             write_triangle_uvs=False,
         )
     elif output_format == "glb":
-        # Open3D's legacy GLB writer uses its core TinyGLTF path. The tensor
-        # writer delegates through Assimp, whose triangulation can emit
-        # FB_ngon_encoding and change triangle topology in consumers such as Blender.
-        normals = np.asarray(legacy.vertex_normals)
-        if not _vertex_normals_are_valid(normals, len(legacy.vertices)):
-            legacy.vertex_normals = o3d.utility.Vector3dVector()
-        written = o3d.io.write_triangle_mesh(
-            str(output_path),
-            legacy,
-            write_vertex_normals=legacy.has_vertex_normals(),
-            write_vertex_colors=False,
-            write_triangle_uvs=False,
-        )
+        _write_glb_with_blender(o3d, legacy, output_path)
+        written = True
     else:
         normals = np.asarray(legacy.vertex_normals)
         if not _vertex_normals_are_valid(normals, len(legacy.vertices)):
@@ -152,6 +173,7 @@ def export_mesh(
         "implementation": {
             "library": "Open3D",
             "version": importlib.metadata.version("open3d"),
+            "glb_exporter": "Blender" if output_format == "glb" else None,
         },
         "input": {
             "path": str(input_path),
