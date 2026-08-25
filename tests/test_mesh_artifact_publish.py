@@ -95,7 +95,9 @@ class MeshArtifactPublishTest(unittest.TestCase):
             self.assertEqual(RAW_MESH_SHA, artifact["provenance"]["raw_mesh_sha256"])
             self.assertEqual("d" * 64, artifact["provenance"]["parent_mesh_sha256"])
             self.assertEqual("unverified", artifact["geometry"]["metric_scale"]["status"])
-            self.assertEqual("https://creativecommons.org/licenses/by/4.0/", artifact["license_url"])
+            self.assertEqual(
+                "https://creativecommons.org/licenses/by/4.0/", artifact["license_url"]
+            )
 
     def test_publish_requires_remote_hash_and_size_readback(self):
         with tempfile.TemporaryDirectory() as d:
