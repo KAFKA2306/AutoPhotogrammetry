@@ -1,6 +1,12 @@
 name: Wikimedia 360 Video Discovery
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "processing/wikimedia_360.py"
+      - "processing/wikimedia_discovery.py"
+      - ".github/workflows/wikimedia-360-discovery.yml"
   schedule:
     - cron: "41 4 * * 1"
   workflow_dispatch:
