@@ -24,7 +24,9 @@ class Wikimedia360Test(unittest.TestCase):
         self.assertTrue(state["projection_review_required"])
         self.assertFalse(state["equirectangular_processing_ready"])
 
-    def test_eac_category_is_explicitly_classified_but_not_sent_to_equirectangular_path(self) -> None:
+    def test_eac_category_is_explicitly_classified_but_not_sent_to_equirectangular_path(
+        self,
+    ) -> None:
         state = projection_state(
             {
                 "commons_categories": ["Category:EAC Video"],
@@ -86,11 +88,7 @@ class Wikimedia360Test(unittest.TestCase):
                     }
                 if category == "Category:EAC Video":
                     return {
-                        "query": {
-                            "categorymembers": [
-                                {"ns": 6, "title": eac_file, "type": "file"}
-                            ]
-                        }
+                        "query": {"categorymembers": [{"ns": 6, "title": eac_file, "type": "file"}]}
                     }
                 raise AssertionError(category)
 
