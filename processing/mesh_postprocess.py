@@ -149,7 +149,10 @@ def repair_mesh(
     initial_vertices = len(mesh.vertices)
     mesh.remove_duplicated_vertices()
     operations.append(
-        {"operation": "remove_duplicated_vertices", "removed": initial_vertices - len(mesh.vertices)}
+        {
+            "operation": "remove_duplicated_vertices",
+            "removed": initial_vertices - len(mesh.vertices),
+        }
     )
     initial_faces = len(mesh.triangles)
     mesh.remove_duplicated_triangles()
@@ -173,7 +176,10 @@ def repair_mesh(
         initial_faces = len(mesh.triangles)
         mesh.remove_non_manifold_edges()
         operations.append(
-            {"operation": "remove_non_manifold_edges", "removed_faces": initial_faces - len(mesh.triangles)}
+            {
+                "operation": "remove_non_manifold_edges",
+                "removed_faces": initial_faces - len(mesh.triangles),
+            }
         )
     mesh.remove_unreferenced_vertices()
     oriented = bool(mesh.orient_triangles()) if mesh.is_orientable() else False
