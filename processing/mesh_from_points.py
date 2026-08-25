@@ -25,12 +25,47 @@ def _open3d():
         raise RuntimeError("Open3D is required for PLY-only mesh reconstruction") from exc
 
 
-def _point_cloud(path: str | Path):
+def _opacity_probabilities(logits: np.ndarray) -> np.ndarray:
+    values = np.asarray(logits, dtype=np.float64)
+    probabilities = np.empty_like(values)
+    positive = values >= 0
+    probabilities[positive] = 1.0 / (1.0 + np.exp(-values[positive]))
+    exp_logits = np.exp(values[~positive])
+    probabilities[~positive] = exp_logits / (1.0 + exp_logits)
+    return probabilities
+
+
+def _point_samples(
+    vertices: np.ndarray, opacity_threshold: float | None
+) -> tuple[np.ndarray, dict]:
+    names = set(vertices.dtype.names or ())
+    mask = np.ones(len(vertices), dtype=bool)
+    if opacity_threshold is not None:
+        if not 0.0 <= opacity_threshold <= 1.0:
+            raise ValueError("opacity_threshold must be between 0 and 1")
+        if "opacity" not in names:
+            raise ValueError("opacity_threshold requires an opacity property")
+        mask = _opacity_probabilities(vertices["opacity"]) >= opacity_threshold
+    kept = int(np.count_nonzero(mask))
+    if kept < 4:
+        raise ValueError(f"opacity filtering left too few point samples: {kept}")
+    points = np.column_stack(
+        [vertices["x"][mask], vertices["y"][mask], vertices["z"][mask]]
+    ).astype(np.float64)
+    return points, {
+        "input_point_count": int(len(vertices)),
+        "kept_point_count": kept,
+        "filtered_point_count": int(len(vertices) - kept),
+        "opacity_threshold": opacity_threshold,
+    }
+
+
+def _point_cloud(path: str | Path, opacity_threshold: float | None):
     o3d = _open3d()
     _, vertices = _read_vertices(path)
-    points = np.column_stack([vertices["x"], vertices["y"], vertices["z"]]).astype(np.float64)
+    points, filtering = _point_samples(vertices, opacity_threshold)
     cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
-    return o3d, cloud
+    return o3d, cloud, filtering
 
 
 def _mesh_stats(mesh) -> dict:
@@ -59,6 +94,7 @@ def reconstruct_mesh(
     depth: int | None = None,
     normal_radius: float | None = None,
     normal_max_nn: int = 30,
+    opacity_threshold: float | None = None,
     max_faces: int | None = None,
 ) -> dict:
     inspection = gaussian_ply_inspection(input_ply)
@@ -66,8 +102,8 @@ def reconstruct_mesh(
     if not backend["supported"]:
         raise ValueError(f"input PLY is not usable as a point cloud: {backend['missing_fields']}")
 
-    o3d, cloud = _point_cloud(input_ply)
-    parameters: dict[str, object] = {}
+    o3d, cloud, filtering = _point_cloud(input_ply, opacity_threshold)
+    parameters: dict[str, object] = {"opacity_threshold": opacity_threshold}
     started = time.perf_counter()
 
     if method == "alpha":
@@ -128,6 +164,7 @@ def reconstruct_mesh(
             "sha256": inspection["sha256"],
             "size_bytes": inspection["size_bytes"],
             "point_count": inspection["vertex_count"],
+            "filtering": filtering,
         },
         "output": {
             "path": str(output),
@@ -154,6 +191,7 @@ def main() -> None:
     parser.add_argument("--depth", type=int)
     parser.add_argument("--normal-radius", type=float)
     parser.add_argument("--normal-max-nn", type=int, default=30)
+    parser.add_argument("--opacity-threshold", type=float)
     parser.add_argument("--max-faces", type=int)
     parser.add_argument("--manifest")
     args = parser.parse_args()
@@ -166,6 +204,7 @@ def main() -> None:
         depth=args.depth,
         normal_radius=args.normal_radius,
         normal_max_nn=args.normal_max_nn,
+        opacity_threshold=args.opacity_threshold,
         max_faces=args.max_faces,
     )
     if args.manifest:
