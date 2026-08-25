@@ -11,6 +11,7 @@ import numpy as np
 from processing.provenance import sha256_file, write_json
 
 SUPPORTED_FORMATS = {"glb", "obj", "stl"}
+OBJ_TEXTURE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".ktx", ".ktx2"}
 
 
 def _open3d():
@@ -43,7 +44,11 @@ def _legacy_mesh_stats(mesh) -> dict:
 
 
 def _belongs_to_obj_group(path: Path, output: Path) -> bool:
-    return path == output or path.name.startswith(f"{output.stem}_") or path.stem == output.stem
+    if path == output:
+        return True
+    if path.name == f"{output.stem}.mtl":
+        return True
+    return path.name.startswith(f"{output.stem}_") and path.suffix.lower() in OBJ_TEXTURE_SUFFIXES
 
 
 def _artifact_files(output: Path) -> list[dict]:
@@ -65,6 +70,26 @@ def _artifact_files(output: Path) -> list[dict]:
     ]
 
 
+def _write_mesh(o3d, legacy, output_path: Path, output_format: str) -> None:
+    if output_format == "stl":
+        if not legacy.has_triangle_normals():
+            legacy.compute_triangle_normals()
+        written = o3d.io.write_triangle_mesh(
+            str(output_path),
+            legacy,
+            write_vertex_normals=False,
+            write_vertex_colors=False,
+            write_triangle_uvs=False,
+        )
+    else:
+        tensor_mesh = o3d.t.geometry.TriangleMesh.from_legacy(legacy)
+        written = o3d.t.io.write_triangle_mesh(str(output_path), tensor_mesh)
+    if not written:
+        raise RuntimeError(f"failed to export mesh: {output_path}")
+    if not output_path.is_file() or output_path.stat().st_size <= 0:
+        raise RuntimeError(f"mesh exporter produced no artifact: {output_path}")
+
+
 def export_mesh(
     input_mesh: str | Path,
     output_mesh: str | Path,
@@ -83,12 +108,8 @@ def export_mesh(
     if not legacy.has_vertex_normals():
         legacy.compute_vertex_normals()
 
-    tensor_mesh = o3d.t.geometry.TriangleMesh.from_legacy(legacy)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    if not o3d.t.io.write_triangle_mesh(str(output_path), tensor_mesh):
-        raise RuntimeError(f"failed to export mesh: {output_path}")
-    if not output_path.is_file() or output_path.stat().st_size <= 0:
-        raise RuntimeError(f"mesh exporter produced no artifact: {output_path}")
+    _write_mesh(o3d, legacy, output_path, output_format)
 
     readback = o3d.io.read_triangle_mesh(str(output_path), enable_post_processing=False)
     readback_stats = _legacy_mesh_stats(readback)
