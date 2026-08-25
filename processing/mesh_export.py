@@ -99,14 +99,25 @@ def _write_glb_with_blender(o3d, legacy, output_path: Path) -> None:
             encoding="utf-8",
         )
         completed = subprocess.run(
-            [blender, "--background", "--factory-startup", "--python", str(script), "--", str(source_ply), str(output_path)],
+            [
+                blender,
+                "--background",
+                "--factory-startup",
+                "--python",
+                str(script),
+                "--",
+                str(source_ply),
+                str(output_path),
+            ],
             check=False,
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
         if completed.returncode != 0:
-            raise RuntimeError(f"Blender GLB export failed ({completed.returncode}): {completed.stdout[-4000:]}")
+            raise RuntimeError(
+                f"Blender GLB export failed ({completed.returncode}): {completed.stdout[-4000:]}"
+            )
 
 
 def _write_mesh(o3d, legacy, output_path: Path, output_format: str) -> None:
