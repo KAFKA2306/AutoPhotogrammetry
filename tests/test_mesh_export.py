@@ -4,7 +4,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from processing.mesh_export import _artifact_files, _format_from_output
+import numpy as np
+
+from processing.mesh_export import _artifact_files, _format_from_output, _vertex_normals_are_valid
 
 
 class MeshExportContractTests(unittest.TestCase):
@@ -15,6 +17,26 @@ class MeshExportContractTests(unittest.TestCase):
     def test_rejects_unsupported_format(self) -> None:
         with self.assertRaisesRegex(ValueError, "unsupported mesh export format"):
             _format_from_output("asset.ply")
+
+    def test_vertex_normals_require_one_nonzero_finite_vector_per_vertex(self) -> None:
+        self.assertTrue(
+            _vertex_normals_are_valid(
+                np.asarray([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]),
+                2,
+            )
+        )
+        self.assertFalse(
+            _vertex_normals_are_valid(
+                np.asarray([[1.0, 0.0, 0.0], [0.0, 0.0, 0.0]]),
+                2,
+            )
+        )
+        self.assertFalse(
+            _vertex_normals_are_valid(
+                np.asarray([[1.0, 0.0, 0.0], [np.nan, 1.0, 0.0]]),
+                2,
+            )
+        )
 
     def test_obj_artifact_group_tracks_only_obj_sidecars(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
