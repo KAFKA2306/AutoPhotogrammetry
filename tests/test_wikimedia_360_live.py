@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 import unittest
+from email.message import Message
 from urllib.error import HTTPError
 
 from processing.wikimedia_360_live import _with_backoff
+
+
+def _headers(retry_after: str | None = None) -> Message:
+    headers = Message()
+    if retry_after is not None:
+        headers["Retry-After"] = retry_after
+    return headers
 
 
 class Wikimedia360LiveTest(unittest.TestCase):
@@ -19,7 +27,7 @@ class Wikimedia360LiveTest(unittest.TestCase):
                     "https://commons.wikimedia.org/w/api.php",
                     429,
                     "Too Many Requests",
-                    {"Retry-After": "0.25"},
+                    _headers("0.25"),
                     None,
                 )
             return {"ok": True}
@@ -42,7 +50,7 @@ class Wikimedia360LiveTest(unittest.TestCase):
                     "https://commons.wikimedia.org/w/api.php",
                     503,
                     "Service Unavailable",
-                    {},
+                    _headers(),
                     None,
                 )
             return {"ok": True}
@@ -78,7 +86,7 @@ class Wikimedia360LiveTest(unittest.TestCase):
                 "https://commons.wikimedia.org/w/api.php",
                 404,
                 "Not Found",
-                {},
+                _headers(),
                 None,
             )
 
