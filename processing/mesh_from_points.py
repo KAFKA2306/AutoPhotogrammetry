@@ -35,7 +35,9 @@ def _opacity_probabilities(logits: np.ndarray) -> np.ndarray:
     return probabilities
 
 
-def _point_samples(vertices: np.ndarray, opacity_threshold: float | None) -> tuple[np.ndarray, dict]:
+def _point_samples(
+    vertices: np.ndarray, opacity_threshold: float | None
+) -> tuple[np.ndarray, dict]:
     names = set(vertices.dtype.names or ())
     mask = np.ones(len(vertices), dtype=bool)
     if opacity_threshold is not None:
