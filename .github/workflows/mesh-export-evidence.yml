@@ -28,10 +28,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install mesh and glTF validation runtime
+      - name: Install mesh, glTF validation, and Blender runtime
+        shell: bash
         run: |
+          set -euo pipefail
           python -m pip install --disable-pip-version-check numpy open3d==0.19.0
           npm install --no-save gltf-validator@2.0.0-dev.3.10
+          blender_version=4.5.12
+          archive="blender-${blender_version}-linux-x64.tar.xz"
+          url="https://download.blender.org/release/Blender4.5/${archive}"
+          curl --fail --location --retry 3 "$url" --output "/tmp/$archive"
+          archive_sha256="$(sha256sum "/tmp/$archive" | cut -d' ' -f1)"
+          tar -xf "/tmp/$archive" -C /tmp
+          echo "BLENDER_EXECUTABLE=/tmp/blender-${blender_version}-linux-x64/blender" >> "$GITHUB_ENV"
+          echo "BLENDER_DOWNLOAD_URL=$url" >> "$GITHUB_ENV"
+          echo "BLENDER_ARCHIVE_SHA256=$archive_sha256" >> "$GITHUB_ENV"
       - name: Materialize real Gaussian PLY and reconstruct canonical alpha mesh
         shell: bash
         run: |
@@ -60,54 +71,29 @@ jobs:
               else 0.0
           )
           mask = probabilities >= threshold
-          points = np.column_stack(
-              [vertices['x'][mask], vertices['y'][mask], vertices['z'][mask]]
-          ).astype(np.float64)
+          points = np.column_stack([vertices['x'][mask], vertices['y'][mask], vertices['z'][mask]]).astype(np.float64)
           cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
           distances = np.asarray(cloud.compute_nearest_neighbor_distance())
           spacing = float(np.median(distances[distances > 0]))
-          reconstruct_mesh(
-              source,
-              'mesh-export-evidence/raw-alpha.ply',
-              method='alpha',
-              alpha=4.0 * spacing,
-              opacity_threshold=threshold,
-              max_faces=1000000,
-          )
+          reconstruct_mesh(source, 'mesh-export-evidence/raw-alpha.ply', method='alpha', alpha=4.0 * spacing, opacity_threshold=threshold, max_faces=1000000)
           PY
       - name: Inspect repair and decimate raw mesh
         run: |
           set -euo pipefail
-          python -m processing.mesh_postprocess inspect \
-            mesh-export-evidence/raw-alpha.ply \
-            --manifest mesh-export-evidence/raw-inspection.json
-          python -m processing.mesh_postprocess repair \
-            mesh-export-evidence/raw-alpha.ply \
-            mesh-export-evidence/repaired.ply \
-            --minimum-component-faces 10 \
-            --manifest mesh-export-evidence/repair-manifest.json
+          python -m processing.mesh_postprocess inspect mesh-export-evidence/raw-alpha.ply --manifest mesh-export-evidence/raw-inspection.json
+          python -m processing.mesh_postprocess repair mesh-export-evidence/raw-alpha.ply mesh-export-evidence/repaired.ply --minimum-component-faces 10 --manifest mesh-export-evidence/repair-manifest.json
           python - <<'PY'
           from processing.mesh_postprocess import decimate_mesh, inspect_mesh
           from processing.provenance import write_json
-
           repaired = inspect_mesh('mesh-export-evidence/repaired.ply')
-          target_faces = max(1000, repaired['face_count'] // 2)
-          result = decimate_mesh(
-              'mesh-export-evidence/repaired.ply',
-              'mesh-export-evidence/decimated.ply',
-              target_faces=target_faces,
-          )
+          result = decimate_mesh('mesh-export-evidence/repaired.ply', 'mesh-export-evidence/decimated.ply', target_faces=max(1000, repaired['face_count'] // 2))
           write_json('mesh-export-evidence/decimation-manifest.json', result)
           PY
       - name: Export GLB OBJ STL and verify readback
         run: |
           set -euo pipefail
           for format in glb obj stl; do
-            python -m processing.mesh_export \
-              mesh-export-evidence/decimated.ply \
-              "mesh-export-evidence/asset.$format" \
-              --source-manifest mesh-export-evidence/decimation-manifest.json \
-              --manifest "mesh-export-evidence/$format-manifest.json"
+            python -m processing.mesh_export mesh-export-evidence/decimated.ply "mesh-export-evidence/asset.$format" --source-manifest mesh-export-evidence/decimation-manifest.json --manifest "mesh-export-evidence/$format-manifest.json"
           done
       - name: Validate GLB with Khronos glTF Validator
         run: |
@@ -115,124 +101,71 @@ jobs:
           const fs = require('fs');
           const validator = require('gltf-validator');
           const path = 'mesh-export-evidence/asset.glb';
-          validator.validateBytes(new Uint8Array(fs.readFileSync(path)), {
-            uri: 'asset.glb',
-            format: 'glb',
-            writeTimestamp: false,
-            maxIssues: 0
-          }).then(report => {
-            fs.writeFileSync(
-              'mesh-export-evidence/gltf-validation.json',
-              JSON.stringify(report, null, 2)
-            );
-            if (report.issues && report.issues.numErrors > 0) {
-              console.error(JSON.stringify(report.issues, null, 2));
-              process.exit(1);
-            }
-          }).catch(error => {
-            console.error(error);
-            process.exit(1);
-          });
+          validator.validateBytes(new Uint8Array(fs.readFileSync(path)), {uri: 'asset.glb', format: 'glb', writeTimestamp: false, maxIssues: 0}).then(report => {
+            fs.writeFileSync('mesh-export-evidence/gltf-validation.json', JSON.stringify(report, null, 2));
+            if (report.issues && report.issues.numErrors > 0) { console.error(JSON.stringify(report.issues, null, 2)); process.exit(1); }
+          }).catch(error => { console.error(error); process.exit(1); });
           NODE
       - name: Import GLB in Blender 4.5.12 LTS and verify consumer geometry
         shell: bash
         run: |
           set -euo pipefail
-          blender_version=4.5.12
-          archive="blender-${blender_version}-linux-x64.tar.xz"
-          url="https://download.blender.org/release/Blender4.5/${archive}"
-          curl --fail --location --retry 3 "$url" --output "/tmp/$archive"
-          archive_sha256="$(sha256sum "/tmp/$archive" | cut -d' ' -f1)"
-          tar -xf "/tmp/$archive" -C /tmp
           cat > /tmp/verify_blender_glb.py <<'PY'
           import hashlib
           import json
           import math
           from pathlib import Path
-
           import bpy
           from mathutils import Vector
 
           glb = Path('mesh-export-evidence/asset.glb').resolve()
           export_manifest = json.loads(Path('mesh-export-evidence/glb-manifest.json').read_text())
           expected = export_manifest['output']['readback']
-
           bpy.ops.wm.read_factory_settings(use_empty=True)
           result = bpy.ops.import_scene.gltf(filepath=str(glb))
           if 'FINISHED' not in result:
               raise RuntimeError(f'Blender glTF import did not finish: {result}')
-
           mesh_objects = [obj for obj in bpy.context.scene.objects if obj.type == 'MESH']
           if not mesh_objects:
               raise RuntimeError('Blender imported no mesh objects')
-
           vertex_count = sum(len(obj.data.vertices) for obj in mesh_objects)
           polygon_count = sum(len(obj.data.polygons) for obj in mesh_objects)
           for obj in mesh_objects:
               obj.data.calc_loop_triangles()
           triangle_count = sum(len(obj.data.loop_triangles) for obj in mesh_objects)
           if vertex_count != expected['vertex_count'] or triangle_count != expected['face_count']:
-              raise RuntimeError(
-                  f'geometry count drift: expected {expected["vertex_count"]}/{expected["face_count"]} triangles, '
-                  f'got {vertex_count}/{triangle_count} triangles ({polygon_count} Blender polygons)'
-              )
-
+              raise RuntimeError(f'geometry count drift: expected {expected["vertex_count"]}/{expected["face_count"]} triangles, got {vertex_count}/{triangle_count} triangles ({polygon_count} Blender polygons)')
           corners = [obj.matrix_world @ Vector(corner) for obj in mesh_objects for corner in obj.bound_box]
           bbox_min = [min(point[i] for point in corners) for i in range(3)]
           bbox_max = [max(point[i] for point in corners) for i in range(3)]
           if not all(math.isfinite(v) for v in bbox_min + bbox_max):
               raise RuntimeError('Blender import produced non-finite bounds')
-
           source_extent = sorted(expected['bbox_max'][i] - expected['bbox_min'][i] for i in range(3))
           imported_extent = sorted(bbox_max[i] - bbox_min[i] for i in range(3))
           tolerance = max(1e-5, max(source_extent) * 1e-5)
           if any(abs(a - b) > tolerance for a, b in zip(source_extent, imported_extent)):
-              raise RuntimeError(
-                  f'extent drift after basis conversion: source={source_extent}, imported={imported_extent}'
-              )
-
-          material_names = sorted({slot.material.name for obj in mesh_objects for slot in obj.material_slots if slot.material})
-          image_names = sorted(image.name for image in bpy.data.images)
+              raise RuntimeError(f'extent drift after basis conversion: source={source_extent}, imported={imported_extent}')
           report = {
               'schema_version': 1,
               'status': 'success',
               'consumer': {'name': 'Blender', 'version': bpy.app.version_string, 'importer': 'bpy.ops.import_scene.gltf'},
-              'source_glb': {
-                  'path': str(glb),
-                  'sha256': hashlib.sha256(glb.read_bytes()).hexdigest(),
-                  'size_bytes': glb.stat().st_size,
-              },
-              'import': {
-                  'mesh_object_count': len(mesh_objects),
-                  'vertex_count': vertex_count,
-                  'polygon_count': polygon_count,
-                  'triangle_count': triangle_count,
-                  'bbox_min': bbox_min,
-                  'bbox_max': bbox_max,
-                  'material_names': material_names,
-                  'image_names': image_names,
-              },
-              'comparison': {
-                  'expected_vertex_count': expected['vertex_count'],
-                  'expected_triangle_count': expected['face_count'],
-                  'source_extent_sorted': source_extent,
-                  'imported_extent_sorted': imported_extent,
-                  'extent_tolerance': tolerance,
-              },
+              'source_glb': {'path': str(glb), 'sha256': hashlib.sha256(glb.read_bytes()).hexdigest(), 'size_bytes': glb.stat().st_size},
+              'import': {'mesh_object_count': len(mesh_objects), 'vertex_count': vertex_count, 'polygon_count': polygon_count, 'triangle_count': triangle_count, 'bbox_min': bbox_min, 'bbox_max': bbox_max, 'material_names': sorted({slot.material.name for obj in mesh_objects for slot in obj.material_slots if slot.material}), 'image_names': sorted(image.name for image in bpy.data.images)},
+              'comparison': {'expected_vertex_count': expected['vertex_count'], 'expected_triangle_count': expected['face_count'], 'source_extent_sorted': source_extent, 'imported_extent_sorted': imported_extent, 'extent_tolerance': tolerance},
               'metric_scale': {'status': 'unverified', 'unit': None},
           }
           Path('mesh-export-evidence/blender-import.json').write_text(json.dumps(report, indent=2) + '\n')
           print(json.dumps(report, indent=2))
           PY
-          BLENDER_ARCHIVE_SHA256="$archive_sha256" "/tmp/blender-${blender_version}-linux-x64/blender" \
-            --background --factory-startup --python /tmp/verify_blender_glb.py
-          python - <<PY
+          "$BLENDER_EXECUTABLE" --background --factory-startup --python /tmp/verify_blender_glb.py
+          python - <<'PY'
           import json
+          import os
           from pathlib import Path
           path = Path('mesh-export-evidence/blender-import.json')
           report = json.loads(path.read_text())
-          report['consumer']['download_url'] = '$url'
-          report['consumer']['archive_sha256'] = '$archive_sha256'
+          report['consumer']['download_url'] = os.environ['BLENDER_DOWNLOAD_URL']
+          report['consumer']['archive_sha256'] = os.environ['BLENDER_ARCHIVE_SHA256']
           path.write_text(json.dumps(report, indent=2) + '\n')
           PY
       - uses: actions/upload-artifact@v4
