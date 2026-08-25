@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "processing/wikimedia_360.py"
+      - "processing/wikimedia_360_live.py"
       - "processing/wikimedia_discovery.py"
       - ".github/workflows/wikimedia-360-discovery.yml"
   schedule:
@@ -13,7 +14,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: wikimedia-360-video-discovery
@@ -34,15 +34,13 @@ jobs:
       - run: uv sync --locked
       - name: Verify repository before discovery
         run: bash scripts/check
-      - name: Refresh Wikimedia 360 pool
-        run: uv run python -m processing.wikimedia_360 refresh
+      - name: Refresh complete Wikimedia 360 pool
+        run: uv run python -m processing.wikimedia_360_live
       - name: Validate refreshed snapshot
         run: |
           uv run python -m processing.wikimedia_360 validate
-          uv run python -m unittest tests.test_wikimedia_360 tests.test_wikimedia_discovery -v
-      - name: Open a reviewable data pull request when content changes
-        env:
-          GH_TOKEN: ${{ github.token }}
+          uv run python -m unittest tests.test_wikimedia_360 tests.test_wikimedia_360_live tests.test_wikimedia_discovery -v
+      - name: Persist complete snapshot when content changes
         shell: bash
         run: |
           set -euo pipefail
@@ -52,20 +50,8 @@ jobs:
             exit 0
           fi
 
-          branch="automation/wikimedia-360-discovery"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin "refs/heads/${branch}:refs/remotes/origin/${branch}" || true
-          git switch -c "${branch}"
           git add "${path}"
           git commit -m "Data: refresh Wikimedia 360 discovery"
-          git push --force-with-lease origin "HEAD:refs/heads/${branch}"
-
-          existing="$(gh pr list --head "${branch}" --base main --state open --json number --jq '.[0].number // empty')"
-          if [[ -z "${existing}" ]]; then
-            gh pr create \
-              --base main \
-              --head "${branch}" \
-              --title "Data: refresh Wikimedia 360 discovery" \
-              --body "Automated Wikimedia Commons 360-degree video discovery refresh. Review source identity, rights metadata, and projection-review state before merging. Metadata does not rank reconstruction quality and no media blobs are included."
-          fi
+          git push origin HEAD:main
