@@ -88,6 +88,20 @@ def _write_mesh(o3d, legacy, output_path: Path, output_format: str) -> None:
             write_vertex_colors=False,
             write_triangle_uvs=False,
         )
+    elif output_format == "glb":
+        # Open3D's legacy GLB writer uses its core TinyGLTF path. The tensor
+        # writer delegates through Assimp, whose triangulation can emit
+        # FB_ngon_encoding and change triangle topology in consumers such as Blender.
+        normals = np.asarray(legacy.vertex_normals)
+        if not _vertex_normals_are_valid(normals, len(legacy.vertices)):
+            legacy.vertex_normals = o3d.utility.Vector3dVector()
+        written = o3d.io.write_triangle_mesh(
+            str(output_path),
+            legacy,
+            write_vertex_normals=legacy.has_vertex_normals(),
+            write_vertex_colors=False,
+            write_triangle_uvs=False,
+        )
     else:
         normals = np.asarray(legacy.vertex_normals)
         if not _vertex_normals_are_valid(normals, len(legacy.vertices)):
