@@ -6,7 +6,9 @@ on:
       - '.github/workflows/mesh-export-evidence.yml'
       - 'processing/mesh_export.py'
       - 'processing/mesh_from_points.py'
+      - 'processing/mesh_postprocess.py'
       - 'tests/test_mesh_export.py'
+      - 'tests/test_mesh_postprocess.py'
   workflow_dispatch:
 
 permissions:
@@ -73,13 +75,38 @@ jobs:
               max_faces=1000000,
           )
           PY
+      - name: Inspect repair and decimate raw mesh
+        run: |
+          set -euo pipefail
+          python -m processing.mesh_postprocess inspect \
+            mesh-export-evidence/raw-alpha.ply \
+            --manifest mesh-export-evidence/raw-inspection.json
+          python -m processing.mesh_postprocess repair \
+            mesh-export-evidence/raw-alpha.ply \
+            mesh-export-evidence/repaired.ply \
+            --minimum-component-faces 10 \
+            --manifest mesh-export-evidence/repair-manifest.json
+          python - <<'PY'
+          from processing.mesh_postprocess import decimate_mesh, inspect_mesh
+          from processing.provenance import write_json
+
+          repaired = inspect_mesh('mesh-export-evidence/repaired.ply')
+          target_faces = max(1000, repaired['face_count'] // 2)
+          result = decimate_mesh(
+              'mesh-export-evidence/repaired.ply',
+              'mesh-export-evidence/decimated.ply',
+              target_faces=target_faces,
+          )
+          write_json('mesh-export-evidence/decimation-manifest.json', result)
+          PY
       - name: Export GLB OBJ STL and verify readback
         run: |
           set -euo pipefail
           for format in glb obj stl; do
             python -m processing.mesh_export \
-              mesh-export-evidence/raw-alpha.ply \
+              mesh-export-evidence/decimated.ply \
               "mesh-export-evidence/asset.$format" \
+              --source-manifest mesh-export-evidence/decimation-manifest.json \
               --manifest "mesh-export-evidence/$format-manifest.json"
           done
       - name: Validate GLB with Khronos glTF Validator
