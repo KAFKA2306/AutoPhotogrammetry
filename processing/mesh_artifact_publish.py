@@ -17,7 +17,9 @@ SUPPORTED_SINGLE_FILE_FORMATS = {"glb", "stl"}
 def _revision(value: str) -> str:
     value = value.strip()
     if len(value) != 40 or any(c not in "0123456789abcdef" for c in value):
-        raise ArtifactPublishError("source_revision must be a full lowercase 40-character Git commit SHA")
+        raise ArtifactPublishError(
+            "source_revision must be a full lowercase 40-character Git commit SHA"
+        )
     return value
 
 
@@ -138,7 +140,9 @@ def publish_mesh_export(
         license_url=license_url,
     )
     artifact = manifest["artifacts"][0]
-    artifact_manifest_path = export_manifest_path.parent / f"{artifact['format']}-artifact-manifest.yaml"
+    artifact_manifest_path = (
+        export_manifest_path.parent / f"{artifact['format']}-artifact-manifest.yaml"
+    )
     artifact_manifest_path.write_text(
         yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True), encoding="utf-8"
     )
