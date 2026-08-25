@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           path="sources/discovery/wikimedia-360.json"
-          if git diff --quiet -- "${path}"; then
+          if [[ -z "$(git status --porcelain -- "${path}")" ]]; then
             echo "No 360 discovery content change."
             exit 0
           fi
