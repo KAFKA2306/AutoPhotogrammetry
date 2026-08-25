@@ -1,0 +1,115 @@
+name: Mesh export evidence
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/mesh-export-evidence.yml'
+      - 'processing/mesh_export.py'
+      - 'processing/mesh_from_points.py'
+      - 'tests/test_mesh_export.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install mesh and glTF validation runtime
+        run: |
+          python -m pip install --disable-pip-version-check numpy open3d==0.19.0
+          npm install --no-save gltf-validator@2.0.0-dev.3.10
+      - name: Materialize real Gaussian PLY and reconstruct canonical alpha mesh
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_commit=1fa7f35b1fc9fce669f97d5ec7c7f46ce4601206
+          scene=puente-san-ignacio-03
+          path="$(git ls-tree -r --name-only "$source_commit" | grep "^output/$scene/.*/export/splat\\.ply$" | head -n1)"
+          test -n "$path"
+          mkdir -p mesh-export-evidence
+          git show "$source_commit:$path" > mesh-export-evidence/source.ply
+          python - <<'PY'
+          from pathlib import Path
+          import numpy as np
+          import open3d as o3d
+
+          from processing.gaussian_ply import _read_vertices
+          from processing.mesh_from_points import _opacity_probabilities, reconstruct_mesh
+
+          source = Path('mesh-export-evidence/source.ply')
+          _, vertices = _read_vertices(source)
+          probabilities = _opacity_probabilities(vertices['opacity'])
+          target = min(50000, len(probabilities))
+          threshold = (
+              float(np.partition(probabilities, len(probabilities) - target)[len(probabilities) - target])
+              if len(probabilities) > target
+              else 0.0
+          )
+          mask = probabilities >= threshold
+          points = np.column_stack(
+              [vertices['x'][mask], vertices['y'][mask], vertices['z'][mask]]
+          ).astype(np.float64)
+          cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(points))
+          distances = np.asarray(cloud.compute_nearest_neighbor_distance())
+          spacing = float(np.median(distances[distances > 0]))
+          reconstruct_mesh(
+              source,
+              'mesh-export-evidence/raw-alpha.ply',
+              method='alpha',
+              alpha=4.0 * spacing,
+              opacity_threshold=threshold,
+              max_faces=1000000,
+          )
+          PY
+      - name: Export GLB OBJ STL and verify readback
+        run: |
+          set -euo pipefail
+          for format in glb obj stl; do
+            python -m processing.mesh_export \
+              mesh-export-evidence/raw-alpha.ply \
+              "mesh-export-evidence/asset.$format" \
+              --manifest "mesh-export-evidence/$format-manifest.json"
+          done
+      - name: Validate GLB with Khronos glTF Validator
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const validator = require('gltf-validator');
+          const path = 'mesh-export-evidence/asset.glb';
+          validator.validateBytes(new Uint8Array(fs.readFileSync(path)), {
+            uri: 'asset.glb',
+            format: 'glb',
+            writeTimestamp: false,
+            maxIssues: 0
+          }).then(report => {
+            fs.writeFileSync(
+              'mesh-export-evidence/gltf-validation.json',
+              JSON.stringify(report, null, 2)
+            );
+            if (report.issues && report.issues.numErrors > 0) {
+              console.error(JSON.stringify(report.issues, null, 2));
+              process.exit(1);
+            }
+          }).catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mesh-standard-export-evidence
+          path: mesh-export-evidence/
+          retention-days: 30
