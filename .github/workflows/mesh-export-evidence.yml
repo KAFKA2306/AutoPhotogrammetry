@@ -167,11 +167,14 @@ jobs:
               raise RuntimeError('Blender imported no mesh objects')
 
           vertex_count = sum(len(obj.data.vertices) for obj in mesh_objects)
-          face_count = sum(len(obj.data.polygons) for obj in mesh_objects)
-          if vertex_count != expected['vertex_count'] or face_count != expected['face_count']:
+          polygon_count = sum(len(obj.data.polygons) for obj in mesh_objects)
+          for obj in mesh_objects:
+              obj.data.calc_loop_triangles()
+          triangle_count = sum(len(obj.data.loop_triangles) for obj in mesh_objects)
+          if vertex_count != expected['vertex_count'] or triangle_count != expected['face_count']:
               raise RuntimeError(
-                  f'geometry count drift: expected {expected["vertex_count"]}/{expected["face_count"]}, '
-                  f'got {vertex_count}/{face_count}'
+                  f'geometry count drift: expected {expected["vertex_count"]}/{expected["face_count"]} triangles, '
+                  f'got {vertex_count}/{triangle_count} triangles ({polygon_count} Blender polygons)'
               )
 
           corners = [obj.matrix_world @ Vector(corner) for obj in mesh_objects for corner in obj.bound_box]
@@ -202,7 +205,8 @@ jobs:
               'import': {
                   'mesh_object_count': len(mesh_objects),
                   'vertex_count': vertex_count,
-                  'face_count': face_count,
+                  'polygon_count': polygon_count,
+                  'triangle_count': triangle_count,
                   'bbox_min': bbox_min,
                   'bbox_max': bbox_max,
                   'material_names': material_names,
@@ -210,7 +214,7 @@ jobs:
               },
               'comparison': {
                   'expected_vertex_count': expected['vertex_count'],
-                  'expected_face_count': expected['face_count'],
+                  'expected_triangle_count': expected['face_count'],
                   'source_extent_sorted': source_extent,
                   'imported_extent_sorted': imported_extent,
                   'extent_tolerance': tolerance,
