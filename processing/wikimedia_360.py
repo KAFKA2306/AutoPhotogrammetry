@@ -214,7 +214,9 @@ def refresh(output_path: str | Path = DEFAULT_POOL) -> dict[str, Any]:
             for candidate in pool["candidates"]
             if candidate["stage_a"].get("eligible_for_projection_review") is True
         ),
-        "eac_count": sum(1 for candidate in pool["candidates"] if candidate["projection_type"] == "eac"),
+        "eac_count": sum(
+            1 for candidate in pool["candidates"] if candidate["projection_type"] == "eac"
+        ),
         "metadata_failure_count": len(pool["metadata_failures"]),
     }
 
