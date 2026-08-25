@@ -42,12 +42,20 @@ def _legacy_mesh_stats(mesh) -> dict:
     }
 
 
+def _belongs_to_obj_group(path: Path, output: Path) -> bool:
+    return (
+        path == output
+        or path.name.startswith(f"{output.stem}_")
+        or path.stem == output.stem
+    )
+
+
 def _artifact_files(output: Path) -> list[dict]:
     if output.suffix.lower() == ".obj":
         candidates = sorted(
             path
             for path in output.parent.iterdir()
-            if path.is_file() and (path == output or path.name.startswith(f"{output.stem}_") or path.stem == output.stem)
+            if path.is_file() and _belongs_to_obj_group(path, output)
         )
     else:
         candidates = [output]
