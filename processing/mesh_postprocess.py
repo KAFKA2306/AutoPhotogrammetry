@@ -32,6 +32,30 @@ def _duplicate_count(rows: np.ndarray) -> int:
     return int(len(rows) - len(np.unique(rows, axis=0)))
 
 
+def _canonical_triangles(triangles: np.ndarray) -> np.ndarray:
+    if len(triangles) == 0:
+        return triangles.copy()
+    return np.sort(triangles, axis=1)
+
+
+def _duplicate_triangle_count(triangles: np.ndarray) -> int:
+    return _duplicate_count(_canonical_triangles(triangles))
+
+
+def _remove_topological_duplicate_triangles(mesh) -> int:
+    triangles = np.asarray(mesh.triangles)
+    if len(triangles) == 0:
+        return 0
+    canonical = _canonical_triangles(triangles)
+    _, first_indices = np.unique(canonical, axis=0, return_index=True)
+    keep = np.zeros(len(triangles), dtype=bool)
+    keep[first_indices] = True
+    removed = int(np.count_nonzero(~keep))
+    if removed:
+        mesh.remove_triangles_by_mask((~keep).tolist())
+    return removed
+
+
 def _mesh_stats(mesh) -> dict:
     vertices = np.asarray(mesh.vertices)
     triangles = np.asarray(mesh.triangles)
@@ -66,7 +90,7 @@ def _mesh_stats(mesh) -> dict:
         "largest_component_face_count": int(max(component_sizes, default=0)),
         "largest_component_area": float(max(component_areas, default=0.0)),
         "duplicate_vertex_count": _duplicate_count(vertices),
-        "duplicate_face_count": _duplicate_count(triangles),
+        "duplicate_face_count": _duplicate_triangle_count(triangles),
         "degenerate_face_count": int(np.count_nonzero(degenerate)),
         "boundary_edge_count": int(np.count_nonzero(edge_counts == 1)),
         "non_manifold_edge_count": int(np.count_nonzero(edge_counts > 2)),
@@ -158,6 +182,13 @@ def repair_mesh(
     mesh.remove_duplicated_triangles()
     operations.append(
         {"operation": "remove_duplicated_triangles", "removed": initial_faces - len(mesh.triangles)}
+    )
+    removed_topological_duplicates = _remove_topological_duplicate_triangles(mesh)
+    operations.append(
+        {
+            "operation": "remove_topological_duplicate_triangles",
+            "removed": removed_topological_duplicates,
+        }
     )
     initial_faces = len(mesh.triangles)
     mesh.remove_degenerate_triangles()
@@ -260,6 +291,7 @@ def decimate_mesh(
     )
     decimated.remove_degenerate_triangles()
     decimated.remove_duplicated_triangles()
+    removed_topological_duplicates = _remove_topological_duplicate_triangles(decimated)
     decimated.remove_unreferenced_vertices()
     decimated.compute_triangle_normals()
     decimated.compute_vertex_normals()
@@ -285,6 +317,7 @@ def decimate_mesh(
             "target_faces": target_faces,
             "maximum_error": None if np.isinf(maximum_error) else maximum_error,
             "boundary_weight": boundary_weight,
+            "removed_topological_duplicate_faces": removed_topological_duplicates,
         },
         "geometry_deviation": deviation,
     }
