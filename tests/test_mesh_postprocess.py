@@ -31,7 +31,13 @@ class MeshPostprocessContractTests(unittest.TestCase):
 
     def test_duplicate_triangle_count_is_winding_independent(self) -> None:
         triangles = np.array(
-            [[0, 1, 2], [2, 0, 1], [2, 1, 0], [0, 2, 3]], dtype=np.int64
+            [
+                [0, 1, 2],
+                [2, 0, 1],
+                [2, 1, 0],
+                [0, 2, 3],
+            ],
+            dtype=np.int64,
         )
         self.assertEqual(_duplicate_triangle_count(triangles), 2)
 
