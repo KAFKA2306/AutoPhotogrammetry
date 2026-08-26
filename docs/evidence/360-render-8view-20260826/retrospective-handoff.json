@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "status": "blocked",
+  "purpose": "Producer handoff for KAFKA2306/vrmine#163. Representative runs are derived from actual AutoPhotogrammetry evidence; this manifest does not claim VRChat runtime readiness until every PLY is materializable and every evidence file has SHA-256 identity.",
+  "source": {
+    "title": "Norah Head Insta360 X5 Virtual Tour OHNE TON.webm",
+    "url": "https://commons.wikimedia.org/wiki/File:Norah_Head_Insta360_X5_Virtual_Tour_OHNE_TON.webm",
+    "author": "GlennsYouTube",
+    "license": {
+      "name": "CC BY 3.0",
+      "url": "https://creativecommons.org/licenses/by/3.0/"
+    },
+    "sha256": "0b34bdc77060d8ec151d1ce50d33b80978440a785695d17d363f3254e2ee6fa3",
+    "size_bytes": 2469583885
+  },
+  "evidence_revision": "330fc63c3603324d108139a101e408e044efd297",
+  "upstream_issue": "https://github.com/KAFKA2306/AutoPhotogrammetry/issues/146",
+  "downstream_issue": "https://github.com/KAFKA2306/vrmine/issues/163",
+  "runs": [
+    {
+      "id": "shot-0-60-8view-2k",
+      "role": "improved-temporal-baseline",
+      "changed_variable": "Restrict the full 8:09 source to one continuous 0-60 s shot while keeping 8 perspective views per equirectangular frame.",
+      "verdict": "FAIL",
+      "learning": "Temporal restriction improves local coherence versus full-video sampling, but the lighthouse and shoreline remain geometrically unstable.",
+      "upstream_evidence": "https://github.com/KAFKA2306/AutoPhotogrammetry/issues/146#issuecomment-5423626252",
+      "ply": {
+        "sha256": "eb16c2675be0da632778ebd2988f5aa87e2507cd599d1e71cd590dd6920c9dea",
+        "primitive_count": 92184,
+        "size_bytes": null,
+        "materialization": null,
+        "status": "identity-known-materialization-missing"
+      },
+      "splat_webp": {
+        "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/shot-0-60-rgb.webp",
+        "sha256": "fc70d1122fe4f03cf546cb7b7352135064bddbb6d449a1ce73ba2f78d5c30fed",
+        "git_blob_sha1": "59bdf855de27093aa27d78d34dc9059a45d9da32",
+        "size_bytes": 29116
+      },
+      "gt_webp": {
+        "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/shot-0-60-gt-rgb.webp",
+        "sha256": null,
+        "git_blob_sha1": "8403e0b5ce47e270afccbdb88f1736195e57fc91",
+        "size_bytes": 30102
+      }
+    },
+    {
+      "id": "shot-0-20-8view-2k",
+      "role": "regression",
+      "changed_variable": "Shorten the continuous temporal window from 0-60 s to 0-20 s while retaining the 8-view reconstruction contract.",
+      "verdict": "FAIL_REGRESSION",
+      "learning": "More registered images did not imply better reconstruction; the shorter window produced severe radial streaking and non-finite Gaussian scales.",
+      "upstream_evidence": "https://github.com/KAFKA2306/AutoPhotogrammetry/issues/146#issuecomment-5423818450",
+      "ply": {
+        "sha256": "71d259787e6a2da3375b64ad4e795b7707f306ca9ad1b2170f8050bc74d4b0f2",
+        "primitive_count": 183332,
+        "size_bytes": null,
+        "materialization": null,
+        "status": "identity-known-materialization-missing"
+      },
+      "splat_webp": {
+        "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/shot-0-20-rgb.webp",
+        "sha256": "23e66caed23d08c36d4918d27d94c8d7984bf7c9b9fb3000c10ef37f07a840b5",
+        "git_blob_sha1": "589383d3ccfc2dd366346ee3f78c48c9ec18b3a7",
+        "size_bytes": 21692
+      },
+      "gt_webp": {
+        "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/shot-0-20-gt-rgb.webp",
+        "sha256": null,
+        "git_blob_sha1": "25547880317770ae20ca45d8136e1b6865df1a31",
+        "size_bytes": 27286
+      }
+    },
+    {
+      "id": "shot-0-60-crop015-8view-2k",
+      "role": "registration-improvement",
+      "changed_variable": "Remove the bottom 15% nadir region from the 0-60 s 8-view input.",
+      "verdict": "FAIL_BUT_IMPROVED_REGISTRATION",
+      "learning": "Removing the nadir region increased registered poses to 43 and removed non-finite export values, but the hold-out geometry still failed.",
+      "upstream_evidence": "https://github.com/KAFKA2306/AutoPhotogrammetry/issues/146",
+      "ply": {
+        "sha256": "095f5745f1ac35d23eadd470b51ede37a935fa20d2f0f3e4818e18f52cdc63e4",
+        "primitive_count": 195707,
+        "size_bytes": null,
+        "materialization": null,
+        "status": "identity-known-materialization-missing"
+      },
+      "splat_webp": {
+        "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/crop015-rgb-frame_00014.webp",
+        "sha256": "ffc484dea4451f236e948512bdbee5e6dcde1dff72326ade1c746b3df3a339fe",
+        "git_blob_sha1": "800227d0efddebebad8546856fe0039f6f925a2f",
+        "size_bytes": 22856
+      },
+      "gt_webp": {
+        "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/crop015-gt-rgb-frame_00014.webp",
+        "sha256": null,
+        "git_blob_sha1": "2ed86a9499231b82be8ca65b2bcd41be8ff68e33",
+        "size_bytes": 26126
+      }
+    },
+    {
+      "id": "shot-20-50-arch6-so3xr3-2k",
+      "role": "best-current-camera-optimized-candidate",
+      "changed_variable": "Use six horizontal perspective directions on the 20-50 s architectural shot and enable Nerfstudio SO3xR3 camera optimization at 2k iterations.",
+      "verdict": "FAIL_BEST_CURRENT_CANDIDATE",
+      "learning": "SO3xR3 camera optimization reduced radial streaking relative to the comparable arch6 baseline without making the reconstruction production-quality.",
+      "upstream_evidence": "https://github.com/KAFKA2306/AutoPhotogrammetry/issues/146",
+      "ply": {
+        "sha256": "ef906022e879cffdf4b6bd25cfb3f8db02c427e7ef7620ffe822d9742efaaa9c",
+        "primitive_count": 128366,
+        "size_bytes": null,
+        "materialization": null,
+        "status": "identity-known-materialization-missing"
+      },
+      "splat_webp": {
+        "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/arch6-camera-opt-rgb.webp",
+        "sha256": "0b6075eb34dd5118ad198a27e34314b2dd48d4bff8678dac5e9e30d074b4878a",
+        "git_blob_sha1": "b258ac1a6fcd905ab2f4d8f5939d495027cad82e",
+        "size_bytes": 17798
+      },
+      "gt_webp": {
+        "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/arch6-camera-opt-gt-rgb.webp",
+        "sha256": null,
+        "git_blob_sha1": "ea0d26845a0040ff54cef6d0b643239c0fb1dfc4",
+        "size_bytes": 26880
+      }
+    }
+  ],
+  "blocking_fields": [
+    "Exact PLY size_bytes and a materialization locator are missing for every representative run.",
+    "Exact SHA-256 is missing for the four GT WebP files; their immutable Git blob identity and byte size are preserved.",
+    "VRMine #163 must not treat this package as ready until blocking_fields is empty."
+  ]
+}
