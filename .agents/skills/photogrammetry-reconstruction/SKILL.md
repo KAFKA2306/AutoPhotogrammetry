@@ -95,7 +95,7 @@ Training longer is not evidence of improvement by itself. Compare the same recon
 
 ### 7. Preserve evidence
 
-Keep experiment-specific numbers and outputs out of this skill. Store them in the repository's Issues or artifacts so later agents can audit the actual run.
+Keep experiment-specific numbers and outputs out of this skill. Store them in repository Issues or artifacts so later agents can audit the actual run.
 
 For each comparison, preserve when available:
 
@@ -121,11 +121,40 @@ Use these rules when conclusions conflict:
 4. Input quality and pose connectivity are resolved before attributing failure to training parameters.
 5. If the evidence does not distinguish candidates, record that result instead of manufacturing a winner.
 
+## AutoPhotogrammetry issue routing
+
+Use the existing Issue authority instead of creating a new overlapping experiment thread:
+
+- #140 — parent / 360-degree source and end-to-end benchmark program
+- #146 — exact same-source, same-shot, same-source-frame `8-view` vs `14-view` controlled comparison only
+- #148 — shot, temporal density, direction selection, crop, COLMAP camera/matching, pose connectivity, frozen dataset selection
+- #149 — camera optimizer A/B on the frozen dataset
+- #150 — Splatfacto artifact-control parameter A/B on the frozen dataset
+- #41 — Scale Regularization A/B
+- #43 — default / Scale Regularization / MCMC production-strategy comparison
+- #151 — representative real PLY/WebP evidence-package curation and VRMine handoff
+
+Historical comments may contain experiments that now belong to another Issue. Preserve them as evidence, but do not continue that responsibility in the historical thread.
+
+Do not create a new Issue when one of the authorities above already owns the changed variable. If a new experiment changes multiple responsibility classes, split it before execution.
+
+## Evidence boundary
+
+Use this skill for rules and decision procedure only.
+
+Do not copy run-specific values, hashes, winner names, view counts, or current best parameters into the skill. Those belong to Issues or machine-readable artifacts and may change independently.
+
+AI-generated summary images may be explanatory material, but they are never reconstruction evidence. Evidence must trace to actual source/run artifacts such as real WebP renders, GT images, PLY files, manifests, logs, metrics, and hashes.
+
 ## Repository evidence
 
-The current rules were motivated by controlled evidence in:
+The workflow is grounded in controlled evidence and responsibility separation from:
 
+- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/140
 - https://github.com/KAFKA2306/AutoPhotogrammetry/issues/146
 - https://github.com/KAFKA2306/AutoPhotogrammetry/issues/148
+- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/149
+- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/150
+- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/151
 
-Treat those Issues as evidence for the workflow, not as universal numeric thresholds or a requirement to reuse a specific number of views.
+Treat those Issues as evidence and routing authority, not as universal numeric thresholds or a requirement to reuse a specific number of views.
