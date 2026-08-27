@@ -1,0 +1,32 @@
+name: Evidence binary guard
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  reject-new-or-modified-ply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+      - name: Reject new or modified PLY blobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          before='${{ github.event.before }}'
+          after='${{ github.sha }}'
+          if [[ "$before" == "0000000000000000000000000000000000000000" ]]; then
+            exit 0
+          fi
+          changes="$(git diff --name-status "$before" "$after" -- '*.ply')"
+          prohibited="$(printf '%s\n' "$changes" | grep -E '^[AMRC]' || true)"
+          if [[ -n "$prohibited" ]]; then
+            echo 'This historical evidence branch is frozen for generated PLY binaries.' >&2
+            echo 'Publish PLY bytes through artifact storage; Git may keep metadata only.' >&2
+            echo "$prohibited" >&2
+            exit 1
+          fi
