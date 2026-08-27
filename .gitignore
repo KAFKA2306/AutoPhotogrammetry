@@ -5,5 +5,5 @@ __pycache__/
 *.py[cod]
 .DS_Store
 
-# Generated Gaussian Splat exports are large run artifacts, not source files.
-output/**/runs/**/export/*.ply
+# Generated Gaussian Splat exports are artifacts, never Git source files.
+*.ply
