@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "issue": "https://github.com/KAFKA2306/AutoPhotogrammetry/issues/146",
+  "source": {
+    "title": "Norah Head Insta360 X5 Virtual Tour OHNE TON.webm",
+    "page_url": "https://commons.wikimedia.org/wiki/File:Norah_Head_Insta360_X5_Virtual_Tour_OHNE_TON.webm",
+    "license": "CC BY 3.0",
+    "author": "GlennsYouTube",
+    "sha256": "0b34bdc77060d8ec151d1ce50d33b80978440a785695d17d363f3254e2ee6fa3",
+    "shot_seconds": [20, 50],
+    "source_frame_count": 8,
+    "crop_bottom": 0.15
+  },
+  "changed_variable": "images-per-equirect",
+  "variants": [
+    {
+      "images_per_equirect": 8,
+      "generated_images": 64,
+      "colmap_registered_images": 56,
+      "colmap_registration_ratio": 0.875,
+      "colmap_sparse_points": null,
+      "colmap_mean_reprojection_error_px": null,
+      "splatfacto_iterations": 2000,
+      "exported_gaussians": 252934,
+      "nan_or_inf_count": 0,
+      "low_opacity_exclusions": 8,
+      "ply_sha256": "3a34bfde520c373158893a67e373ddc07b172b23283b37684d9bd245912ff206",
+      "render_sha256": "b39ab23ebeccb0e8e9f12a00cf917f070f3f0aa9a4938717681588fd188b164c",
+      "render_url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/evidence/360-render-8view-20260826/docs/evidence/360-render-8view-20260826/shot-20-50-rgb-frame_00011.webp",
+      "ground_truth_url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/evidence/360-render-8view-20260826/docs/evidence/360-render-8view-20260826/shot-20-50-gt-rgb-frame_00011.webp",
+      "visual_verdict": "FAIL",
+      "visual_findings": [
+        "灯台が消失する",
+        "芝・岩・海の境界がぼける"
+      ]
+    },
+    {
+      "images_per_equirect": 14,
+      "generated_images": 112,
+      "colmap_registered_images": 14,
+      "colmap_registration_ratio": 0.125,
+      "colmap_sparse_points": null,
+      "colmap_mean_reprojection_error_px": null,
+      "splatfacto_iterations": 2000,
+      "exported_gaussians": 281283,
+      "nan_or_inf_count": 0,
+      "low_opacity_exclusions": 1,
+      "ply_sha256": "9177097bfe519f0a302089dece6b5619c8507c960503dfdb50eb81d2f83aa901",
+      "render_sha256": "ff1800580ba4513824aab12dc35df721fcdd91201933cfc493f375323018230b",
+      "render_url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/evidence/360-render-8view-20260826/docs/evidence/360-render-8view-20260826/view14-rgb.webp",
+      "ground_truth_url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/evidence/360-render-8view-20260826/docs/evidence/360-render-8view-20260826/view14-gt-rgb.webp",
+      "visual_verdict": "FAIL",
+      "visual_findings": [
+        "海面と岩場の境界を誤生成する",
+        "水平のぼけと不自然な帯が出る",
+        "画面上端に孤立した浮遊点が残る",
+        "灯台を含む建築方向の登録改善が確認できない"
+      ]
+    }
+  ],
+  "unavailable_measurements": {
+    "colmap_sparse_points": "この同一A/Bについて保存済み証拠から再監査できる値がないため未記録",
+    "colmap_mean_reprojection_error_px": "この同一A/Bについて保存済み証拠から再監査できる値がないため未記録"
+  },
+  "decision": {
+    "winner": null,
+    "production_quality_pass": false,
+    "conclusion": "このsource、shot、source frame集合では、images-per-equirectを8から14へ増やしてもCOLMAP登録と固定viewの再構成品質は改善しなかった。8-viewもproduction quality PASSではない。"
+  }
+}
