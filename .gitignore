@@ -7,3 +7,5 @@ __pycache__/
 
 # Generated Gaussian Splat exports are artifacts, never Git source files.
 *.ply
+# Retain the historical explicit pattern as a tested compatibility contract.
+output/**/runs/**/export/*.ply
