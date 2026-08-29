@@ -1,88 +1,75 @@
-# Photogrammetry readiness audit service
+# 3D化前の撮影セット監査
 
-AutoPhotogrammetry can turn a rights-cleared photo set into an auditable pre-reconstruction package: a JSON/HTML readiness report, a non-destructively selected image set, provenance evidence, and—when explicitly included—an external reconstruction run manifest.
+AutoPhotogrammetryは、利用権を確認した写真セットを3D再構成へ投入する前に監査します。元画像を削除・上書きせず、JSON / HTMLレポート、選別済み画像セット、来歴とSHA-256を残します。合意した再構成処理を含む場合だけ、その実行証跡も納品対象にします。
 
-This service is for museums and archives, product/EC teams and manufacturers, and 3D production teams that already control the submitted photographs or have confirmed permission to use them.
+対象は、所蔵品を3D化する博物館・資料館・研究室、商品3D表示を検討するEC事業者・メーカー、受領写真の選別を標準化したい3D制作会社です。
 
-## What is being sold
+## 提供するもの
 
-The initial service is a **photo-set audit and reconstruction-preparation service**, not a guarantee that a complete or metrically accurate 3D model will be produced.
+初期サービスは、**写真セットの監査と再構成前処理**です。完全な3Dモデルや実寸精度を保証するサービスではありません。
 
-The audit can report evidence such as:
+監査では、実測できた範囲で次を返します。
 
-- input and selected image counts
-- exact and near-duplicate evidence
-- low-sharpness warnings
-- provenance coverage and SHA-256
-- image dimensions/content types
-- a non-destructive selected set and manifest
+- 入力画像数と選別画像数
+- 完全重複・類似画像の証拠
+- 低鮮明度の警告
+- 来歴情報の充足率とSHA-256
+- 画像寸法とcontent type
+- 元画像とは別の選別済み画像セットとmanifest
 - `generated_views_used=false`
-- an explicitly supplied backend run status/manifest when a reconstruction is part of the engagement
-- measurements that remain unavailable rather than replacing them with inferred scores
+- 再構成を実施した場合のbackend実行状態とrun manifest
+- 未測定項目を推測値で埋めない明示的な状態
 
-Registration rate, reprojection error, geometry completeness and texture quality are not promised when they have not actually been measured.
+登録画像率、再投影誤差、形状の完全性、texture品質、実寸精度を実測していない場合、それらを保証しません。
 
-## Required material and rights
+## 必要な素材と権利
 
-For a customer dataset:
+顧客データは次を満たすものだけを扱います。
 
-1. The customer must control the submitted photographs or provide a confirmed license/permission basis for the intended processing.
-2. Do not submit private photographs, personal information, credentials, unpublished contract terms or other confidential material through a public GitHub issue.
-3. A private transfer method must be agreed before customer image bytes are transferred.
-4. Customer images are not converted into public repository fixtures without separate explicit permission.
+1. 顧客自身が写真を利用できる権利を持つ、または目的に必要な利用許諾を確認している。
+2. 顧客画像、個人情報、認証情報、未公開契約、その他の機密情報を公開GitHub Issueへ添付しない。
+3. 画像本体を受け渡す前に、非公開の転送方法を別途合意する。
+4. 顧客画像を別途の明示許可なく公開fixtureへ転用しない。
 
-## Free sample
+## 無料sample
 
-The free sample is intended to demonstrate the report format and evidence contract using a small redistribution-safe or synthetic dataset. It does not include a commitment to a full reconstruction or a private customer-data transfer.
+`sample-readiness-report.json` はレポート形式を説明するためのsampleです。`sample_kind` は `illustrative_synthetic_no_customer_data` であり、顧客実績や3D再構成性能の証拠ではありません。
 
-Typical sample output:
+sampleで確認できるもの:
 
-- readiness JSON/HTML
-- selected-manifest JSON
-- reason-code summary
-- provenance and hash fields
-- explicit unmeasured-quality fields
+- readiness reportの項目
+- selected manifestの考え方
+- 除外・警告理由の集計
+- 来歴とhashの項目
+- 未測定品質をnullのまま保持する契約
 
-See `sample-readiness-report.json` in this directory for an illustrative, non-customer sample record.
+## 有償の1対象物PoC
 
-## Paid one-object PoC
+1対象物と合意した写真セットについて、次を組み合わせます。
 
-A paid PoC can cover one customer-controlled object/asset and an agreed photo set, typically tens to hundreds of images. Scope is agreed before transfer and can include:
+- 撮影セット監査
+- 再構成投入用の選別済み画像セット
+- 提供manifestから確認できる来歴・SHA-256
+- 必要な実行環境が利用できる場合の、合意した再構成backend 1系統
+- backend run manifestと生成artifact一覧
+- 失敗した条件・未測定条件の明示
 
-- readiness audit
-- selected backend-input set
-- provenance/SHA-256 evidence available from the submitted manifest
-- one agreed reconstruction backend run when the required environment is available
-- backend run manifest and artifact inventory
-- explicit notes about failed or unmeasured criteria
+価格、納期、画像枚数、利用する再構成backend、機密保持、権利条件は案件ごとに合意します。初期の支払意思検証ではSaaS化や自動決済を前提にしません。
 
-Pricing, turnaround time, image count, reconstruction backend, confidentiality requirements and the rights basis are agreed per PoC. No automatic payment or SaaS subscription is required for the first validation stage.
+## 複数対象物・社内導入
 
-## Batch / deployment discussion
+10対象物以上では、batch処理、撮影ガイド、再撮影ラウンド、CLIのprivate deploymentを相談対象にします。実際の有効相談がない段階では継続需要があるとは扱いません。
 
-For 10+ objects, the discussion can cover repeatable batch processing, capture guidance, recapture rounds and/or private deployment of the CLI. A batch request is not treated as proven demand until an actual qualified inquiry is recorded.
+## 相談する
 
-## Calls to action
-
-All three service paths use one structured GitHub Issue Form so the qualification contract has one canonical implementation. The form collects only non-confidential scope information and requires an acknowledgement not to attach customer image bytes, personal data, credentials, or confidential information.
+相談入口は既存のGitHub Issue Form 1つに統一しています。公開Issueには機密情報を入れず、対象物種別、概算件数、画像枚数、権利状態、3Dの用途、今回判断したいことだけを入力します。
 
 - [撮影セットを監査する](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+Input+audit)
 - [1対象物のPoCを相談する](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+One-object+PoC)
 - [大量3D化を相談する](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+Batch+or+private+deployment)
 
-The form asks for engagement type, organization type, object/asset type, approximate object and image counts, rights state, intended 3D use, and the concrete decision the engagement should support. It does not request customer names, contact details, or confidential transfer data.
+## 成果の測定
 
-## Measurement contract
+初期検証で区別する事実は、サービス面の閲覧、sample閲覧、相談開始、有効相談、PoC合意、有償PoCです。顧客画像、氏名、メールアドレス、電話番号、Issue本文などの個人・機密情報を計測データへ保存しません。
 
-Only the following funnel events are counted for the initial validation:
-
-- `service_page_viewed`
-- `sample_report_opened`
-- `audit_inquiry_started`
-- `qualified_inquiry`
-- `pilot_booked`
-- `paid_pilot`
-
-These events must not contain customer image bytes, names, email addresses, phone numbers, issue-body text or other personal/confidential payloads. `readiness-service-kpi-template.json` defines the 60-day targets and the empty evidence slots. Empty/null evidence means **not yet measured**, not zero success.
-
-The external success criteria in Issue #3 remain empirical. Publishing this page or adding tracking infrastructure does not count as a proposal, qualified inquiry, booked pilot or paid pilot.
+Issue #3の外部成果は、実際の相談・PoC・支払いが発生して初めて達成とします。この文書や問い合わせ導線の公開だけを有償化成功とは扱いません。
