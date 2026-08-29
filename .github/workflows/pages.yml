@@ -58,6 +58,8 @@ jobs:
           cp pages/index.html site/index.html
           cp docs/business/sample-readiness-report.json site/sample-readiness-report.json
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
