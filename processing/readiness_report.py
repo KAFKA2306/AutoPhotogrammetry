@@ -27,6 +27,21 @@ def _read_manifest(path: Path) -> list[dict]:
     return payload
 
 
+def _records_by_filename(source_records: list[dict], manifest_path: Path) -> dict[str, dict]:
+    records_by_name: dict[str, dict] = {}
+    for record in source_records:
+        local_path = record.get("local_path")
+        if not isinstance(local_path, str) or not local_path:
+            continue
+        name = Path(local_path).name
+        if name in records_by_name:
+            raise ValueError(
+                f"Collection manifest has duplicate local_path filename {name!r}: {manifest_path}"
+            )
+        records_by_name[name] = record
+    return records_by_name
+
+
 def _backend_evidence(dataset: str, manifest_path: str | Path | None) -> dict:
     if manifest_path is None:
         return {
@@ -145,6 +160,23 @@ def build_readiness_report(
 
     source_manifest_path = image_dir / "manifest.json"
     source_records = _read_manifest(source_manifest_path)
+    records_by_name = _records_by_filename(source_records, source_manifest_path)
+
+    current_manifest_hashes: list[str] = []
+    for image_path in image_paths:
+        record = records_by_name.get(image_path.name)
+        if not record:
+            continue
+        recorded_hash = record.get("sha256")
+        if isinstance(recorded_hash, str) and recorded_hash:
+            actual_hash = sha256_file(image_path)
+            if recorded_hash != actual_hash:
+                raise ValueError(
+                    f"Collection manifest SHA-256 does not match input file {image_path.name!r}: "
+                    f"recorded={recorded_hash} actual={actual_hash}"
+                )
+            current_manifest_hashes.append(recorded_hash)
+
     output_dir = Path(output_root) / dataset
     selected_dir = output_dir / "selected"
     selected_paths = select_images(
@@ -165,11 +197,7 @@ def build_readiness_report(
         else:
             near_duplicate += 1
 
-    hashes = [str(record.get("sha256", "")) for record in source_records if record.get("sha256")]
-    exact_duplicates = len(hashes) - len(set(hashes))
-    records_by_name = {
-        Path(str(record.get("local_path", ""))).name: record for record in source_records
-    }
+    exact_duplicates = len(current_manifest_hashes) - len(set(current_manifest_hashes))
     covered = 0
     dimensions: list[tuple[int, int]] = []
     content_types: Counter[str] = Counter()
