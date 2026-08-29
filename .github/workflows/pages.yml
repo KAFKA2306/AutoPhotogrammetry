@@ -1,0 +1,75 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pages/**"
+      - "docs/business/sample-readiness-report.json"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    paths:
+      - "pages/**"
+      - "docs/business/sample-readiness-report.json"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate public service surface
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          html = Path("pages/index.html").read_text(encoding="utf-8")
+          sample = json.loads(Path("docs/business/sample-readiness-report.json").read_text(encoding="utf-8"))
+
+          required = (
+              "https://kafka2306.github.io/AutoPhotogrammetry/",
+              "photogrammetry-service.yml",
+              "sample-readiness-report.json",
+              "python main.py audit --dataset",
+          )
+          missing = [value for value in required if value not in html]
+          if missing:
+              raise SystemExit(f"missing public service markers: {missing}")
+          if sample.get("sample_kind") != "illustrative_synthetic_no_customer_data":
+              raise SystemExit("sample must stay explicitly synthetic/non-customer")
+          if sample.get("quality_measurements", {}).get("quality_guarantee") is not False:
+              raise SystemExit("sample must not claim reconstruction quality")
+          PY
+      - name: Build site artifact
+        run: |
+          rm -rf site
+          mkdir site
+          cp pages/index.html site/index.html
+          cp docs/business/sample-readiness-report.json site/sample-readiness-report.json
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
