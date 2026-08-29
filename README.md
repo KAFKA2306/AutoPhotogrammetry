@@ -23,7 +23,7 @@ cd AutoPhotogrammetry
 
 GPU用のCUDA / PyTorch / gsplat / Nerfstudio環境をbuild/pushする `GPU Image` workflow はmainに存在します。通常のGPU実行ではローカルでNerfstudio checkoutやpip installを行いません。`task` は指定imageがlocalにあればそのimageを使い、なければGHCRからpullを試みます。imageが取得できない場合はlocal buildへ自動fallbackせず失敗します。
 
-**2026-08-20時点でrepositoryから確認済みなのはworkflow定義・Dockerfile・runner・通常Test workflowのPASSまでです。GHCR上のtag publish成功や対象PCからのpull成功は、実GPU runのevidenceが残るまで確認済みとは扱いません。**
+GPU Imageのpublish成功や対象PCからのpull成功は、実runのevidenceが残るまで確認済みとは扱いません。
 
 Docker CLIまたはDocker daemonが利用できない場合、`./task doctor` / `./task run` / `./task run-all` / `./task quality` は明示的に停止します。このrepositoryのtaskはDocker Desktop、WSL、GPU driver、OS設定、Docker storageを修復・resetしません。host環境の修復はrepository実行とは分離してください。
 
@@ -102,7 +102,7 @@ video
   -> manifest
 ```
 
-Repository-sideのshot-level Stage B/C routingはPR #125で実装済みです。scene-cutから連続shotを作り、shotごとのpose-aware evidenceで選択してからCOLMAPへ渡します。これは実動画20件のStage B/C/Dが完走済みであることを意味しません。
+Repository-sideのshot-level Stage B/C routingはPR #125で実装済みです。scene-cutから連続shotを作り、shotごとのpose-aware evidenceで選択してからCOLMAPへ渡します。これはcatalog全件の再構成が完走済みであることを意味しません。
 
 - [FFmpeg](https://ffmpeg.org/)
 - [COLMAP CLI](https://colmap.github.io/cli.html)
@@ -113,7 +113,7 @@ Repository-sideのshot-level Stage B/C routingはPR #125で実装済みです。
 
 ## Video candidates
 
-候補動画の正本は [`sources/videos.json`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/sources/videos.json) です。現在20候補を一元管理しています。
+候補動画の正本は [`sources/videos.json`](https://github.com/KAFKA2306/AutoPhotogrammetry/blob/main/sources/videos.json) です。catalog件数は完成条件ではありません。sourceを追加・削除しても同じentry contractで扱います。
 
 **metadataだけでは成功点数を付けません。** 評価は実測で進めます。
 
@@ -132,28 +132,14 @@ metadata
 
 ### 現在の実測状態
 
-2026-08-20時点で、commit [`1fa7f35`](https://github.com/KAFKA2306/AutoPhotogrammetry/commit/1fa7f35b1fc9fce669f97d5ec7c7f46ce4601206) に **9件の実Gaussian Splat PLY** が存在します。最終展示要件は20件なので、完成状態ではありません。
+展示対象の正準は [`sources/videos.json`](sources/videos.json) と [Issue #33](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/33) です。各sourceについて、来歴・source動画SHA-256・再構成実行証跡・Gaussian Splat PLYのSHA-256 / byte size・永続artifact locator・再生メタデータが揃ったものだけを下流へ渡します。
 
-- 実PLY: **9 / 20**
-- Huejotzingo PLY: **38,085,465 bytes**
-- Huejotzingo SHA-256: `6dc1d2546ab848eee4587fdaaebe1b60b1f2495f8a9a9b6a58de9356222c4571`
-- 20展示の完成authority: [Issue #33](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/33)
+生成したPLYは通常のGit履歴へ保存しません。GitにはSHA-256、byte size、artifact locator、provenance、run identity、評価結果などの軽量metadataだけを保持します。永続artifact storageを利用できない場合はmaterializationを明示的にblockedとし、Gitやrelease commitを代替保存先にしません。
+
+- 展示catalogの完成authority: [Issue #33](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/33)
 - 1本のsource-to-PLY lineage完成authority: [Issue #15](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/15)
 
-既存9 PLYの存在・代表PLYのsize/hashは確認済みですが、古いHuejotzingo run directoryにはtraining config/checkpoint/logが残っていないため、その過去runのexact `ns-train` / `ns-export` lineageを後から復元したとは扱いません。現在のrunnerは次回runからtool version、command、return code、config/checkpoint、PLY hash/sizeをmanifestへ保存します。
-
-今後生成する大容量PLYは通常のGit履歴へ追加せず、`output/**/runs/**/export/*.ply` を生成artifactとして扱います。
-
-現在のdefaultは `huejotzingo` です。registryの20本をすべて処理する場合は次を実行します。
-
-```bash
-./task run-all
-```
-
-各動画は `output/<id>/manifest.json` と独立したGaussian Splat PLYを生成し、全体の
-`output/batch-manifest.json` に20件の成功・失敗とPLY hashを記録します。`run-all` は
-途中生成物を消してから全件を再実行します。個別に再実行したい場合も `task` を入口にします。
-実証時のSplatfactoは `--max-num-iterations 2000` で実行します。品質比較は上記 `./task quality <scene> 30000` を使います。
+`./task run-all` は現在のregistry全件を処理し、各sourceの成功・失敗を `output/batch-manifest.json` に記録します。固定件数を前提にしません。個別再実行も `task` を入口にします。品質比較は `./task quality <scene> 30000` を使います。
 
 - source: [Wikimedia Commons — Ex Convento de San Miguel Arcángel, Huejotzingo](https://commons.wikimedia.org/wiki/File:Vista_del_Ex_Convento_de_San_Miguel_Arc%C3%A1ngel,_Huejotzingo,_desde_un_dron.webm)
 - author: Luisalvaz
