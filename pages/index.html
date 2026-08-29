@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="3D化前の写真セットを、重複・鮮明度・来歴・再構成投入可否の観点で監査し、JSON/HTMLレポートと選別済み画像セットを納品します。">
+  <link rel="canonical" href="https://kafka2306.github.io/AutoPhotogrammetry/">
+  <title>3D化前の撮影セット監査 | AutoPhotogrammetry</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; color: #18202a; background: #f5f7fa; line-height: 1.7; }
+    main { max-width: 980px; margin: 0 auto; padding: 56px 24px 80px; }
+    section { background: #fff; border-radius: 18px; padding: 28px; margin: 20px 0; }
+    h1 { font-size: clamp(2rem, 6vw, 3.8rem); line-height: 1.08; margin: 0 0 20px; }
+    h2 { margin-top: 0; font-size: 1.45rem; }
+    .lead { font-size: 1.15rem; max-width: 760px; }
+    .cta { display: inline-block; margin: 8px 8px 0 0; padding: 12px 18px; border-radius: 10px; background: #18202a; color: #fff; text-decoration: none; font-weight: 700; }
+    .secondary { background: #e8edf4; color: #18202a; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .card { background: #f5f7fa; border-radius: 12px; padding: 18px; }
+    code { background: #eef1f5; padding: 2px 6px; border-radius: 5px; }
+    .note { font-size: .92rem; color: #5b6570; }
+    ul { padding-left: 1.25rem; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p>AutoPhotogrammetry</p>
+    <h1>3D化する前に、撮影セットの失敗要因を見える化します。</h1>
+    <p class="lead">博物館・EC商品・3D制作向けに、権利確認済みの写真セットを非破壊で監査します。元画像を残したまま、重複、低鮮明度、類似画像、来歴不足を整理し、再構成へ渡せる選別済みセットと証拠付きレポートを作ります。</p>
+    <a class="cta" href="https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+Input+audit">撮影セットを監査する</a>
+    <a class="cta secondary" href="https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+One-object+PoC">1対象物のPoCを相談する</a>
+    <a class="cta secondary" href="https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+Batch+or+private+deployment">大量3D化を相談する</a>
+  </header>
+
+  <section>
+    <h2>納品するもの</h2>
+    <div class="grid">
+      <div class="card"><strong>入力監査レポート</strong><br>入力数、選別数、重複、鮮明度警告、画像寸法、来歴カバレッジをJSON/HTMLで出力します。</div>
+      <div class="card"><strong>選別済み画像セット</strong><br>元画像を削除・上書きせず、再構成投入候補を別ディレクトリとmanifestとして生成します。</div>
+      <div class="card"><strong>実行証跡</strong><br>合意した再構成backendを実行する場合は、command、return code、生成artifact、run manifestへ追跡できます。</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>保証しないこと</h2>
+    <p>登録画像率、再投影誤差、mesh completeness、実寸精度を測っていない案件で、それらを推測して品質保証しません。監査結果は「3D化前に何を直すべきか」を判断するための証拠であり、完全な3Dモデルの生成保証ではありません。</p>
+  </section>
+
+  <section>
+    <h2>無料sample</h2>
+    <p>レポート形式を確認できるsample JSONを公開しています。これは顧客実績ではなく、再配布可能な説明用データです。</p>
+    <p><a href="sample-readiness-report.json">sample-readiness-report.json を見る</a></p>
+    <p class="note">sample内の <code>sample_kind</code> は <code>illustrative_synthetic_no_customer_data</code> です。実顧客の画像や3D品質実績として扱いません。</p>
+  </section>
+
+  <section>
+    <h2>対象</h2>
+    <ul>
+      <li>所蔵品を小規模に3D化したい博物館・資料館・研究室</li>
+      <li>家具、雑貨、工芸品などの商品3D表示を検討するEC事業者・メーカー</li>
+      <li>受領写真の選別や再撮影判断を標準化したい3D制作会社</li>
+    </ul>
+    <p>顧客が権利を持つ、または利用許諾を確認した写真だけを対象にします。顧客画像、個人情報、機密情報を公開GitHub Issueへ添付しないでください。画像の受け渡し方法は案件開始前に別途決めます。</p>
+  </section>
+
+  <section>
+    <h2>実装</h2>
+    <p>監査はrepositoryの既存CLI <code>python main.py audit --dataset &lt;dataset-id&gt;</code> を使います。別の営業用処理系は作っていません。</p>
+    <p><a href="https://github.com/KAFKA2306/AutoPhotogrammetry">実装と検証を見る</a></p>
+  </section>
+</main>
+</body>
+</html>
