@@ -1,104 +1,104 @@
-name: Photogrammetry service inquiry
-description: Request a free input audit, paid one-object PoC, or batch/private deployment discussion.
-title: "[Photogrammetry inquiry] "
+name: 3D化前の撮影セット監査・PoC相談
+description: 無料の入力監査、有償の1対象物PoC、複数対象物・private deploymentを相談します。
+title: "[撮影セット監査] "
 body:
   - type: markdown
     attributes:
       value: |
-        Use this public form only for non-confidential qualification information.
-        Do not attach customer images, personal data, credentials, unpublished contract terms, or other confidential material. A private transfer method must be agreed before any customer image bytes are transferred.
+        この公開フォームには、相談範囲を判断するための非機密情報だけを入力してください。
+        顧客画像、個人情報、認証情報、未公開の契約条件、その他の機密情報を添付しないでください。画像本体を受け渡す前に、非公開の転送方法を別途合意します。
 
   - type: dropdown
     id: engagement
     attributes:
-      label: Engagement
-      description: Choose the smallest engagement that matches the current decision you need to make.
+      label: 相談内容
+      description: 今回判断したいことに合う最小の範囲を選んでください。
       options:
-        - Free input-audit sample
-        - Paid one-object PoC
-        - Batch or private deployment discussion
+        - 無料の入力監査sample
+        - 有償の1対象物PoC
+        - 複数対象物またはprivate deploymentの相談
     validations:
       required: true
 
   - type: dropdown
     id: organization_type
     attributes:
-      label: Organization type
+      label: 組織の種類
       options:
-        - Museum, archive, or research collection
-        - EC, manufacturer, or product team
-        - 3D production or photogrammetry provider
-        - Other
+        - 博物館・資料館・研究機関
+        - EC事業者・メーカー・商品企画
+        - 3D制作・フォトグラメトリ事業者
+        - その他
     validations:
       required: true
 
   - type: input
     id: asset_type
     attributes:
-      label: Object or asset type
-      description: Describe the kind of physical object or collection, without confidential identifiers.
-      placeholder: e.g. ceramic artifact, furniture product, architectural detail
+      label: 対象物の種類
+      description: 機密情報を含めず、3D化したい物やコレクションの種類を書いてください。
+      placeholder: 例：陶器、家具、建築部材
     validations:
       required: true
 
   - type: input
     id: object_count
     attributes:
-      label: Approximate object count
-      placeholder: e.g. 1, 25, 100+
+      label: 対象物のおおよその数
+      placeholder: 例：1、25、100以上
     validations:
       required: true
 
   - type: input
     id: image_count
     attributes:
-      label: Approximate images per object
-      placeholder: e.g. 80-150
+      label: 1対象物あたりのおおよその画像枚数
+      placeholder: 例：80〜150枚
     validations:
       required: true
 
   - type: dropdown
     id: rights
     attributes:
-      label: Rights to process the submitted images
-      description: Processing can proceed only when the customer controls the images or has a confirmed permission/license basis for the intended use.
+      label: 提出画像を処理する権利
+      description: 顧客自身が画像を利用できる権利を持つ、または目的に必要な利用許諾を確認している場合だけ処理できます。
       options:
-        - Confirmed
-        - Needs review
-        - Not confirmed
+        - 確認済み
+        - 確認が必要
+        - 未確認
     validations:
       required: true
 
   - type: dropdown
     id: intended_use
     attributes:
-      label: Intended 3D use
+      label: 3Dデータの用途
       options:
-        - Web or EC visualization
-        - Museum, archive, or research visualization
-        - Game, VR, or spatial experience
-        - Editing or downstream 3D production
-        - 3D printing
-        - Reconstruction-readiness decision only
-        - Other
+        - Web・EC表示
+        - 博物館・資料館・研究用途の表示
+        - ゲーム・VR・空間体験
+        - 編集・後工程の3D制作
+        - 3Dプリント
+        - 再構成へ進めるかの判断だけ
+        - その他
     validations:
       required: true
 
   - type: textarea
     id: decision
     attributes:
-      label: Decision this engagement should support
-      description: State the concrete decision or deliverable you need from the audit or PoC. Do not include confidential information.
-      placeholder: e.g. Decide whether the current 120-image capture is ready for reconstruction or needs recapture.
+      label: この監査・PoCで判断したいこと
+      description: 必要な判断や納品物を具体的に書いてください。機密情報は含めないでください。
+      placeholder: 例：現在の120枚の撮影セットで再構成へ進めるか、再撮影が必要か判断したい。
     validations:
       required: true
 
   - type: checkboxes
     id: public_data_acknowledgement
     attributes:
-      label: Public issue acknowledgement
+      label: 公開Issueへの入力確認
       options:
-        - label: I will not attach private customer images, personal data, credentials, or confidential information to this public issue.
+        - label: 顧客の非公開画像、個人情報、認証情報、その他の機密情報をこの公開Issueへ添付しません。
           required: true
-        - label: I understand that reconstruction quality is not guaranteed when registration, reprojection, geometry completeness, or texture quality have not been measured.
+        - label: 登録画像率、再投影誤差、形状の完全性、texture品質を実測していない場合、再構成品質は保証されないことを理解しました。
           required: true

@@ -1,5 +1,11 @@
 # AGENTS.md
 
+## 公開文書
+
+- README、Issue Form、利用者向け文書は平易な日本語で書く。公式名称・標準用語・API名は正式名称を使い、独自略語を作らない。
+- 公開サービスの入口と実装を分離しない。READMEから現在の相談・利用入口へ直接到達できる状態を保つ。
+- synthetic / fixture / conceptは、その用途を明示し、顧客実績・production asset・品質証拠として扱わない。
+
 ## Photogrammetry / 3D reconstruction
 
 - Do not optimize image count or COLMAP registered count/ratio as a proxy for reconstruction quality.
