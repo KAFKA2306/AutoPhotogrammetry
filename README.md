@@ -1,12 +1,20 @@
-https://kafka2306.github.io/AutoPhotogrammetry/
+https://github.com/KAFKA2306/AutoPhotogrammetry
 
 # AutoPhotogrammetry
 
 実写写真・動画から、監査可能な3D再構成入力、Gaussian Splat PLY、mesh成果物を作るためのrepositoryです。
 
-公開サービスは、3D化前の撮影セット監査です。元画像を削除せず、重複・鮮明度・類似画像・来歴不足を整理し、JSON/HTMLレポートと再構成投入用の選別済み画像セットを生成します。
+現在の公開サービスは、3D化前の撮影セット監査です。元画像を削除せず、重複・鮮明度・類似画像・来歴不足を整理し、JSON / HTMLレポートと再構成投入用の選別済み画像セットを生成します。
 
-## 撮影セットを監査する
+## 撮影セット監査を相談する
+
+- [撮影セットを監査する](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+Input+audit)
+- [1対象物のPoCを相談する](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+One-object+PoC)
+- [大量3D化を相談する](https://github.com/KAFKA2306/AutoPhotogrammetry/issues/new?template=photogrammetry-service.yml&title=%5BPhotogrammetry+inquiry%5D+Batch+or+private+deployment)
+
+公開Issueには顧客画像、個人情報、認証情報、契約情報などの機密情報を添付しないでください。画像本体の受け渡し方法は案件開始前に別途決めます。
+
+実装済みの監査入口:
 
 ```bash
 python main.py audit --dataset <dataset-id>
