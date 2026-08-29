@@ -139,6 +139,67 @@ class ReadinessReportTests(unittest.TestCase):
                     backend_run_manifest=backend_manifest,
                 )
 
+    def test_report_ignores_stale_manifest_rows_when_counting_exact_duplicates(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image_dir = self._write_input(root)
+            manifest_path = image_dir / "manifest.json"
+            records = json.loads(manifest_path.read_text(encoding="utf-8"))
+            records.append(
+                {
+                    "source_page": "https://example.test/removed",
+                    "image_url": "https://example.test/removed.jpg",
+                    "local_path": str(image_dir / "removed.jpg"),
+                    "sha256": records[0]["sha256"],
+                    "width": 128,
+                    "height": 128,
+                    "content_type": "image/jpeg",
+                }
+            )
+            write_json(manifest_path, records)
+
+            result = build_readiness_report(
+                "artifact",
+                input_root=root / "input",
+                output_root=root / "output",
+            )
+            report = json.loads(Path(result["report_json"]).read_text(encoding="utf-8"))
+
+            self.assertEqual(report["input"]["count"], 3)
+            self.assertEqual(report["selection"]["reason_counts"]["EXACT_DUPLICATE"], 1)
+
+    def test_report_rejects_manifest_hash_that_does_not_match_input_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image_dir = self._write_input(root)
+            manifest_path = image_dir / "manifest.json"
+            records = json.loads(manifest_path.read_text(encoding="utf-8"))
+            records[0]["sha256"] = "0" * 64
+            write_json(manifest_path, records)
+
+            with self.assertRaisesRegex(ValueError, "SHA-256 does not match input file"):
+                build_readiness_report(
+                    "artifact",
+                    input_root=root / "input",
+                    output_root=root / "output",
+                )
+
+    def test_report_rejects_duplicate_manifest_filename_identity(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image_dir = self._write_input(root)
+            manifest_path = image_dir / "manifest.json"
+            records = json.loads(manifest_path.read_text(encoding="utf-8"))
+            records.append({**records[0], "local_path": str(Path("elsewhere") / "first.jpg")})
+            write_json(manifest_path, records)
+
+            with self.assertRaisesRegex(ValueError, "duplicate local_path filename"):
+                build_readiness_report(
+                    "artifact",
+                    input_root=root / "input",
+                    output_root=root / "output",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
