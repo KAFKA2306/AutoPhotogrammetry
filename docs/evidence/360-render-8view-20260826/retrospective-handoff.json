@@ -108,9 +108,9 @@
       "ply": {
         "sha256": "ef906022e879cffdf4b6bd25cfb3f8db02c427e7ef7620ffe822d9742efaaa9c",
         "primitive_count": 128366,
-        "size_bytes": null,
-        "materialization": null,
-        "status": "identity-known-materialization-missing"
+        "size_bytes": 31836361,
+        "materialization": "hf://buckets/k4fka/kafka-data-lake/sha256/ef906022e879cffdf4b6bd25cfb3f8db02c427e7ef7620ffe822d9742efaaa9c/norah-head-20-50-arch6-camera-opt.splat.ply",
+        "status": "materialized-and-readback-verified"
       },
       "splat_webp": {
         "url": "https://raw.githubusercontent.com/KAFKA2306/AutoPhotogrammetry/330fc63c3603324d108139a101e408e044efd297/docs/evidence/360-render-8view-20260826/arch6-camera-opt-rgb.webp",
