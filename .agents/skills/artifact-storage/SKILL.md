@@ -15,6 +15,15 @@ description: Mandatory artifact handling rules for generated reconstruction bina
 6. Existing tracked PLY files on historical evidence branches are debt, not precedent. Do not add or modify them.
 7. A regenerated file with a different SHA-256 is a new artifact. Never present it as recovery of an older artifact.
 
+## Official Hugging Face method
+
+When the HF account and writable bucket are available, publish through the
+official `huggingface_hub.batch_bucket_files()` API. Immediately verify the
+same object with `download_bucket_files()` and compare exact SHA-256 and byte
+size before marking the artifact published. `hf buckets cp` is a supported
+manual fallback, but the repository publisher uses the batch Python API for
+multi-artifact and resumable workflows.
+
 ## Completion condition
 
 Artifact handoff is complete only when SHA-256, byte size, and durable external locator resolve to the exact same bytes outside Git.

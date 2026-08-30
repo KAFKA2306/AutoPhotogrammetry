@@ -12,11 +12,42 @@ from unittest.mock import patch
 import yaml
 
 from processing.artifact_publish import ArtifactPublishError, _hf_cache_command, publish_run_splat
+from processing.hf_bucket_publish import publish_and_verify
 
 REVISION = "a" * 40
 
 
 class ArtifactPublishTest(unittest.TestCase):
+    def test_official_hf_bucket_api_uploads_and_verifies_exact_readback(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            artifact = root / "splat.ply"
+            artifact.write_bytes(b"ply\nofficial-api")
+            calls = []
+
+            def uploader(bucket, *, add, token=None):
+                calls.append(("upload", bucket, add, token))
+
+            def downloader(bucket, *, files, raise_on_missing_files, token=None):
+                calls.append(("download", bucket, files, raise_on_missing_files, token))
+                _, destination = files[0]
+                Path(destination).write_bytes(artifact.read_bytes())
+
+            result = publish_and_verify(
+                "k4fka/test",
+                artifact,
+                "autophotogrammetry/gaussian-splats/demo/hash.ply",
+                uploader=uploader,
+                downloader=downloader,
+                token=False,
+            )
+            self.assertEqual("PUBLISHED", result["status"])
+            self.assertTrue(result["remote_verified"])
+            self.assertEqual(2, len(calls))
+            self.assertEqual("upload", calls[0][0])
+            self.assertEqual("download", calls[1][0])
+            self.assertTrue(calls[1][3])
+
     def _fixture(
         self,
         root: Path,

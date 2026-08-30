@@ -13,3 +13,12 @@ This branch contains historical evidence and existing large binary debt. It is n
 - Treat `evidence/360-render-8view-20260826` as frozen for new binary evidence. Any further experiment must not increase the set of tracked PLY blobs.
 
 Use `.agents/skills/artifact-storage/SKILL.md` for artifact handling.
+
+## Official Hugging Face upload method
+
+For authenticated Storage Bucket publishing, use the official `huggingface_hub`
+`batch_bucket_files()` API and verify exact read-back with
+`download_bucket_files()`. The canonical remote layout is
+`autophotogrammetry/gaussian-splats/<dataset>/<sha256>.ply`. Do not diagnose a
+stalled `hf buckets cp` as an authentication failure when `hf auth whoami` and
+bucket listing succeed; use the Python batch API instead.

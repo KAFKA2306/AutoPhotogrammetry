@@ -10,6 +10,7 @@ from pathlib import Path, PurePosixPath
 
 import yaml
 
+from processing.hf_bucket_publish import publish_and_verify
 from processing.orientation import OrientationContractError, write_orientation_evidence
 from processing.provenance import sha256_file, write_json
 
@@ -230,16 +231,24 @@ def publish_run_splat(
         encoding="utf-8",
     )
 
-    command: Sequence[str] = [
-        *_hf_cache_command(hf_cache_hub_root),
-        "--manifest",
-        str(artifact_manifest_path),
-        "publish",
-        str(ply_path),
-        "--id",
-        artifact_id,
-    ]
-    completed = runner(command, check=False, capture_output=True, text=True)
+    if hf_cache_hub_root is None:
+        publish_result = publish_and_verify(
+            bucket,
+            ply_path,
+            str(artifact_manifest["artifacts"][0]["storage"]["path"]),
+        )
+        completed = subprocess.CompletedProcess([], 0, stdout=json.dumps(publish_result), stderr="")
+    else:
+        command: Sequence[str] = [
+            *_hf_cache_command(hf_cache_hub_root),
+            "--manifest",
+            str(artifact_manifest_path),
+            "publish",
+            str(ply_path),
+            "--id",
+            artifact_id,
+        ]
+        completed = runner(command, check=False, capture_output=True, text=True)
     try:
         publish_result = json.loads(completed.stdout)
     except json.JSONDecodeError as exc:
