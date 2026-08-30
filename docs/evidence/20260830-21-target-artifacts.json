@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "shared_at": "2026-08-30",
+  "bucket": "k4fka/kafka-data-lake",
+  "method": "huggingface_hub.batch_bucket_files + download_bucket_files read-back",
+  "verification": {
+    "count": 21,
+    "sha256_verified": 21,
+    "size_verified": 21
+  },
+  "selection_note": "Existing local quality-ratio15-5k-export candidates; Norah Head uses shot-20-50-arch6/export-camera-opt. This manifest records sharing and integrity, not a new quality evaluation.",
+  "artifacts": [
+    {"id":"huejotzingo","size_bytes":61859489,"sha256":"db47297ebc870e4450a85fc26dd875fa3c6f209820a9290e4290c6121c4725cc","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/huejotzingo/db47297ebc870e4450a85fc26dd875fa3c6f209820a9290e4290c6121c4725cc.ply"},
+    {"id":"tepotzotlan-virreinato","size_bytes":63756193,"sha256":"7b648e76bc017f87977c7b134b8f091dea9430a64a6dbc87f5b181a8632a7c89","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/tepotzotlan-virreinato/7b648e76bc017f87977c7b134b8f091dea9430a64a6dbc87f5b181a8632a7c89.ply"},
+    {"id":"templo-san-marcos","size_bytes":62126089,"sha256":"b680ba954cdaa391d8d4206f06d9473e81f7c3f35b5123e37d1154aaf0c3e3ab","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/templo-san-marcos/b680ba954cdaa391d8d4206f06d9473e81f7c3f35b5123e37d1154aaf0c3e3ab.ply"},
+    {"id":"calvillo-centro","size_bytes":66411281,"sha256":"5f558048569eba51e6126cb43b2ad8b81df77eee6e5482e0b18897bd88883abc","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/calvillo-centro/5f558048569eba51e6126cb43b2ad8b81df77eee6e5482e0b18897bd88883abc.ply"},
+    {"id":"puente-san-ignacio-03","size_bytes":145085809,"sha256":"e05876f43b4fb060b9d9c0518462216d2afdf55a175940c650fecaa4a80c4cf8","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/puente-san-ignacio-03/e05876f43b4fb060b9d9c0518462216d2afdf55a175940c650fecaa4a80c4cf8.ply"},
+    {"id":"avenida-gomez-morin","size_bytes":146611753,"sha256":"0438304ef6cecae8dfc5f6264bd37a97ccda6b1da573d75dd78d65e26e167080","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/avenida-gomez-morin/0438304ef6cecae8dfc5f6264bd37a97ccda6b1da573d75dd78d65e26e167080.ply"},
+    {"id":"san-francisco-nayarit-01","size_bytes":95053297,"sha256":"062f1129af8327e145b2c3fb9fe0e05edb3d3330955fd2108cbb5b5823d2e70e","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/san-francisco-nayarit-01/062f1129af8327e145b2c3fb9fe0e05edb3d3330955fd2108cbb5b5823d2e70e.ply"},
+    {"id":"baluarte-san-pedro","size_bytes":83705809,"sha256":"ebf38e7717eb23bebf6ef75107118c2514dc18d001bb6a5b23f93d34853aa58c","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/baluarte-san-pedro/ebf38e7717eb23bebf6ef75107118c2514dc18d001bb6a5b23f93d34853aa58c.ply"},
+    {"id":"puente-san-ignacio-01","size_bytes":53416577,"sha256":"0e61ce96f6aaa95746b6c4b97f5111e0db93bd1dfe1d6de0da74e6b27f56bf7b","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/puente-san-ignacio-01/0e61ce96f6aaa95746b6c4b97f5111e0db93bd1dfe1d6de0da74e6b27f56bf7b.ply"},
+    {"id":"herstmonceux-castle","size_bytes":53680449,"sha256":"dfb1a577007192b71d750aee80d99197a1b652e8b2ff63be3166d95ce40e0002","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/herstmonceux-castle/dfb1a577007192b71d750aee80d99197a1b652e8b2ff63be3166d95ce40e0002.ply"},
+    {"id":"fachada-san-francisco-javier","size_bytes":70207665,"sha256":"40c0cbaf63412e6c5cf4b9901697e8c9b86b06e0043c23b5525b0d468c442302","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/fachada-san-francisco-javier/40c0cbaf63412e6c5cf4b9901697e8c9b86b06e0043c23b5525b0d468c442302.ply"},
+    {"id":"panoramica-puebla-centro","size_bytes":82129273,"sha256":"a504068aa822953eb90af00aaf4bfdaa87392b34adf729a0d250893b03dbb51f","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/panoramica-puebla-centro/a504068aa822953eb90af00aaf4bfdaa87392b34adf729a0d250893b03dbb51f.ply"},
+    {"id":"centro-aguascalientes","size_bytes":114041169,"sha256":"5e80a396b1afe867b29b7f1b118dcba44a65dcaaf38fd52cf755ad3aabec90d6","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/centro-aguascalientes/5e80a396b1afe867b29b7f1b118dcba44a65dcaaf38fd52cf755ad3aabec90d6.ply"},
+    {"id":"barco-la-pona-01","size_bytes":74636201,"sha256":"f8b29332128f4425fdc83553be6669fbe8f92621c7735ad3aa3e8b0fef6155fd","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/barco-la-pona-01/f8b29332128f4425fdc83553be6669fbe8f92621c7735ad3aa3e8b0fef6155fd.ply"},
+    {"id":"presa-san-blas","size_bytes":81934841,"sha256":"4af7de0ca1680bb9e6a618d8f4f0424f4609bbc37e1c44ad84cd7a8a41efa841","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/presa-san-blas/4af7de0ca1680bb9e6a618d8f4f0424f4609bbc37e1c44ad84cd7a8a41efa841.ply"},
+    {"id":"playa-guayabitos-region","size_bytes":51482425,"sha256":"b3daf93037c06560c9d8014c2664314fac7931cdf660c2008851d5ddf3c18dda","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/playa-guayabitos-region/b3daf93037c06560c9d8014c2664314fac7931cdf660c2008851d5ddf3c18dda.ply"},
+    {"id":"cascadas-agua-azul","size_bytes":97131041,"sha256":"3842b8d5c18614b73f91f802a693f082ae1b5a70ea496be17c32b3383d496f89","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/cascadas-agua-azul/3842b8d5c18614b73f91f802a693f082ae1b5a70ea496be17c32b3383d496f89.ply"},
+    {"id":"los-cabos-sunset","size_bytes":42064625,"sha256":"bf77a697a3c341e0e3e556635d94c38031d9c2b5a2d138a29fc0bdc339d3287f","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/los-cabos-sunset/bf77a697a3c341e0e3e556635d94c38031d9c2b5a2d138a29fc0bdc339d3287f.ply"},
+    {"id":"la-pona-fire-2025","size_bytes":135645689,"sha256":"b976d3f11da1280d5e5ef5b4351f2376f295e692c1e1025bd03e29208ca84681","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/la-pona-fire-2025/b976d3f11da1280d5e5ef5b4351f2376f295e692c1e1025bd03e29208ca84681.ply"},
+    {"id":"cadena-humana-la-pona","size_bytes":147890937,"sha256":"cccffcfe9c89502d5807694880fab67525b55a9295cff90eab214b41348ff12c","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/cadena-humana-la-pona/cccffcfe9c89502d5807694880fab67525b55a9295cff90eab214b41348ff12c.ply"},
+    {"id":"norah-head-insta360-x5","size_bytes":31836361,"sha256":"ef906022e879cffdf4b6bd25cfb3f8db02c427e7ef7620ffe822d9742efaaa9c","locator":"hf://buckets/k4fka/kafka-data-lake/autophotogrammetry/gaussian-splats/norah-head-insta360-x5/ef906022e879cffdf4b6bd25cfb3f8db02c427e7ef7620ffe822d9742efaaa9c.ply"}
+  ]
+}

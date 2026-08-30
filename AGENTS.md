@@ -26,3 +26,10 @@
 
 Use `.agents/skills/photogrammetry-reconstruction/SKILL.md` for the repeatable experiment workflow.
 Use `.agents/skills/artifact-storage/SKILL.md` whenever an experiment produces or republishes generated artifacts.
+
+## Official Hugging Face upload method
+
+For authenticated Storage Bucket publishing, use the official `huggingface_hub`
+`batch_bucket_files()` API and verify exact read-back with
+`download_bucket_files()`. The canonical remote layout is
+`autophotogrammetry/gaussian-splats/<dataset>/<sha256>.ply`.
