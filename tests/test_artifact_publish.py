@@ -63,114 +63,279 @@ class ArtifactPublishTest(unittest.TestCase):
         sha = hashlib.sha256(payload).hexdigest()
         manifest = root / "output" / "demo" / "manifest.json"
         manifest.parent.mkdir(parents=True, exist_ok=True)
-        manifest.write_text(
-            json.dumps(
+        transforms = manifest.parent / "nerfstudio-data" / "transforms.json"
+        transforms.parent.mkdir()
+        transforms_payload: dict[str, object] = {
+            "frames": [
                 {
-                    "dataset_id": "demo",
-                    "source": {"revision": REVISION},
-                    "preflight": {
-                        "files": [
-                            {
-                                "source_path": "input/demo/frame.jpg",
-                                "sha256": "b" * 64,
-                            }
-                        ]
-                    },
-                    "runs": [
-                        {
-                            "run_id": "r1",
-                            "status": "PASS",
-                            "output_ply": str(ply),
-                            "output_sha256": sha,
-                            "output_size_bytes": len(payload),
-                            "output_vertex_count": 1,
-                            "export": {"command": ["ns-export", "gaussian-splat"]},
-                            "training": {"command": ["ns-train", "splatfacto"]},
-                        }
-                    ],
+                    "file_path": "images/frame-000001.jpg",
+                    "transform_matrix": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
                 }
-            ),
-            encoding="utf-8",
-        )
-        return manifest, ply, sha
+            ]
+        }
+        if orientation_override is not None:
+            transforms_payload["orientation_override"] = orientation_override
+        transforms.write_text(json.dumps(transforms_payload), encoding="utf-8")
+        body: dict[str, object] = {
+            "schema_version": 2,
+            "dataset": "demo",
+            "status": "success",
+            "started_at": "2026-08-20T00:00:00Z",
+            "source_revision": REVISION,
+            "registry": {
+                "source_page": "https://commons.wikimedia.org/wiki/File:Demo.webm",
+                "license": {"url": "https://creativecommons.org/publicdomain/zero/1.0/"},
+            },
+            "splatfacto": {
+                "ply_path": (
+                    "/workspace/output/demo/runs/r1/export/splat.ply"
+                    if container_path
+                    else str(ply)
+                ),
+                "ply_sha256": sha,
+                "ply_size_bytes": len(payload),
+            },
+        }
+        if with_physical_up:
+            physical_path = manifest.parent / "physical-up-evidence.json"
+            physical_path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "authority_type": "imu_gravity",
+                        "authority_source": "fixture://imu.json",
+                        "authority_source_sha256": "c" * 64,
+                        "source_frame": "imu-frame",
+                        "vector_semantics": "gravity_down",
+                        "source_vector": [0.0, 0.5, -0.8660254037844386],
+                        "source_to_model_matrix3x3": [
+                            [1.0, 0.0, 0.0],
+                            [0.0, 1.0, 0.0],
+                            [0.0, 0.0, 1.0],
+                        ],
+                        "angular_uncertainty_deg": 0.2,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            body["physical_up_evidence_path"] = physical_path.name
+        manifest.write_text(json.dumps(body), encoding="utf-8")
+        hf_root = root / "hf-cache-hub"
+        (hf_root / "scripts").mkdir(parents=True)
+        (hf_root / "scripts" / "artifact_manager.py").write_text("# cli", encoding="utf-8")
+        return manifest, ply, sha, hf_root
 
-    def test_publish_requires_pinned_source_revision(self):
+    @staticmethod
+    def _successful_runner(command, **kwargs):
+        if command[:3] == ["git", "rev-parse", "HEAD"]:
+            raise AssertionError("publish must not infer provenance from current HEAD")
+        artifact_manifest = Path(command[command.index("--manifest") + 1])
+        declared = yaml.safe_load(artifact_manifest.read_text(encoding="utf-8"))["artifacts"][0]
+        result = {
+            "status": "PUBLISHED",
+            "remote_verified": True,
+            "remote_uri": f"hf://buckets/{declared['storage']['bucket']}/{declared['storage']['path']}",
+            "sha256": declared["sha256"],
+            "size_bytes": declared["size_bytes"],
+        }
+        return subprocess.CompletedProcess(command, 0, stdout=json.dumps(result), stderr="")
+
+    def test_missing_hf_cache_hub_root_fails_with_required_error(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(ArtifactPublishError, "HF_CACHE_HUB_ROOT"):
+                _hf_cache_command(None)
+
+    def test_hf_cache_hub_python_can_be_selected_explicitly(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
-            manifest, _, _ = self._fixture(root)
-            payload = json.loads(manifest.read_text(encoding="utf-8"))
-            payload["source"].pop("revision")
-            manifest.write_text(json.dumps(payload), encoding="utf-8")
-            with self.assertRaisesRegex(ArtifactPublishError, "source revision"):
-                publish_run_splat(manifest, "r1", bucket="k4fka/test", dry_run=True)
+            script = root / "scripts" / "artifact_manager.py"
+            script.parent.mkdir()
+            script.write_text("# cli", encoding="utf-8")
+            with patch.dict(os.environ, {"HF_CACHE_HUB_PYTHON": "/opt/hf/bin/python"}, clear=True):
+                self.assertEqual(
+                    ["/opt/hf/bin/python", str(script)],
+                    _hf_cache_command(root),
+                )
 
-    def test_publish_requires_exact_output_hash(self):
+    def test_publish_uses_generation_time_revision_without_git_lookup(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
-            manifest, _, _ = self._fixture(root)
-            payload = json.loads(manifest.read_text(encoding="utf-8"))
-            payload["runs"][0]["output_sha256"] = "0" * 64
-            manifest.write_text(json.dumps(payload), encoding="utf-8")
-            with self.assertRaisesRegex(ArtifactPublishError, "SHA-256"):
-                publish_run_splat(manifest, "r1", bucket="k4fka/test", dry_run=True)
-
-    def test_publish_requires_physical_up_or_explicit_override(self):
-        with tempfile.TemporaryDirectory() as d:
-            root = Path(d)
-            manifest, _, _ = self._fixture(root)
-            with self.assertRaisesRegex(ArtifactPublishError, "physical up"):
-                publish_run_splat(manifest, "r1", bucket="k4fka/test", dry_run=True)
-
-    def test_publish_accepts_explicit_orientation_override(self):
-        with tempfile.TemporaryDirectory() as d:
-            root = Path(d)
-            manifest, _, sha = self._fixture(root)
+            manifest, ply, sha, hf_root = self._fixture(root)
             result = publish_run_splat(
                 manifest,
-                "r1",
-                bucket="k4fka/test",
-                dry_run=True,
-                orientation_override="reviewed-y-up",
+                bucket="k4fka/artifacts",
+                hf_cache_hub_root=hf_root,
+                runner=self._successful_runner,
             )
-            self.assertEqual("DRY_RUN", result["status"])
+            self.assertEqual("published", result["status"])
+            self.assertTrue(result["remote_verified"])
             self.assertEqual(sha, result["sha256"])
-            self.assertEqual("reviewed-y-up", result["orientation"])
+            self.assertEqual(REVISION, result["source_revision"])
+            self.assertEqual("accepted", result["orientation_status"])
+            self.assertEqual("coordinate_basis_only", result["orientation_scope"])
+            self.assertEqual("review_required", result["physical_up_status"])
+            self.assertIsNone(result["physical_up_authority_type"])
+            artifact_manifest = yaml.safe_load(
+                (manifest.parent / "artifact-manifest.yaml").read_text(encoding="utf-8")
+            )
+            artifact = artifact_manifest["artifacts"][0]
+            self.assertEqual("gaussian-splat", artifact["kind"])
+            self.assertEqual("ply", artifact["format"])
+            self.assertEqual(sha, artifact["sha256"])
+            self.assertEqual(REVISION, artifact["provenance"]["revision"])
+            self.assertIn("run_id", artifact["provenance"])
+            self.assertNotIn("source_path", artifact["provenance"])
+            self.assertEqual("accepted", artifact["orientation"]["status"])
+            self.assertEqual("review_required", artifact["orientation"]["physical_up"]["status"])
+            self.assertEqual(sha, artifact["orientation"]["ply_sha256"])
+            self.assertEqual("orientation-evidence.json", artifact["orientation"]["evidence_path"])
+            self.assertEqual(
+                [2**-0.5, 0.0, 0.0, 2**-0.5],
+                artifact["orientation"]["consumer_application"]["quaternion_xyzw"],
+            )
+            updated = json.loads(manifest.read_text(encoding="utf-8"))
+            self.assertEqual("success", updated["status"])
+            self.assertEqual("accepted", updated["orientation"]["status"])
+            self.assertEqual("published", updated["artifact_publish"]["status"])
+            self.assertTrue((manifest.parent / "orientation-evidence.json").is_file())
+            self.assertTrue(ply.exists())
 
-    def test_publish_accepts_physical_up_evidence(self):
+    def test_external_physical_up_is_published_with_portable_evidence_path(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
-            manifest, _, _ = self._fixture(root)
-            payload = json.loads(manifest.read_text(encoding="utf-8"))
-            payload["orientation"] = {
-                "physical_up_status": "PASS",
-                "canonical_orientation": "y-up",
-            }
-            manifest.write_text(json.dumps(payload), encoding="utf-8")
-            result = publish_run_splat(manifest, "r1", bucket="k4fka/test", dry_run=True)
-            self.assertEqual("y-up", result["orientation"])
+            manifest, _, _, hf_root = self._fixture(root, with_physical_up=True)
+            result = publish_run_splat(
+                manifest,
+                bucket="k4fka/artifacts",
+                hf_cache_hub_root=hf_root,
+                runner=self._successful_runner,
+            )
+            self.assertEqual("coordinate_basis_plus_physical_up", result["orientation_scope"])
+            self.assertEqual("accepted", result["physical_up_status"])
+            self.assertEqual("imu_gravity", result["physical_up_authority_type"])
+            artifact = yaml.safe_load(
+                (manifest.parent / "artifact-manifest.yaml").read_text(encoding="utf-8")
+            )["artifacts"][0]
+            physical = artifact["orientation"]["physical_up"]
+            self.assertEqual("accepted", physical["status"])
+            self.assertEqual("physical-up-evidence.json", physical["evidence_path"])
+            self.assertEqual("c" * 64, physical["authority_source_sha256"])
 
-    def test_hf_cache_command_requires_binary(self):
-        with patch("processing.artifact_publish.shutil.which", return_value=None):
-            with self.assertRaisesRegex(ArtifactPublishError, "hf-cache-hub"):
-                _hf_cache_command()
+    def test_container_output_path_is_resolved_on_host(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, ply, sha, hf_root = self._fixture(root, container_path=True)
+            result = publish_run_splat(
+                manifest,
+                bucket="k4fka/artifacts",
+                hf_cache_hub_root=hf_root,
+                runner=self._successful_runner,
+            )
+            self.assertEqual(sha, result["sha256"])
+            self.assertTrue(ply.exists())
 
-    def test_hf_cache_command_uses_detected_binary(self):
-        with patch("processing.artifact_publish.shutil.which", return_value="/usr/bin/hf-cache-hub"):
-            self.assertEqual(["/usr/bin/hf-cache-hub"], _hf_cache_command())
+    def test_missing_generation_revision_fails(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, _, _, hf_root = self._fixture(root)
+            body = json.loads(manifest.read_text(encoding="utf-8"))
+            body.pop("source_revision")
+            manifest.write_text(json.dumps(body), encoding="utf-8")
+            with self.assertRaisesRegex(
+                ArtifactPublishError, "must record generation-time source_revision"
+            ):
+                publish_run_splat(
+                    manifest,
+                    bucket="k4fka/artifacts",
+                    hf_cache_hub_root=hf_root,
+                    runner=self._successful_runner,
+                )
 
-    def test_hf_cache_upload_command_is_exact(self):
-        cmd = _hf_cache_command("upload", "--foo", "bar")
-        self.assertEqual(["hf-cache-hub", "upload", "--foo", "bar"], cmd)
+    def test_publish_failure_preserves_local_run_for_retry(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, ply, _, hf_root = self._fixture(root)
 
-    def test_env_forwarding_uses_explicit_contract(self):
-        with patch.dict(os.environ, {"HF_TOKEN": "secret", "OTHER": "x"}, clear=True):
-            env = os.environ.copy()
-            self.assertEqual("secret", env["HF_TOKEN"])
-            self.assertEqual("x", env["OTHER"])
+            def runner(command, **kwargs):
+                return subprocess.CompletedProcess(
+                    command,
+                    1,
+                    stdout=json.dumps({"status": "FAILED"}),
+                    stderr="",
+                )
 
-    def test_subprocess_example_is_non_shell(self):
-        completed = subprocess.CompletedProcess(args=["echo"], returncode=0)
-        self.assertEqual(0, completed.returncode)
+            with self.assertRaises(ArtifactPublishError):
+                publish_run_splat(
+                    manifest,
+                    bucket="k4fka/artifacts",
+                    hf_cache_hub_root=hf_root,
+                    runner=runner,
+                )
+            updated = json.loads(manifest.read_text(encoding="utf-8"))
+            self.assertEqual("success", updated["status"])
+            self.assertEqual("accepted", updated["orientation"]["status"])
+            self.assertEqual("failed", updated["artifact_publish"]["status"])
+            self.assertTrue(ply.exists())
+
+    def test_local_ply_mismatch_fails_before_publish(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, ply, _, hf_root = self._fixture(root)
+            ply.write_bytes(b"changed")
+            with self.assertRaises(ArtifactPublishError):
+                publish_run_splat(
+                    manifest,
+                    bucket="k4fka/artifacts",
+                    hf_cache_hub_root=hf_root,
+                )
+
+    def test_missing_transforms_fails_before_publish(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, _, _, hf_root = self._fixture(root)
+            (manifest.parent / "nerfstudio-data" / "transforms.json").unlink()
+            with self.assertRaisesRegex(ArtifactPublishError, "transforms.json"):
+                publish_run_splat(
+                    manifest,
+                    bucket="k4fka/artifacts",
+                    hf_cache_hub_root=hf_root,
+                    runner=self._successful_runner,
+                )
+
+    def test_declared_missing_physical_up_fails_before_publish(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, _, _, hf_root = self._fixture(root)
+            body = json.loads(manifest.read_text(encoding="utf-8"))
+            body["physical_up_evidence_path"] = "missing-physical-up.json"
+            manifest.write_text(json.dumps(body), encoding="utf-8")
+            with self.assertRaisesRegex(
+                ArtifactPublishError, "physical-up evidence file is missing"
+            ):
+                publish_run_splat(
+                    manifest,
+                    bucket="k4fka/artifacts",
+                    hf_cache_hub_root=hf_root,
+                    runner=self._successful_runner,
+                )
+
+    def test_non_gravity_orientation_method_fails_before_publish(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, _, _, hf_root = self._fixture(root, orientation_override="pca")
+            with self.assertRaisesRegex(
+                ArtifactPublishError, "only accepted orientation basis evidence"
+            ):
+                publish_run_splat(
+                    manifest,
+                    bucket="k4fka/artifacts",
+                    hf_cache_hub_root=hf_root,
+                    runner=self._successful_runner,
+                )
+
+    def test_generated_ply_remains_gitignored(self):
+        ignore = (Path(__file__).parents[1] / ".gitignore").read_text(encoding="utf-8")
+        self.assertIn("output/**/runs/**/export/*.ply", ignore)
 
 
 if __name__ == "__main__":
