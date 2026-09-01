@@ -4,7 +4,8 @@ on:
   pull_request:
     paths:
       - Dockerfile.longsplat
-      - requirements.txt
+      - pyproject.toml
+      - uv.lock
       - processing/longsplat_backend.py
       - processing/external_research.py
       - .github/workflows/longsplat-image.yml
@@ -12,7 +13,8 @@ on:
     branches: [main]
     paths:
       - Dockerfile.longsplat
-      - requirements.txt
+      - pyproject.toml
+      - uv.lock
       - processing/longsplat_backend.py
       - processing/external_research.py
       - .github/workflows/longsplat-image.yml
