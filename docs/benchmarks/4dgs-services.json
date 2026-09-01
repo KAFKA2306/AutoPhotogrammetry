@@ -69,7 +69,8 @@
         "status": "UNVERIFIED"
       },
       "runtime": {
-        "public_interactive_asset_confirmed": false,
+        "public_runtime_asset_reference_confirmed": false,
+        "local_playback_verified": false,
         "public_asset_url": null,
         "transfer_bytes": null,
         "time_to_first_visible_frame_ms": null,
@@ -77,7 +78,7 @@
         "seek_latency_ms": null,
         "viewpoint_change_latency_ms": null,
         "status": "BLOCKED",
-        "reason": "No public interactive 4DGS runtime asset was confirmed from the provider sources reviewed on 2026-09-01."
+        "reason": "No public interactive 4DGS runtime asset reference was confirmed from the provider sources reviewed on 2026-09-01."
       },
       "integration": {
         "web_sdk": null,
@@ -87,6 +88,7 @@
         "downloadable_artifact": null,
         "export_format": null,
         "api": null,
+        "locally_verified": false,
         "status": "UNVERIFIED"
       },
       "commercial": {
@@ -155,7 +157,9 @@
           "WASM"
         ],
         "adaptive_streaming": true,
-        "public_interactive_asset_confirmed": true,
+        "evidence_basis": "official_provider_repository",
+        "public_runtime_asset_reference_confirmed": true,
+        "local_playback_verified": false,
         "public_asset_format": ".mint",
         "public_asset_examples": [
           "https://gstatic.gracia.ai/demo/mint/fashion_example_1724.mint",
@@ -168,7 +172,7 @@
         "seek_latency_ms": null,
         "viewpoint_change_latency_ms": null,
         "status": "PARTIAL",
-        "reason": "Official public stream assets and player source are available, but transfer/performance metrics have not yet been measured on a target device."
+        "reason": "Official repository references public stream assets and player code, but playback and transfer/performance metrics have not been verified locally on a target device."
       },
       "integration": {
         "web_sdk": true,
@@ -191,7 +195,9 @@
           "Apple Vision Pro"
         ],
         "webgpu_requirement": "navigator.gpu; official README lists Chrome 113+, Edge 113+, Safari 18+, Firefox Nightly with flag",
-        "status": "PASS"
+        "evidence_basis": "official_provider_repository",
+        "locally_verified": false,
+        "status": "PARTIAL"
       },
       "licensing": {
         "web_sdk": "proprietary",
@@ -209,7 +215,7 @@
   "next_measurements": [
     {
       "entry_id": "gracia",
-      "measure": "public stream transfer bytes, range behavior, time to first visible frame, steady-state FPS, seek latency and viewpoint-change latency",
+      "measure": "public stream playback, transfer bytes, range behavior, time to first visible frame, steady-state FPS, seek latency and viewpoint-change latency",
       "required_environment": "instrumented WebGPU browser on a target desktop or XR/mobile device"
     },
     {
