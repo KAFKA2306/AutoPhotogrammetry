@@ -23,7 +23,7 @@ class ArtifactPublishTest(unittest.TestCase):
             root = Path(d)
             artifact = root / "splat.ply"
             artifact.write_bytes(b"ply\nofficial-api")
-            calls = []
+            calls: list[tuple[object, ...]] = []
 
             def uploader(bucket, *, add, token=None):
                 calls.append(("upload", bucket, add, token))

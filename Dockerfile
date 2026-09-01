@@ -5,6 +5,7 @@ ARG CUDA_ARCH_LIST=12.0
 ARG NERFSTUDIO_REVISION=50e0e3c70c775e89333256213363badbf074f29d
 ARG GSPLAT_REVISION=v1.4.0
 ARG OPEN3D_VERSION=0.19.0
+ARG UV_VERSION=0.12.8
 ARG AUTOPHOTOGRAMMETRY_REVISION
 ENV CUDA_HOME=/usr/local/cuda \
     TORCH_CUDA_ARCH_LIST=${CUDA_ARCH_LIST} \
@@ -49,8 +50,11 @@ RUN git init /opt/nerfstudio \
 
 RUN python -m pip install --no-cache-dir "open3d==${OPEN3D_VERSION}"
 
-COPY requirements.txt /tmp/requirements.txt
-RUN python -m pip install --no-cache-dir -r /tmp/requirements.txt \
+RUN python -m pip install --no-cache-dir "uv==${UV_VERSION}"
+COPY pyproject.toml uv.lock /tmp/autophotogrammetry/
+RUN cd /tmp/autophotogrammetry \
+    && uv export --frozen --no-dev --format requirements-txt --output-file /tmp/requirements.txt \
+    && python -m pip install --no-cache-dir -r /tmp/requirements.txt \
     && python -m pip check
 
 COPY . /opt/autophotogrammetry
