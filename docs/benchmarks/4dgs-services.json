@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-01",
+  "issue": "https://github.com/KAFKA2306/AutoPhotogrammetry/issues/161",
+  "status_values": [
+    "PASS",
+    "PARTIAL",
+    "FAIL",
+    "BLOCKED",
+    "UNVERIFIED"
+  ],
+  "rules": {
+    "vendor_claims_are_measurements": false,
+    "paper_metrics_are_local_measurements": false,
+    "unknown_values_are_null": true,
+    "static_3dgs_is_equivalent_to_4dgs": false
+  },
+  "entries": [
+    {
+      "id": "nexia-video",
+      "provider": "株式会社ネクシアエンターテインメント",
+      "product": "NEXIA VIDEO",
+      "kind": "external_service",
+      "status": "PARTIAL",
+      "sources": [
+        {
+          "type": "provider_press_release",
+          "url": "https://prtimes.jp/main/html/rd/p/000000003.000183494.html",
+          "published_at": "2026-08-31"
+        },
+        {
+          "type": "service",
+          "url": "https://nexia.vc/ai/"
+        }
+      ],
+      "public_claims": {
+        "service_start": "2026-09-01",
+        "methods": [
+          "3D Gaussian Splatting",
+          "4D Gaussian Splatting"
+        ],
+        "experience": "free-viewpoint video with user-controlled distance, position, and angle",
+        "service_scope": [
+          "capture",
+          "data_processing",
+          "content_production",
+          "delivery"
+        ],
+        "target_devices": [
+          "smartphone",
+          "PC"
+        ],
+        "compression": {
+          "basis": "provider_test_environment",
+          "average_size_ratio": 0.125,
+          "maximum_reported_size_ratio": 0.1,
+          "example_original_bytes_mb": 362.0,
+          "example_compressed_bytes_mb": 41.6,
+          "locally_reproduced": false
+        }
+      },
+      "capture": {
+        "camera_count": null,
+        "camera_models": null,
+        "capture_resolution": null,
+        "capture_fps": null,
+        "synchronization": null,
+        "calibration": null,
+        "status": "UNVERIFIED"
+      },
+      "runtime": {
+        "public_interactive_asset_confirmed": false,
+        "public_asset_url": null,
+        "transfer_bytes": null,
+        "time_to_first_visible_frame_ms": null,
+        "steady_state_fps": null,
+        "seek_latency_ms": null,
+        "viewpoint_change_latency_ms": null,
+        "status": "BLOCKED",
+        "reason": "No public interactive 4DGS runtime asset was confirmed from the provider sources reviewed on 2026-09-01."
+      },
+      "integration": {
+        "web_sdk": null,
+        "unity": null,
+        "unreal": null,
+        "webxr": null,
+        "downloadable_artifact": null,
+        "export_format": null,
+        "api": null,
+        "status": "UNVERIFIED"
+      },
+      "commercial": {
+        "public_price": null,
+        "public_sla": null,
+        "inquiry_available": true,
+        "status": "UNVERIFIED"
+      }
+    },
+    {
+      "id": "gracia",
+      "provider": "Gracia Labs",
+      "product": "Gracia",
+      "kind": "external_service_and_sdk",
+      "status": "PARTIAL",
+      "sources": [
+        {
+          "type": "provider_site",
+          "url": "https://gracia.ai/"
+        },
+        {
+          "type": "provider_case_study",
+          "url": "https://gracia.ai/store/blog/muse-nightshift-superstar"
+        },
+        {
+          "type": "official_repository",
+          "url": "https://github.com/gracia-labs/web-sdk",
+          "revision": "7d649d3c362f6911f0e1fbad51bb25cf56dee23f"
+        },
+        {
+          "type": "official_demo_source_registry",
+          "url": "https://github.com/gracia-labs/web-sdk/blob/7d649d3c362f6911f0e1fbad51bb25cf56dee23f/sources.json"
+        }
+      ],
+      "public_claims": {
+        "method": "4D Gaussian Splatting volumetric video",
+        "capture_case": {
+          "project": "Muse - Nightshift Superstar",
+          "camera_count": 56,
+          "camera_model": "iPhone 17 Pro",
+          "synchronization": "genlocked",
+          "capture_site": "Radiant Images, Los Angeles"
+        },
+        "delivery_targets": [
+          "standard CG pipelines",
+          "Unity",
+          "Unreal Engine",
+          "web"
+        ]
+      },
+      "capture": {
+        "camera_count": 56,
+        "camera_models": [
+          "iPhone 17 Pro"
+        ],
+        "capture_resolution": null,
+        "capture_fps": null,
+        "synchronization": "genlocked",
+        "calibration": null,
+        "scope_note": "Values are from one published production case and are not asserted as universal Gracia requirements.",
+        "status": "PARTIAL"
+      },
+      "runtime": {
+        "renderer": [
+          "WebGPU",
+          "WASM"
+        ],
+        "adaptive_streaming": true,
+        "public_interactive_asset_confirmed": true,
+        "public_asset_format": ".mint",
+        "public_asset_examples": [
+          "https://gstatic.gracia.ai/demo/mint/fashion_example_1724.mint",
+          "https://gstatic.gracia.ai/demo/mint/mma.mint",
+          "https://gstatic.gracia.ai/demo/mint/gymnastic.mint"
+        ],
+        "transfer_bytes": null,
+        "time_to_first_visible_frame_ms": null,
+        "steady_state_fps": null,
+        "seek_latency_ms": null,
+        "viewpoint_change_latency_ms": null,
+        "status": "PARTIAL",
+        "reason": "Official public stream assets and player source are available, but transfer/performance metrics have not yet been measured on a target device."
+      },
+      "integration": {
+        "web_sdk": true,
+        "three_js": true,
+        "playcanvas": true,
+        "react": true,
+        "unity": true,
+        "unreal": true,
+        "webxr": true,
+        "vr": true,
+        "ar": true,
+        "local_file_extensions": [
+          ".mint",
+          ".sog"
+        ],
+        "documented_xr_targets": [
+          "Meta Quest 3",
+          "Meta Quest 3S",
+          "Pico 4 Ultra",
+          "Apple Vision Pro"
+        ],
+        "webgpu_requirement": "navigator.gpu; official README lists Chrome 113+, Edge 113+, Safari 18+, Firefox Nightly with flag",
+        "status": "PASS"
+      },
+      "licensing": {
+        "web_sdk": "proprietary",
+        "examples_and_documentation": "MIT",
+        "source": "https://github.com/gracia-labs/web-sdk/blob/7d649d3c362f6911f0e1fbad51bb25cf56dee23f/LICENSE"
+      },
+      "commercial": {
+        "public_price": null,
+        "public_sla": null,
+        "hosted_streaming_available": true,
+        "status": "UNVERIFIED"
+      }
+    }
+  ],
+  "next_measurements": [
+    {
+      "entry_id": "gracia",
+      "measure": "public stream transfer bytes, range behavior, time to first visible frame, steady-state FPS, seek latency and viewpoint-change latency",
+      "required_environment": "instrumented WebGPU browser on a target desktop or XR/mobile device"
+    },
+    {
+      "entry_id": "nexia-video",
+      "measure": "same runtime metrics once a public interactive 4DGS asset is available",
+      "required_environment": "public provider asset plus instrumented browser"
+    }
+  ]
+}
