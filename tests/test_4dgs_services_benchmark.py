@@ -1,7 +1,5 @@
 from json import load
 from pathlib import Path
-
-
 BENCHMARK = Path(__file__).parents[1] / "docs" / "benchmarks" / "4dgs-services.json"
 STATUS_VALUES = {"PASS", "PARTIAL", "FAIL", "BLOCKED", "UNVERIFIED"}
 
