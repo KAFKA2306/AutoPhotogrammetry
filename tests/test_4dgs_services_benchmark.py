@@ -1,4 +1,4 @@
-import json
+from json import load
 from pathlib import Path
 
 
@@ -8,7 +8,7 @@ STATUS_VALUES = {"PASS", "PARTIAL", "FAIL", "BLOCKED", "UNVERIFIED"}
 
 def _load() -> dict:
     with BENCHMARK.open(encoding="utf-8") as stream:
-        return json.load(stream)
+        return load(stream)
 
 
 def test_4dgs_service_benchmark_has_single_machine_readable_authority() -> None:
