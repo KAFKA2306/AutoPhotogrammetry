@@ -3,6 +3,7 @@ FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 ARG DEBIAN_FRONTEND=noninteractive
 ARG VGGT_REVISION=a288dd0f14786c93483e45524328726ab7b1b4ce
 ARG LIGHTGLUE_REVISION=746fac2c042e05d1865315b1413419f1c1e7ba55
+ARG UV_VERSION=0.12.8
 ENV CUDA_HOME=/usr/local/cuda \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONUNBUFFERED=1
@@ -65,8 +66,11 @@ RUN python -m pip install --no-cache-dir \
     && python -m pip install --no-cache-dir --no-deps /opt/lightglue \
     && python -m pip install --no-cache-dir --no-deps /opt/vggt
 
-COPY requirements.txt /tmp/autophotogrammetry-requirements.txt
-RUN python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
+RUN python -m pip install --no-cache-dir "uv==${UV_VERSION}"
+COPY pyproject.toml uv.lock /tmp/autophotogrammetry/
+RUN cd /tmp/autophotogrammetry \
+    && uv export --frozen --no-dev --format requirements-txt --output-file /tmp/autophotogrammetry-requirements.txt \
+    && python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
     && python -m pip check
 
 COPY . /opt/autophotogrammetry
