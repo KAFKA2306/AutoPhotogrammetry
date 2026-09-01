@@ -66,12 +66,52 @@ RUN python -m pip install --no-cache-dir \
     && python -m pip install --no-cache-dir --no-deps /opt/lightglue \
     && python -m pip install --no-cache-dir --no-deps /opt/vggt
 
+# pyproject.toml + uv.lock remain the AutoPhotogrammetry dependency authority.
+# VGGT owns numpy and pydantic versions in this image because its pinned upstream
+# runtime requires numpy<2. Omit only those packages from the exported install;
+# their installed versions still satisfy AutoPhotogrammetry's declared ranges.
 RUN python -m pip install --no-cache-dir "uv==${UV_VERSION}"
 COPY pyproject.toml uv.lock /tmp/autophotogrammetry/
 RUN cd /tmp/autophotogrammetry \
-    && uv export --frozen --no-dev --format requirements-txt --output-file /tmp/autophotogrammetry-requirements.txt \
-    && python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
-    && python -m pip check
+    && uv export --frozen --no-dev --format requirements-txt \
+        --no-emit-package numpy \
+        --no-emit-package pydantic \
+        --no-emit-package pydantic-core \
+        --output-file /tmp/autophotogrammetry-requirements.txt \
+    && python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt
+
+# LightGlue and VGGT declare opencv-python, while this headless container
+# intentionally provides the API-compatible opencv-python-headless distribution.
+# Accept exactly those two metadata findings and fail on every other pip-check error.
+RUN python - <<'PY'
+import subprocess
+import sys
+
+import cv2
+import numpy
+import pydantic
+
+assert numpy.__version__ == "1.26.1", numpy.__version__
+assert pydantic.__version__ == "2.10.6", pydantic.__version__
+assert cv2.__version__, "cv2 import failed"
+
+check = subprocess.run(
+    [sys.executable, "-m", "pip", "check"],
+    capture_output=True,
+    text=True,
+)
+findings = {
+    line.strip()
+    for line in (check.stdout + "\n" + check.stderr).splitlines()
+    if line.strip()
+}
+expected = {
+    "lightglue 0.0 requires opencv-python, which is not installed.",
+    "vggt 0.0.1 requires opencv-python, which is not installed.",
+}
+assert check.returncode == 1, (check.returncode, findings)
+assert findings == expected, findings
+PY
 
 COPY . /opt/autophotogrammetry
 WORKDIR /opt/autophotogrammetry
