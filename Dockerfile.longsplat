@@ -3,6 +3,7 @@ FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LONGSPLAT_REVISION=19750775a9d19f30aa05a8333c4c6c231b2d5f4a
 ARG PYTORCH3D_REVISION=33824be3cbc87a7dd1db0f6a9a9de9ac81b2d0ba
+ARG UV_VERSION=0.12.8
 ENV CUDA_HOME=/usr/local/cuda \
     TORCH_CUDA_ARCH_LIST=12.0 \
     MAX_JOBS=4 \
@@ -65,8 +66,11 @@ RUN python -m pip install --no-cache-dir -r /tmp/longsplat-requirements.txt \
         /opt/longsplat/submodules/diff-gaussian-rasterization \
         /opt/longsplat/submodules/fused-ssim
 
-COPY requirements.txt /tmp/autophotogrammetry-requirements.txt
-RUN python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
+RUN python -m pip install --no-cache-dir "uv==${UV_VERSION}"
+COPY pyproject.toml uv.lock /tmp/autophotogrammetry/
+RUN cd /tmp/autophotogrammetry \
+    && uv export --frozen --no-dev --format requirements-txt --output-file /tmp/autophotogrammetry-requirements.txt \
+    && python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
     && python -m pip check \
     && python -m pip freeze > /opt/longsplat-environment.txt
 
