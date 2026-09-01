@@ -2,6 +2,7 @@ FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG EFA_REVISION=57f330f6f9b12d2684c6df0f0359ffec8f60976d
+ARG UV_VERSION=0.12.8
 ENV CUDA_HOME=/usr/local/cuda \
     TORCH_CUDA_ARCH_LIST=12.0 \
     MAX_JOBS=4 \
@@ -52,8 +53,11 @@ RUN python -m pip install --no-cache-dir \
         /opt/efa-gs/3DGS/submodules/diff-gaussian-rasterization \
         /opt/efa-gs/3DGS/submodules/simple-knn
 
-COPY requirements.txt /tmp/autophotogrammetry-requirements.txt
-RUN python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
+RUN python -m pip install --no-cache-dir "uv==${UV_VERSION}"
+COPY pyproject.toml uv.lock /tmp/autophotogrammetry/
+RUN cd /tmp/autophotogrammetry \
+    && uv export --frozen --no-dev --format requirements-txt --output-file /tmp/autophotogrammetry-requirements.txt \
+    && python -m pip install --no-cache-dir -r /tmp/autophotogrammetry-requirements.txt \
     && python -m pip check
 
 COPY . /opt/autophotogrammetry
