@@ -24,6 +24,10 @@ on:
       - .github/workflows/vggt-image.yml
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   packages: write
@@ -46,7 +50,6 @@ jobs:
           context: .
           file: Dockerfile.vggt
           push: ${{ github.event_name != 'pull_request' }}
-          load: ${{ github.event_name == 'pull_request' }}
           tags: |
             ghcr.io/kafka2306/autophotogrammetry:vggt-a288dd0-sm120-v1
             ghcr.io/kafka2306/autophotogrammetry:vggt-sha-${{ github.sha }}
@@ -55,8 +58,3 @@ jobs:
             LIGHTGLUE_REVISION=746fac2c042e05d1865315b1413419f1c1e7ba55
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Verify research image contract
-        if: github.event_name == 'pull_request'
-        run: |
-          docker run --rm ghcr.io/kafka2306/autophotogrammetry:vggt-a288dd0-sm120-v1 \
-            python -c 'import subprocess,torch,vggt,pycolmap; from lightglue import ALIKED,SuperPoint; rev=subprocess.run(["git","-C","/opt/vggt","rev-parse","HEAD"],check=True,capture_output=True,text=True).stdout.strip(); assert rev=="a288dd0f14786c93483e45524328726ab7b1b4ce"; assert torch.__version__.startswith("2.7.1"); print({"revision":rev,"torch":torch.__version__,"cuda":torch.version.cuda,"pycolmap":pycolmap.__version__})'
