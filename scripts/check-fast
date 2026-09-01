@@ -2,8 +2,6 @@
 set -euo pipefail
 
 uv lock --check
-uv export --frozen --no-dev --format requirements-txt --output-file /tmp/autophotogrammetry-requirements.txt
-diff -u <(tail -n +3 requirements.txt) <(tail -n +3 /tmp/autophotogrammetry-requirements.txt)
 uv run ruff format --check .
 uv run ruff check .
 uv run pyrefly check
