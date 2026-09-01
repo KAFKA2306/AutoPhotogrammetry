@@ -4,7 +4,8 @@ on:
   pull_request:
     paths:
       - Dockerfile.efa
-      - requirements.txt
+      - pyproject.toml
+      - uv.lock
       - processing/efa_gs_backend.py
       - processing/external_research.py
       - .github/workflows/efa-image.yml
@@ -12,7 +13,8 @@ on:
     branches: [main]
     paths:
       - Dockerfile.efa
-      - requirements.txt
+      - pyproject.toml
+      - uv.lock
       - processing/efa_gs_backend.py
       - processing/external_research.py
       - .github/workflows/efa-image.yml
