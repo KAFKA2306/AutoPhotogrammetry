@@ -33,6 +33,7 @@ def test_runtime_measurements_do_not_promote_unmeasured_values() -> None:
         assert entry["status"] in STATUS_VALUES
         runtime = entry["runtime"]
         assert runtime["status"] in STATUS_VALUES
+        assert isinstance(runtime["local_playback_verified"], bool)
 
         for metric in (
             "transfer_bytes",
@@ -55,6 +56,9 @@ def test_runtime_measurements_do_not_promote_unmeasured_values() -> None:
         ):
             assert runtime["status"] != "PASS"
 
+        if runtime["local_playback_verified"] is False:
+            assert runtime["status"] != "PASS"
+
 
 def test_nexia_compression_is_explicitly_vendor_claim_only() -> None:
     data = _load()
@@ -64,9 +68,10 @@ def test_nexia_compression_is_explicitly_vendor_claim_only() -> None:
     assert compression["basis"] == "provider_test_environment"
     assert compression["locally_reproduced"] is False
     assert nexia["runtime"]["status"] == "BLOCKED"
+    assert nexia["runtime"]["public_runtime_asset_reference_confirmed"] is False
 
 
-def test_gracia_public_demo_and_sdk_revision_are_traceable() -> None:
+def test_gracia_public_asset_reference_and_sdk_revision_are_traceable() -> None:
     data = _load()
     gracia = next(entry for entry in data["entries"] if entry["id"] == "gracia")
 
@@ -74,7 +79,10 @@ def test_gracia_public_demo_and_sdk_revision_are_traceable() -> None:
         source for source in gracia["sources"] if source["type"] == "official_repository"
     )
     assert repo_source["revision"] == "7d649d3c362f6911f0e1fbad51bb25cf56dee23f"
-    assert gracia["runtime"]["public_interactive_asset_confirmed"] is True
+    assert gracia["runtime"]["public_runtime_asset_reference_confirmed"] is True
+    assert gracia["runtime"]["local_playback_verified"] is False
     assert gracia["runtime"]["public_asset_examples"]
+    assert gracia["integration"]["locally_verified"] is False
+    assert gracia["integration"]["status"] == "PARTIAL"
     assert gracia["licensing"]["web_sdk"] == "proprietary"
     assert gracia["licensing"]["examples_and_documentation"] == "MIT"
