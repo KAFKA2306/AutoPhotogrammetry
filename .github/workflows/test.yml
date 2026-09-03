@@ -20,10 +20,6 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --locked
-      - name: Verify canonical design contract
-        run: |
-          git init /tmp/kafka-design
-          git -C /tmp/kafka-design fetch --depth=1 https://github.com/KAFKA2306/design.git f39a0865cf0342f495bf49f547c7fdf112145d77
-          git -C /tmp/kafka-design checkout --detach FETCH_HEAD
-          node /tmp/kafka-design/scripts/design-conformance.mjs --consumer "$GITHUB_WORKSPACE"
       - run: bash scripts/check
+      - name: Verify canonical design contract
+        run: node assets/.kafka-design/portable-conformance.mjs --consumer "$GITHUB_WORKSPACE"
