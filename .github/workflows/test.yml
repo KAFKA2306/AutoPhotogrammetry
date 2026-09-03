@@ -21,3 +21,5 @@ jobs:
           enable-cache: true
       - run: uv sync --locked
       - run: bash scripts/check
+      - name: Verify canonical design contract
+        run: node assets/.kafka-design/portable-conformance.mjs --consumer "$GITHUB_WORKSPACE"

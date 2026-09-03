@@ -1,0 +1,46 @@
+/* Generated from tokens/foundation.tokens.json. Do not edit. */
+:root {
+  --k-dimension-app-bar: 44px;
+  --k-dimension-control-height: 32px;
+  --k-dimension-radius: 2px;
+  --k-dimension-sidebar: 192px;
+  --k-dimension-sidebar-collapsed: 48px;
+  --k-dimension-space1: 4px;
+  --k-dimension-space2: 8px;
+  --k-dimension-space3: 12px;
+  --k-dimension-space4: 16px;
+  --k-dimension-table-row: 30px;
+  --k-dimension-touch-target: 44px;
+  --k-font-family-mono: "Roboto Mono", SFMono-Regular, Consolas, monospace;
+  --k-font-family-sans: Inter, "Noto Sans JP", system-ui, sans-serif;
+  --k-font-size-body: 14px;
+  --k-font-size-small: 12px;
+  --k-font-size-title: 20px;
+  --k-number-motion-fast-ms: 120;
+  --k-number-shadow-opacity: 0;
+  --k-color-accent: #7DD3FC;
+  --k-color-border: #D9D6CE;
+  --k-color-canvas: #F7F5EF;
+  --k-color-danger: #B91C1C;
+  --k-color-focus: #2563EB;
+  --k-color-foreground: #17233F;
+  --k-color-muted-foreground: #667085;
+  --k-color-primary: #2563EB;
+  --k-color-success: #15803D;
+  --k-color-surface: #FFFFFF;
+  --k-color-warning: #A16207;
+}
+
+[data-theme="dark"] {
+  --k-color-accent: #7DD3FC;
+  --k-color-border: #1E293B;
+  --k-color-canvas: #0B0F17;
+  --k-color-danger: #F87171;
+  --k-color-focus: #60A5FA;
+  --k-color-foreground: #F1F5F9;
+  --k-color-muted-foreground: #94A3B8;
+  --k-color-primary: #60A5FA;
+  --k-color-success: #4ADE80;
+  --k-color-surface: #111827;
+  --k-color-warning: #FBBF24;
+}
