@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "designSha": "f39a0865cf0342f495bf49f547c7fdf112145d77",
+  "preset": "base",
+  "cssEntry": "assets/readiness-report.css",
+  "managedDir": "assets/.kafka-design"
+}
