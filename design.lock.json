@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "designSha": "f39a0865cf0342f495bf49f547c7fdf112145d77",
+  "preset": "base",
+  "configHash": "c93642a4c3ed43326a054f29fabca94ed72954a3d170a9d81f6d1403ee88c745",
+  "manifestHash": "05d6b239c92006736451d5f22db95650086541895e5b48af1db361f924d1199f",
+  "logoHash": null,
+  "installedRegistryItems": [],
+  "managedFiles": [
+    {
+      "path": "assets/.kafka-design/kafka-tokens.css",
+      "sha256": "897ef1dfb22bf1a9671ad96075104af78eca6d5e02427135cd7d0b6d647af6d8"
+    },
+    {
+      "path": "assets/.kafka-design/kafka-globals.css",
+      "sha256": "2304371a0c507131844c2fbaa8e9725dedc72ba3165226ba6f2d1862812256bc"
+    },
+    {
+      "path": "assets/.kafka-design/kafka-components.css",
+      "sha256": "6236943bda6adc5bbd82f6fee9f600b1cffd1d25bc515b64843b5b7f51fd0cde"
+    }
+  ],
+  "integration": {
+    "cssEntry": "assets/readiness-report.css",
+    "blockHash": "a22ccfc87e7ebb134ccac8bd2b5f5978fa63039a7a5cc23e30e70f3524865201"
+  }
+}
