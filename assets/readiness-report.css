@@ -1,7 +1,7 @@
 /* kafka-design:managed-start */
-@import "./.kafka-design/kafka-tokens.css";
-@import "./.kafka-design/kafka-globals.css";
-@import "./.kafka-design/kafka-components.css";
+@import ".kafka-design/kafka-tokens.css";
+@import ".kafka-design/kafka-globals.css";
+@import ".kafka-design/kafka-components.css";
 /* kafka-design:managed-end */
 
 body {
