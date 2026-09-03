@@ -1,0 +1,112 @@
+/* kafka-design:managed-start */
+@import "./.kafka-design/kafka-tokens.css";
+@import "./.kafka-design/kafka-globals.css";
+@import "./.kafka-design/kafka-components.css";
+/* kafka-design:managed-end */
+
+body {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: calc(var(--k-dimension-space4) * 2) var(--k-dimension-space4);
+  background: var(--k-color-surface);
+}
+
+.audit-header {
+  display: grid;
+  gap: var(--k-dimension-space1);
+  margin-bottom: calc(var(--k-dimension-space4) * 2);
+  border-bottom: 1px solid var(--k-color-border);
+  padding-bottom: var(--k-dimension-space4);
+}
+
+.audit-kicker {
+  margin: 0;
+  color: var(--k-color-muted-foreground);
+  font-family: var(--k-font-family-mono);
+  font-size: var(--k-font-size-small);
+}
+
+h1 {
+  margin: 0;
+  color: var(--k-color-foreground);
+  font-size: var(--k-font-size-title);
+  line-height: 1.2;
+}
+
+.audit-asset {
+  margin: 0;
+  color: var(--k-color-muted-foreground);
+}
+
+.audit-asset strong {
+  color: var(--k-color-foreground);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 1px solid var(--k-color-border);
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--k-color-border);
+  padding: var(--k-dimension-space3) var(--k-dimension-space2);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  width: 48%;
+  color: var(--k-color-muted-foreground);
+  font-size: var(--k-font-size-small);
+  font-weight: 600;
+}
+
+td {
+  color: var(--k-color-foreground);
+  font-family: var(--k-font-family-mono);
+  overflow-wrap: anywhere;
+}
+
+.notice {
+  margin-top: calc(var(--k-dimension-space4) * 2);
+  border-left: var(--k-dimension-space1) solid var(--k-color-primary);
+  background: var(--k-color-canvas);
+  padding: var(--k-dimension-space4);
+}
+
+.notice strong {
+  color: var(--k-color-foreground);
+}
+
+.notice p {
+  margin: 0;
+  color: var(--k-color-muted-foreground);
+}
+
+.notice p + p {
+  margin-top: var(--k-dimension-space2);
+}
+
+@media (max-width: 36rem) {
+  body {
+    padding: var(--k-dimension-space4) var(--k-dimension-space3);
+  }
+
+  th,
+  td {
+    display: block;
+    width: 100%;
+  }
+
+  th {
+    border-bottom: 0;
+    padding-bottom: var(--k-dimension-space1);
+  }
+
+  td {
+    padding-top: 0;
+  }
+}
