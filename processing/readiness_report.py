@@ -17,6 +17,16 @@ REQUIRED_PROVENANCE_FIELDS = (
     "content_type",
 )
 
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+_REPORT_CSS_ENTRY = _REPOSITORY_ROOT / "assets" / "readiness-report.css"
+_MANAGED_CSS_FILES = (
+    _REPOSITORY_ROOT / "assets" / ".kafka-design" / "kafka-tokens.css",
+    _REPOSITORY_ROOT / "assets" / ".kafka-design" / "kafka-globals.css",
+    _REPOSITORY_ROOT / "assets" / ".kafka-design" / "kafka-components.css",
+)
+_MANAGED_START = "/* kafka-design:managed-start */"
+_MANAGED_END = "/* kafka-design:managed-end */"
+
 
 def _read_manifest(path: Path) -> list[dict]:
     if not path.is_file():
@@ -91,6 +101,25 @@ def _backend_evidence(dataset: str, manifest_path: str | Path | None) -> dict:
     }
 
 
+def _report_css() -> str:
+    if not _REPORT_CSS_ENTRY.is_file():
+        raise FileNotFoundError(f"Report CSS entry does not exist: {_REPORT_CSS_ENTRY}")
+
+    entry = _REPORT_CSS_ENTRY.read_text(encoding="utf-8")
+    start = entry.find(_MANAGED_START)
+    end = entry.find(_MANAGED_END)
+    if start < 0 or end < 0 or end < start:
+        raise ValueError(f"Managed design import block is invalid: {_REPORT_CSS_ENTRY}")
+
+    local_css = (entry[:start] + entry[end + len(_MANAGED_END) :]).strip()
+    managed_parts: list[str] = []
+    for css_path in _MANAGED_CSS_FILES:
+        if not css_path.is_file():
+            raise FileNotFoundError(f"Managed design CSS does not exist: {css_path}")
+        managed_parts.append(css_path.read_text(encoding="utf-8").strip())
+    return "\n\n".join([*managed_parts, local_css])
+
+
 def _render_html(report: dict) -> str:
     reason_counts = report["selection"]["reason_counts"]
     dimensions = report["dimensions"]
@@ -113,6 +142,7 @@ def _render_html(report: dict) -> str:
         f"<tr><th>{html.escape(str(label))}</th><td>{html.escape(str(value))}</td></tr>"
         for label, value in rows
     )
+    report_css = _report_css()
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -120,20 +150,23 @@ def _render_html(report: dict) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Photogrammetry input audit — {html.escape(report["asset_id"])}</title>
   <style>
-    body {{ font-family: system-ui, sans-serif; max-width: 880px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }}
-    table {{ border-collapse: collapse; width: 100%; }}
-    th, td {{ border-bottom: 1px solid #ddd; padding: .6rem; text-align: left; }}
-    .notice {{ background: #f6f6f6; padding: 1rem; border-radius: .5rem; }}
+{report_css}
   </style>
 </head>
 <body>
-  <h1>Photogrammetry input audit</h1>
-  <p><strong>Asset:</strong> {html.escape(report["asset_id"])}</p>
-  <table><tbody>{table}</tbody></table>
-  <div class="notice">
-    <p>This report describes input selection and provenance only.</p>
-    <p>Registration rate, reprojection error, geometry completeness, and texture quality are not measured here, so this report does not guarantee 3D reconstruction quality.</p>
-  </div>
+  <header class="audit-header">
+    <p class="audit-kicker">AutoPhotogrammetry / input audit</p>
+    <h1>Photogrammetry input audit</h1>
+    <p class="audit-asset"><strong>Asset:</strong> {html.escape(report["asset_id"])}</p>
+  </header>
+  <main>
+    <table><tbody>{table}</tbody></table>
+    <div class="notice">
+      <p><strong>Scope boundary</strong></p>
+      <p>This report describes input selection and provenance only.</p>
+      <p>Registration rate, reprojection error, geometry completeness, and texture quality are not measured here, so this report does not guarantee 3D reconstruction quality.</p>
+    </div>
+  </main>
 </body>
 </html>
 """
