@@ -166,9 +166,7 @@ class ReadinessReportTests(unittest.TestCase):
             report = json.loads(Path(result["report_json"]).read_text(encoding="utf-8"))
             report_html = Path(result["report_html"]).read_text(encoding="utf-8")
 
-            self.assertEqual(
-                report["selection"]["reason_counts"]["PROVENANCE_MISSING"], 1
-            )
+            self.assertEqual(report["selection"]["reason_counts"]["PROVENANCE_MISSING"], 1)
             self.assertEqual(report["decision"]["status"], "ACTION_REQUIRED")
             self.assertIn("missing required provenance", report["decision"]["reason"])
             self.assertIn("source_page", report["decision"]["next_action"])
