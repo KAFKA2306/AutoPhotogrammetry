@@ -101,6 +101,62 @@ def _backend_evidence(dataset: str, manifest_path: str | Path | None) -> dict:
     }
 
 
+def _audit_decision(report: dict) -> dict[str, str]:
+    selected = report["selection"]["selected_count"]
+    input_count = report["input"]["count"]
+    missing_provenance = report["selection"]["reason_counts"]["PROVENANCE_MISSING"]
+    backend = report["backend"]
+    backend_status = backend["status"]
+    return_code = backend["return_code"]
+
+    if selected <= 0:
+        return {
+            "status": "BLOCKED",
+            "reason": "No input image passed selection, so there is nothing to hand to a reconstruction backend.",
+            "next_action": "Review the sharpness and similarity thresholds, then rerun input selection.",
+        }
+
+    if missing_provenance > 0:
+        return {
+            "status": "ACTION_REQUIRED",
+            "reason": (
+                f"{missing_provenance} of {input_count} input images are missing required provenance fields."
+            ),
+            "next_action": (
+                "Complete source_page, image_url, sha256, width, height, and content_type in the input manifest."
+            ),
+        }
+
+    if backend_status == "failed" or (isinstance(return_code, int) and return_code != 0):
+        return {
+            "status": "BLOCKED",
+            "reason": "The recorded reconstruction backend execution failed.",
+            "next_action": "Inspect the backend run manifest, resolve the failure, and rerun the backend.",
+        }
+
+    if backend_status == "not_run":
+        return {
+            "status": "READY_FOR_BACKEND",
+            "reason": "Input selection and provenance checks have evidence, but no reconstruction backend run is attached.",
+            "next_action": "Run a reconstruction backend and attach its run manifest to this audit.",
+        }
+
+    if backend_status == "success":
+        return {
+            "status": "REVIEW_READY",
+            "reason": "Input selection, provenance, and a successful backend run are recorded.",
+            "next_action": (
+                "Evaluate registration, reprojection, geometry completeness, and texture quality before claiming 3D quality."
+            ),
+        }
+
+    return {
+        "status": "REVIEW_REQUIRED",
+        "reason": f"Backend evidence is recorded with status {backend_status!r}, but success is not established.",
+        "next_action": "Inspect the backend run manifest and establish an explicit success or failure state.",
+    }
+
+
 def _report_css() -> str:
     if not _REPORT_CSS_ENTRY.is_file():
         raise FileNotFoundError(f"Report CSS entry does not exist: {_REPORT_CSS_ENTRY}")
@@ -123,17 +179,18 @@ def _report_css() -> str:
 def _render_html(report: dict) -> str:
     reason_counts = report["selection"]["reason_counts"]
     dimensions = report["dimensions"]
+    decision = report["decision"]
+    selected = report["selection"]["selected_count"]
+    input_count = report["input"]["count"]
+    covered = report["provenance"]["covered_count"]
     rows = [
-        ("Input images", report["input"]["count"]),
-        ("Selected images", report["selection"]["selected_count"]),
+        ("Input images", input_count),
+        ("Selected images", selected),
         ("Low sharpness", reason_counts["LOW_SHARPNESS"]),
         ("Near duplicate", reason_counts["NEAR_DUPLICATE"]),
         ("Exact duplicate manifest rows", reason_counts["EXACT_DUPLICATE"]),
         ("Missing provenance", reason_counts["PROVENANCE_MISSING"]),
-        (
-            "Provenance coverage",
-            f"{report['provenance']['covered_count']}/{report['input']['count']}",
-        ),
+        ("Provenance coverage", f"{covered}/{input_count}"),
         ("Distinct image sizes", dimensions["distinct_size_count"]),
         ("Backend execution", report["backend"]["status"]),
         ("Backend manifest", report["backend"]["run_manifest_path"] or "not recorded"),
@@ -156,11 +213,54 @@ def _render_html(report: dict) -> str:
 <body>
   <header class="audit-header">
     <p class="audit-kicker">AutoPhotogrammetry / input audit</p>
-    <h1>Photogrammetry input audit</h1>
-    <p class="audit-asset"><strong>Asset:</strong> {html.escape(report["asset_id"])}</p>
+    <div class="audit-title-row">
+      <div>
+        <h1>Photogrammetry input audit</h1>
+        <p class="audit-asset"><strong>Asset:</strong> {html.escape(report["asset_id"])}</p>
+      </div>
+      <strong class="audit-status" data-status="{html.escape(decision["status"])}">{html.escape(decision["status"])}</strong>
+    </div>
   </header>
   <main>
-    <table><tbody>{table}</tbody></table>
+    <section class="decision-surface" aria-labelledby="decision-heading">
+      <div>
+        <p class="surface-kicker">Current decision</p>
+        <h2 id="decision-heading">{html.escape(decision["reason"])}</h2>
+      </div>
+      <div class="next-action">
+        <span>Next action</span>
+        <strong>{html.escape(decision["next_action"])}</strong>
+      </div>
+    </section>
+
+    <section class="kpi-grid" aria-label="Readiness summary">
+      <div class="kpi">
+        <span>Selected</span>
+        <strong>{selected}/{input_count}</strong>
+        <small>input images</small>
+      </div>
+      <div class="kpi">
+        <span>Provenance</span>
+        <strong>{covered}/{input_count}</strong>
+        <small>fully covered</small>
+      </div>
+      <div class="kpi">
+        <span>Backend</span>
+        <strong>{html.escape(str(report["backend"]["status"]))}</strong>
+        <small>execution evidence</small>
+      </div>
+      <div class="kpi">
+        <span>Image sizes</span>
+        <strong>{dimensions["distinct_size_count"]}</strong>
+        <small>distinct sizes</small>
+      </div>
+    </section>
+
+    <details class="evidence-details">
+      <summary>Evidence details</summary>
+      <table><tbody>{table}</tbody></table>
+    </details>
+
     <div class="notice">
       <p><strong>Scope boundary</strong></p>
       <p>This report describes input selection and provenance only.</p>
@@ -289,6 +389,7 @@ def build_readiness_report(
             "quality_guarantee": False,
         },
     }
+    report["decision"] = _audit_decision(report)
 
     selected_manifest = {
         "schema_version": 1,

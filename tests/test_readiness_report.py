@@ -77,6 +77,9 @@ class ReadinessReportTests(unittest.TestCase):
             self.assertFalse(report["generated_views_used"])
             self.assertEqual(report["backend"]["status"], "not_run")
             self.assertIsNone(report["backend"]["run_manifest_path"])
+            self.assertEqual(report["decision"]["status"], "READY_FOR_BACKEND")
+            self.assertIn("no reconstruction backend run", report["decision"]["reason"])
+            self.assertIn("Run a reconstruction backend", report["decision"]["next_action"])
             self.assertFalse(report["quality_measurements"]["quality_guarantee"])
             self.assertIsNone(report["quality_measurements"]["registration_rate"])
             self.assertIsNone(report["quality_measurements"]["reprojection_error"])
@@ -84,6 +87,11 @@ class ReadinessReportTests(unittest.TestCase):
             self.assertEqual(selected_manifest["asset_id"], "artifact")
             self.assertEqual(len(selected_manifest["images"]), 1)
             self.assertIn("does not guarantee 3D reconstruction quality", report_html)
+            self.assertIn('class="decision-surface"', report_html)
+            self.assertIn('data-status="READY_FOR_BACKEND"', report_html)
+            self.assertIn("Next action", report_html)
+            self.assertIn("Evidence details", report_html)
+            self.assertLess(report_html.index("Next action"), report_html.index("Evidence details"))
 
     def test_report_links_existing_backend_manifest_by_asset_and_hash(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -115,6 +123,8 @@ class ReadinessReportTests(unittest.TestCase):
             self.assertEqual(report["backend"]["status"], "success")
             self.assertEqual(report["backend"]["return_code"], 0)
             self.assertEqual(report["backend"]["run_manifest_path"], str(backend_manifest))
+            self.assertEqual(report["decision"]["status"], "REVIEW_READY")
+            self.assertIn("successful backend run", report["decision"]["reason"])
             self.assertEqual(
                 report["backend"]["run_manifest_sha256"],
                 sha256_file(backend_manifest),
@@ -138,6 +148,29 @@ class ReadinessReportTests(unittest.TestCase):
                     output_root=root / "output",
                     backend_run_manifest=backend_manifest,
                 )
+
+    def test_missing_provenance_requires_action_before_backend_handoff(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image_dir = self._write_input(root)
+            manifest_path = image_dir / "manifest.json"
+            records = json.loads(manifest_path.read_text(encoding="utf-8"))
+            records[0].pop("source_page")
+            write_json(manifest_path, records)
+
+            result = build_readiness_report(
+                "artifact",
+                input_root=root / "input",
+                output_root=root / "output",
+            )
+            report = json.loads(Path(result["report_json"]).read_text(encoding="utf-8"))
+            report_html = Path(result["report_html"]).read_text(encoding="utf-8")
+
+            self.assertEqual(report["selection"]["reason_counts"]["PROVENANCE_MISSING"], 1)
+            self.assertEqual(report["decision"]["status"], "ACTION_REQUIRED")
+            self.assertIn("missing required provenance", report["decision"]["reason"])
+            self.assertIn("source_page", report["decision"]["next_action"])
+            self.assertIn('data-status="ACTION_REQUIRED"', report_html)
 
     def test_report_ignores_stale_manifest_rows_when_counting_exact_duplicates(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
