@@ -101,7 +101,6 @@ def _backend_evidence(dataset: str, manifest_path: str | Path | None) -> dict:
     }
 
 
-
 def _audit_decision(report: dict) -> dict[str, str]:
     selected = report["selection"]["selected_count"]
     input_count = report["input"]["count"]
@@ -158,6 +157,7 @@ def _audit_decision(report: dict) -> dict[str, str]:
         "reason": f"Backend evidence is recorded with status {backend_status!r}, but success is not established.",
         "next_action": "Inspect the backend run manifest and establish an explicit success or failure state.",
     }
+
 
 def _report_css() -> str:
     if not _REPORT_CSS_ENTRY.is_file():
