@@ -127,9 +127,7 @@ def _audit_decision(report: dict) -> dict[str, str]:
             ),
         }
 
-    if backend_status == "failed" or (
-        isinstance(return_code, int) and return_code != 0
-    ):
+    if backend_status == "failed" or (isinstance(return_code, int) and return_code != 0):
         return {
             "status": "BLOCKED",
             "reason": "The recorded reconstruction backend execution failed.",
