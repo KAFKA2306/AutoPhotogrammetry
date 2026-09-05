@@ -11,8 +11,4 @@ permissions:
 
 jobs:
   conformance:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Verify canonical design contract
-        run: node assets/.kafka-design/portable-conformance.mjs --consumer "$GITHUB_WORKSPACE"
+    uses: KAFKA2306/design/.github/workflows/conformance.yml@a6e586bbbb9c755f96ef9f48c60481971ddf845c
