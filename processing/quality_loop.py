@@ -6,7 +6,9 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from processing.provenance import write_json
+from PIL import Image, ImageOps
+
+from processing.provenance import sha256_file, write_json
 from processing.quality_followup import CULLING_FLAGS, WINNERS, run_culling_sweep
 
 DEFAULT_POLICY = {
@@ -19,6 +21,7 @@ DEFAULT_POLICY = {
     "min_artifact_improvement": 0.001,
 }
 ARTIFACT_METRICS = ("low_opacity_primitive_ratio", "scale_anisotropy_above_10_ratio")
+MONTAGE_CELL_SIZE = (320, 180)
 
 
 def _number(row: Mapping[str, Any], key: str) -> float | None:
@@ -118,6 +121,123 @@ def _value_key(value: float) -> str:
     return format(float(value), ".12g")
 
 
+def _verified_render_records(
+    experiment: Mapping[str, Any],
+) -> list[tuple[str, Path, dict[str, Any]]]:
+    if experiment.get("status") != "success":
+        return []
+    manifest_value = experiment.get("evaluation_manifest_path")
+    records = experiment.get("renders")
+    if not isinstance(manifest_value, str) or not manifest_value:
+        return []
+    if not isinstance(records, list) or not records:
+        return []
+
+    manifest_path = Path(manifest_value).expanduser().resolve()
+    if not manifest_path.is_file():
+        raise ValueError(f"evaluation manifest does not exist: {manifest_path}")
+    render_root = (manifest_path.parent / "renders").resolve()
+    verified: list[tuple[str, Path, dict[str, Any]]] = []
+    for index, record in enumerate(records):
+        if not isinstance(record, Mapping):
+            raise ValueError(f"render record {index} must be an object")
+        relative = record.get("path")
+        expected_sha256 = record.get("sha256")
+        if not isinstance(relative, str) or not relative:
+            raise ValueError(f"render record {index} is missing path")
+        if not isinstance(expected_sha256, str) or len(expected_sha256) != 64:
+            raise ValueError(f"render record {index} is missing SHA-256")
+        path = (render_root / relative).resolve()
+        if path != render_root and render_root not in path.parents:
+            raise ValueError(f"render path escapes evaluation root: {relative}")
+        if not path.is_file():
+            raise ValueError(f"hold-out render does not exist: {path}")
+        actual_sha256 = sha256_file(path)
+        if actual_sha256 != expected_sha256:
+            raise ValueError(f"hold-out render hash mismatch: {path}")
+        verified.append((relative, path, dict(record)))
+    return sorted(verified, key=lambda item: item[0])
+
+
+def _write_holdout_montage(
+    sweep: Mapping[str, Any],
+    destination: str | Path,
+) -> dict[str, Any] | None:
+    experiments = sweep.get("experiments")
+    if not isinstance(experiments, list) or len(experiments) != 2:
+        return None
+    baseline_entry, candidate_entry = experiments
+    if not isinstance(baseline_entry, Mapping) or not isinstance(candidate_entry, Mapping):
+        raise ValueError("sweep experiments must be objects")
+
+    baseline = _verified_render_records(baseline_entry)
+    candidate = _verified_render_records(candidate_entry)
+    if not baseline or not candidate:
+        return None
+
+    baseline_paths = [item[0] for item in baseline]
+    candidate_paths = [item[0] for item in candidate]
+    if baseline_paths != candidate_paths:
+        raise ValueError(
+            "baseline/candidate hold-out render sets differ: "
+            f"baseline={baseline_paths}, candidate={candidate_paths}"
+        )
+
+    cell_width, cell_height = MONTAGE_CELL_SIZE
+    canvas = Image.new(
+        "RGB",
+        (cell_width * len(baseline_paths), cell_height * 2),
+        "white",
+    )
+    for row_index, records in enumerate((baseline, candidate)):
+        for column_index, (_, path, _) in enumerate(records):
+            with Image.open(path) as source:
+                image = ImageOps.contain(
+                    source.convert("RGB"),
+                    MONTAGE_CELL_SIZE,
+                    method=Image.Resampling.LANCZOS,
+                )
+            x = column_index * cell_width + (cell_width - image.width) // 2
+            y = row_index * cell_height + (cell_height - image.height) // 2
+            canvas.paste(image, (x, y))
+
+    output = Path(destination).expanduser().resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    canvas.save(output, format="PNG")
+    return {
+        "schema_version": 1,
+        "path": str(output),
+        "sha256": sha256_file(output),
+        "layout": {
+            "rows": ["baseline", "candidate"],
+            "columns": baseline_paths,
+            "cell_size": [cell_width, cell_height],
+        },
+        "baseline_renders": [item[2] for item in baseline],
+        "candidate_renders": [item[2] for item in candidate],
+    }
+
+
+def _all_candidates_failed(
+    attempts: Sequence[Mapping[str, Any]],
+    candidates: Sequence[float],
+) -> bool:
+    expected = {_value_key(value) for value in candidates}
+    by_value: dict[str, Mapping[str, Any]] = {}
+    for attempt in attempts:
+        value = attempt.get("value")
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            continue
+        by_value[_value_key(float(value))] = attempt
+    if not expected or not expected.issubset(by_value):
+        return False
+    return all(
+        isinstance(by_value[key].get("candidate"), Mapping)
+        and by_value[key]["candidate"].get("status") == "failed"
+        for key in expected
+    )
+
+
 def run_bounded_culling_loop(
     data_dir: str | Path,
     source_video: str | Path,
@@ -198,10 +318,11 @@ def run_bounded_culling_loop(
 
     for value in scheduled:
         index = len(summary["attempts"]) + 1
+        iteration_root = root / f"iteration-{index:02d}-{_value_key(value).replace('.', 'p')}"
         result = runner(
             data_dir,
             source_video,
-            root / f"iteration-{index:02d}-{_value_key(value).replace('.', 'p')}",
+            iteration_root,
             winner=winner,
             parameter=parameter,
             values=[value],
@@ -227,6 +348,10 @@ def run_bounded_culling_loop(
             raise ValueError("comparison rows must be objects")
 
         decision = evaluate_candidate(baseline, candidate, active_policy)
+        render_evidence = _write_holdout_montage(
+            result,
+            iteration_root / "holdout-before-after.png",
+        )
         last_good_score = last_good.get("score")
         if isinstance(last_good_score, bool) or not isinstance(last_good_score, (int, float)):
             last_good_score = 0.0
@@ -254,6 +379,7 @@ def run_bounded_culling_loop(
                 "comparison_path": result.get("comparison_path"),
                 "candidate": dict(candidate),
                 "decision": decision,
+                "renderEvidence": render_evidence,
                 "adoptedAsLastGood": improved,
             }
         )
@@ -261,11 +387,18 @@ def run_bounded_culling_loop(
 
         if no_improvement >= no_improvement_limit:
             summary["status"] = "stopped"
-            summary["stop_reason"] = "no_improvement"
+            summary["stop_reason"] = (
+                "all_failed"
+                if _all_candidates_failed(summary["attempts"], candidates)
+                else "no_improvement"
+            )
             break
 
     if summary["status"] == "running":
-        if len(summary["attempts"]) >= max_iterations:
+        if _all_candidates_failed(summary["attempts"], candidates):
+            summary["status"] = "stopped"
+            summary["stop_reason"] = "all_failed"
+        elif len(summary["attempts"]) >= max_iterations:
             summary["status"] = "stopped"
             summary["stop_reason"] = "max_iterations"
         elif not available:
