@@ -361,6 +361,36 @@ case "${1:-run}" in
       --value "$value" \
       --iterations "$iterations"
     ;;
+  quality-loop)
+    scene="${2:-}"
+    winner="${3:-}"
+    parameter="${4:-}"
+    values_csv="${5:-}"
+    iterations="${6:-30000}"
+    max_iterations="${7:-4}"
+    no_improvement_limit="${8:-2}"
+    if [[ -z "$scene" || -z "$winner" || -z "$parameter" || -z "$values_csv" ]]; then
+      echo "usage: ./task quality-loop <scene-id> <default|scale-regularized|mcmc> <parameter> <v1,v2,...> [iterations] [max-iterations] [no-improvement-limit]" >&2
+      exit 2
+    fi
+    require_quality_inputs "$scene"
+    prepare_named_runtime "$IMAGE"
+    IFS=',' read -r -a loop_values <<< "$values_csv"
+    value_args=()
+    for value in "${loop_values[@]}"; do
+      [[ -n "$value" ]] && value_args+=(--value "$value")
+    done
+    run_gpu python -m processing.quality_loop \
+      --data "/workspace/output/$scene/nerfstudio-data" \
+      --source-video "/workspace/input/$scene/source.webm" \
+      --output-root "/workspace/output/$scene/quality-loop/$winner/$parameter" \
+      --winner "$winner" \
+      --parameter "$parameter" \
+      "${value_args[@]}" \
+      --iterations "$iterations" \
+      --max-iterations "$max_iterations" \
+      --no-improvement-limit "$no_improvement_limit"
+    ;;
   quality-budget)
     scene="${2:-}"
     winner="${3:-}"
@@ -479,7 +509,7 @@ case "${1:-run}" in
     find "$ROOT/output" "$ROOT/input" -mindepth 1 -maxdepth 1 ! -name .gitignore -exec rm -rf -- {} +
     ;;
   *)
-    echo "usage: ./task {run|run-one <scene-id>|run-all|quality [scene] [iterations]|quality-pair <bad> <good> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-budget <scene> <winner> <current> <increased>|compression-baseline <scene> [iterations]|vggt-research <scene> [feedforward|ba]|vggt-splatfacto <scene> [iterations]|vggt-compare <scene> [feedforward|ba] [iterations]|efa-research <scene> [iterations]|longsplat-research <scene>|doctor|pull|vggt-pull|efa-pull|longsplat-pull|test|image|vggt-image|clean|clean-all}" >&2
+    echo "usage: ./task {run|run-one <scene-id>|run-all|quality [scene] [iterations]|quality-pair <bad> <good> [iterations]|quality-culling <scene> <winner> <parameter> <value> [iterations]|quality-loop <scene> <winner> <parameter> <v1,v2,...> [iterations] [max] [patience]|quality-budget <scene> <winner> <current> <increased>|compression-baseline <scene> [iterations]|vggt-research <scene> [feedforward|ba]|vggt-splatfacto <scene> [iterations]|vggt-compare <scene> [feedforward|ba] [iterations]|efa-research <scene> [iterations]|longsplat-research <scene>|doctor|pull|vggt-pull|efa-pull|longsplat-pull|test|image|vggt-image|clean|clean-all}" >&2
     exit 2
     ;;
 esac
