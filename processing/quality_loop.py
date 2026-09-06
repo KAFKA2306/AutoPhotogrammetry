@@ -84,10 +84,7 @@ def evaluate_candidate(
         _number(candidate, "peak_gpu_memory_bytes"),
         _number(baseline, "peak_gpu_memory_bytes"),
     )
-    if (
-        runtime_ratio is not None
-        and runtime_ratio > active_policy["max_runtime_ratio"]
-    ):
+    if runtime_ratio is not None and runtime_ratio > active_policy["max_runtime_ratio"]:
         reasons.append("runtime_regression")
     if vram_ratio is not None and vram_ratio > active_policy["max_vram_ratio"]:
         reasons.append("vram_regression")
@@ -104,11 +101,7 @@ def evaluate_candidate(
             reasons.append(f"{key}_regression")
 
     score = sum(gains.values())
-    if (
-        not gains
-        or max(gains.values(), default=0.0)
-        < active_policy["min_artifact_improvement"]
-    ):
+    if not gains or max(gains.values(), default=0.0) < active_policy["min_artifact_improvement"]:
         reasons.append("no_measured_artifact_improvement")
 
     return {
@@ -215,9 +208,7 @@ def run_bounded_culling_loop(
             iterations=iterations,
             holdout_count=holdout_count,
         )
-        dataset_id = result.get("dataset_id") or (
-            result.get("comparison") or {}
-        ).get("dataset_id")
+        dataset_id = result.get("dataset_id") or (result.get("comparison") or {}).get("dataset_id")
         if not dataset_id:
             raise ValueError("sweep did not report dataset identity")
         if summary["dataset_id"] is None:
@@ -230,18 +221,14 @@ def run_bounded_culling_loop(
             raise ValueError("sweep comparison is missing")
         rows = comparison.get("results")
         if not isinstance(rows, list) or len(rows) != 2:
-            raise ValueError(
-                "bounded loop requires baseline + one candidate comparison"
-            )
+            raise ValueError("bounded loop requires baseline + one candidate comparison")
         baseline, candidate = rows
         if not isinstance(baseline, Mapping) or not isinstance(candidate, Mapping):
             raise ValueError("comparison rows must be objects")
 
         decision = evaluate_candidate(baseline, candidate, active_policy)
         last_good_score = last_good.get("score")
-        if isinstance(last_good_score, bool) or not isinstance(
-            last_good_score, (int, float)
-        ):
+        if isinstance(last_good_score, bool) or not isinstance(last_good_score, (int, float)):
             last_good_score = 0.0
         improved = (
             decision["eligible"]
@@ -295,9 +282,7 @@ def run_bounded_culling_loop(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description=(
-            "Bounded one-parameter quality loop using same-holdout culling sweeps."
-        )
+        description=("Bounded one-parameter quality loop using same-holdout culling sweeps.")
     )
     parser.add_argument("--data", required=True)
     parser.add_argument("--source-video", required=True)
