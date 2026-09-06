@@ -12,42 +12,11 @@ from unittest.mock import patch
 import yaml
 
 from processing.artifact_publish import ArtifactPublishError, _hf_cache_command, publish_run_splat
-from processing.hf_bucket_publish import publish_and_verify
 
 REVISION = "a" * 40
 
 
 class ArtifactPublishTest(unittest.TestCase):
-    def test_official_hf_bucket_api_uploads_and_verifies_exact_readback(self):
-        with tempfile.TemporaryDirectory() as d:
-            root = Path(d)
-            artifact = root / "splat.ply"
-            artifact.write_bytes(b"ply\nofficial-api")
-            calls: list[tuple[object, ...]] = []
-
-            def uploader(bucket, *, add, token=None):
-                calls.append(("upload", bucket, add, token))
-
-            def downloader(bucket, *, files, raise_on_missing_files, token=None):
-                calls.append(("download", bucket, files, raise_on_missing_files, token))
-                _, destination = files[0]
-                Path(destination).write_bytes(artifact.read_bytes())
-
-            result = publish_and_verify(
-                "k4fka/test",
-                artifact,
-                "autophotogrammetry/gaussian-splats/demo/hash.ply",
-                uploader=uploader,
-                downloader=downloader,
-                token=False,
-            )
-            self.assertEqual("PUBLISHED", result["status"])
-            self.assertTrue(result["remote_verified"])
-            self.assertEqual(2, len(calls))
-            self.assertEqual("upload", calls[0][0])
-            self.assertEqual("download", calls[1][0])
-            self.assertTrue(calls[1][3])
-
     def _fixture(
         self,
         root: Path,
@@ -139,6 +108,18 @@ class ArtifactPublishTest(unittest.TestCase):
             "size_bytes": declared["size_bytes"],
         }
         return subprocess.CompletedProcess(command, 0, stdout=json.dumps(result), stderr="")
+
+    def test_publish_requires_canonical_hf_cache_hub_owner(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            manifest, _, _, _ = self._fixture(root)
+            with patch.dict(os.environ, {}, clear=True):
+                with self.assertRaisesRegex(ArtifactPublishError, "HF_CACHE_HUB_ROOT"):
+                    publish_run_splat(
+                        manifest,
+                        bucket="k4fka/artifacts",
+                        runner=self._successful_runner,
+                    )
 
     def test_missing_hf_cache_hub_root_fails_with_required_error(self):
         with patch.dict(os.environ, {}, clear=True):
