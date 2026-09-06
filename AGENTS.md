@@ -16,20 +16,12 @@
 - Freeze the selected dataset identity before camera-optimizer, iteration-budget, regularization, or other training-side A/B experiments.
 - Preserve experiment-specific numbers, renders, hashes, and conclusions in Issues or machine-readable artifacts. Keep this file limited to reusable decision rules.
 
-## Artifact storage — mandatory
+## Artifact storage
 
-- Never commit generated PLY files to Git, including evidence, fallback, retrospective, temporary, or diagnostic branches.
-- Never use a GitHub branch, Git blob, raw GitHub URL, or release commit as fallback storage for generated PLY bytes.
-- Materialize generated PLYs through the repository artifact publishing/cache path. Git may contain only lightweight metadata such as SHA-256, byte size, durable artifact locator, provenance, run identity, and evaluation result.
-- If durable artifact storage is unavailable, leave materialization explicitly blocked. Do not bypass the block by committing the binary to Git.
-- Before committing, verify that no `*.ply` is tracked by Git. The repository CI enforces this rule independently of agent behavior.
+- Generated PLY files are never committed to Git. Repository CI owns enforcement.
+- Use `.agents/skills/artifact-storage/SKILL.md` whenever a run creates, republishes, restores, or hands off generated artifacts.
+- The canonical publish interface is `python main.py publish-splat --run-manifest <path>`. Agent instructions must not choose a storage-provider API or alternate publisher implementation.
+- The publish implementation delegates durable storage, remote read-back, SHA-256, and byte-size verification to the repository's canonical artifact publisher.
+- If durable storage is unavailable, record the artifact as blocked/unavailable. Do not invent a locator or use Git as fallback storage.
 
 Use `.agents/skills/photogrammetry-reconstruction/SKILL.md` for the repeatable experiment workflow.
-Use `.agents/skills/artifact-storage/SKILL.md` whenever an experiment produces or republishes generated artifacts.
-
-## Official Hugging Face upload method
-
-For authenticated Storage Bucket publishing, use the official `huggingface_hub`
-`batch_bucket_files()` API and verify exact read-back with
-`download_bucket_files()`. The canonical remote layout is
-`autophotogrammetry/gaussian-splats/<dataset>/<sha256>.ply`.
