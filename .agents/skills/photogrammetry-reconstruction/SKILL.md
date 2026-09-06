@@ -121,22 +121,15 @@ Use these rules when conclusions conflict:
 4. Input quality and pose connectivity are resolved before attributing failure to training parameters.
 5. If the evidence does not distinguish candidates, record that result instead of manufacturing a winner.
 
-## AutoPhotogrammetry issue routing
+## Current Issue routing
 
-Use the existing Issue authority instead of creating a new overlapping experiment thread:
+Before creating or continuing an experiment thread, inspect current open Issues and machine-readable evidence for the responsibility being changed.
 
-- #140 — parent / 360-degree source and end-to-end benchmark program
-- #146 — exact same-source, same-shot, same-source-frame `8-view` vs `14-view` controlled comparison only
-- #148 — shot, temporal density, direction selection, crop, COLMAP camera/matching, pose connectivity, frozen dataset selection
-- #149 — camera optimizer A/B on the frozen dataset
-- #150 — Splatfacto artifact-control parameter A/B on the frozen dataset
-- #41 — Scale Regularization A/B
-- #43 — default / Scale Regularization / MCMC production-strategy comparison
-- #151 — representative real PLY/WebP evidence-package curation and VRMine handoff
-
-Historical comments may contain experiments that now belong to another Issue. Preserve them as evidence, but do not continue that responsibility in the historical thread.
-
-Do not create a new Issue when one of the authorities above already owns the changed variable. If a new experiment changes multiple responsibility classes, split it before execution.
+- Reuse an existing current Issue when it already owns the same requested outcome or experimental variable.
+- Treat closed, superseded, or historical Issues as evidence, not as permanent routing authority.
+- Route by responsibility class such as source/dataset selection, camera/pose optimization, training controls, reconstruction strategy, or artifact handoff.
+- If one proposed experiment changes multiple responsibility classes and the effects cannot be separated, split the work before execution.
+- Do not encode current Issue numbers, current winners, or current parameter choices in this reusable skill.
 
 ## Evidence boundary
 
@@ -145,16 +138,3 @@ Use this skill for rules and decision procedure only.
 Do not copy run-specific values, hashes, winner names, view counts, or current best parameters into the skill. Those belong to Issues or machine-readable artifacts and may change independently.
 
 AI-generated summary images may be explanatory material, but they are never reconstruction evidence. Evidence must trace to actual source/run artifacts such as real WebP renders, GT images, PLY files, manifests, logs, metrics, and hashes.
-
-## Repository evidence
-
-The workflow is grounded in controlled evidence and responsibility separation from:
-
-- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/140
-- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/146
-- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/148
-- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/149
-- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/150
-- https://github.com/KAFKA2306/AutoPhotogrammetry/issues/151
-
-Treat those Issues as evidence and routing authority, not as universal numeric thresholds or a requirement to reuse a specific number of views.
