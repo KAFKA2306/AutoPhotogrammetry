@@ -37,12 +37,12 @@ Before a batch run, validate that the source frames and camera metadata exist an
 4. Render the fixed evaluation views with both RGB and GT outputs. Convert the selected views to RGB and GT contact-sheet WEBPs.
 5. View both WEBPs. Record view-specific artifacts such as floating splats, water/sky ghosts, streaks, missing geometry, color drift, or loss of structural detail.
 6. Compute the same metrics used for the baseline. Select a new best only when it improves the fixed metric and does not introduce a material visual regression.
-7. Publish PLY artifacts with the official Hugging Face `batch_bucket_files()` API, verify exact read-back with `download_bucket_files()`, then upload WEBPs to the designated evidence branch or artifact location, verify each raw URL with HTTP 200 and non-zero size, and comment on the relevant GitHub Issue. Include immutable commit/revision links when available.
+7. Publish the PLY through the canonical interface in `.agents/skills/artifact-storage/SKILL.md` and require its remote read-back/hash verification to pass. Then upload WEBPs to the designated evidence branch or artifact location, verify each raw URL with HTTP 200 and non-zero size, and comment on the relevant GitHub Issue. Include immutable commit/revision links when available.
 8. Decide the next hypothesis from the evidence. Stop a parameter family when multiple neighboring values are worse; switch to data, masks, camera poses, frame selection, or reconstruction strategy instead of endlessly repeating the same sweep.
 
 ## Artifact and repository safety
 
-Read and obey `.agents/skills/artifact-storage/SKILL.md` for PLY handling. Never commit generated PLY files, use GitHub raw as a PLY fallback, force-add ignored PLYs, or invent an external locator. If durable artifact storage is unavailable, mark the artifact blocked/unavailable and continue with lightweight review evidence only when appropriate.
+Read and obey `.agents/skills/artifact-storage/SKILL.md` for PLY handling and publishing. If durable artifact storage is unavailable, mark the artifact blocked/unavailable and continue with lightweight review evidence only when appropriate.
 
 WEBPs and lightweight metadata may be committed to the designated evidence location, but never use evidence uploads to bypass the PLY policy. Keep the PLY SHA-256, byte size, source/run identity, producing revision, and evaluation result together.
 
