@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 from typing import Any
@@ -113,3 +114,22 @@ def write_experiment_candidates(events_path: str | Path, output_path: str | Path
         "candidate_count": len(candidates),
         "output": str(output),
     }\n
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Route shared creation knowledge into reproducible reconstruction experiments."
+    )
+    parser.add_argument("--events", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    print(
+        json.dumps(
+            write_experiment_candidates(args.events, args.output),
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+
+
+if __name__ == "__main__":
+    main()
