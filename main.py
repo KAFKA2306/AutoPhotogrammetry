@@ -11,6 +11,7 @@ from processing.batch import run_all_videos
 from processing.collection import collect_images
 from processing.huejotzingo import run_huejotzingo
 from processing.image_selection import select_images
+from processing.knowledge_intake import write_experiment_candidates
 from processing.provenance import write_json
 from processing.readiness_report import build_readiness_report
 
@@ -96,6 +97,13 @@ def main() -> None:
     compare_parser.add_argument("--result", action="append", required=True)
     compare_parser.add_argument("--output", required=True)
 
+    knowledge_parser = subparsers.add_parser(
+        "knowledge-intake",
+        help="Route shared creation knowledge events into reproducible reconstruction experiments.",
+    )
+    knowledge_parser.add_argument("--events", required=True)
+    knowledge_parser.add_argument("--output", required=True)
+
     args = parser.parse_args()
 
     if args.command == "collect":
@@ -167,6 +175,8 @@ def main() -> None:
         backend_results = [_read_json(path) for path in args.result]
         result = write_comparison(args.output, backend_results, dataset)
         result = {**result, "comparison_path": str(Path(args.output))}
+    elif args.command == "knowledge-intake":
+        result = write_experiment_candidates(args.events, args.output)
     else:
         result = run_all_videos(
             registry_path=args.registry,
