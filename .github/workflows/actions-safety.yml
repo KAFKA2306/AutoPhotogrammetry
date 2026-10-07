@@ -1,0 +1,16 @@
+name: Actions safety
+
+on:
+  pull_request:
+    paths: ['.github/workflows/**']
+  push:
+    branches: [main]
+    paths: ['.github/workflows/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safety:
+    uses: KAFKA2306/agent-resources/.github/workflows/actions-safety-reusable.yml@fff1a85a3bb274fafe19671e6517196c2ef2a5ad
