@@ -115,6 +115,7 @@ def write_experiment_candidates(events_path: str | Path, output_path: str | Path
         "output": str(output),
     }
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Route shared creation knowledge into reproducible reconstruction experiments."
