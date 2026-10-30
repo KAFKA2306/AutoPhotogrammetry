@@ -36,7 +36,9 @@ def _load_jsonl(path: str | Path) -> list[dict[str, Any]]:
 def _experiment_kind(event: dict[str, Any]) -> str:
     tags = set(event.get("claim", {}).get("tags", []))
     statement = str(event.get("claim", {}).get("statement", "")).lower()
-    if "reconstruction" in tags or any(word in statement for word in ("gaussian", "splat", "colmap")):
+    if "reconstruction" in tags or any(
+        word in statement for word in ("gaussian", "splat", "colmap")
+    ):
         return "reconstruction_backend"
     if "performance" in tags:
         return "performance"
