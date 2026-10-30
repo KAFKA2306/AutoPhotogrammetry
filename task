@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="${BASH_SOURCE[0]%/*}"
+if [[ "$SCRIPT_DIR" == "${BASH_SOURCE[0]}" ]]; then SCRIPT_DIR="."; fi
+ROOT="$(cd -- "$SCRIPT_DIR" && pwd)"
 IMAGE="${AUTOPHOTOGRAMMETRY_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:quality-ns50e0e3-sm120-v1}"
 VGGT_IMAGE="${AUTOPHOTOGRAMMETRY_VGGT_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:vggt-a288dd0-sm120-v1}"
 EFA_IMAGE="${AUTOPHOTOGRAMMETRY_EFA_IMAGE:-ghcr.io/kafka2306/autophotogrammetry:efa-57f330f-sm120-v1}"
