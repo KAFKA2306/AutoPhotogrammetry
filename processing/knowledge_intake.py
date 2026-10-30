@@ -113,7 +113,7 @@ def write_experiment_candidates(events_path: str | Path, output_path: str | Path
         "status": "success",
         "candidate_count": len(candidates),
         "output": str(output),
-    }\n
+    }
 
 def main() -> None:
     parser = argparse.ArgumentParser(
