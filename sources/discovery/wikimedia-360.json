@@ -7,8 +7,8 @@
     "duration_fallback": "MediaWiki REST API file information"
   },
   "root_category": "Category:360-degree videos",
-  "discovered_file_count": 70,
-  "candidate_count": 70,
+  "discovered_file_count": 71,
+  "candidate_count": 71,
   "candidates": [
     {
       "canonical_title": "File:(361VR) Superwoman 주이형의 비키니몸매 만들기 운동법 대공개!.webm",
@@ -508,6 +508,10 @@
         "Category:360-degree videos",
         "Category:CC-BY-3.0",
         "Category:Files from external sources with reviewed licenses",
+        "Category:Files with closed captioning in Arabic",
+        "Category:Files with closed captioning in English",
+        "Category:Files with closed captioning in French",
+        "Category:Files with closed captioning in Thai",
         "Category:Media of the day",
         "Category:Médecins sans frontières",
         "Category:Refugees in Lebanon from Syria",
@@ -781,6 +785,7 @@
         "Category:360-degree videos",
         "Category:CC-BY-3.0",
         "Category:Files from external sources with reviewed licenses",
+        "Category:Files with closed captioning in English",
         "Category:Uploaded with video2commons",
         "Category:Video display resolution 1920 x 960",
         "Category:Videos from YouTube",
@@ -850,6 +855,7 @@
         "Category:CC-BY-3.0",
         "Category:EAC Video",
         "Category:Files from external sources with reviewed licenses",
+        "Category:Files with closed captioning in English",
         "Category:Médecins sans frontières",
         "Category:Uploaded with video2commons",
         "Category:Videos from YouTube",
@@ -920,6 +926,68 @@
         "Category:Files from external sources with reviewed licenses",
         "Category:Uploaded with video2commons",
         "Category:Videos from YouTube"
+      ],
+      "discovered_categories": [
+        "Category:360-degree videos"
+      ],
+      "discovery_paths": [
+        [
+          "Category:360-degree videos"
+        ]
+      ],
+      "metadata_authority": "Wikimedia Commons videoinfo/categories",
+      "evaluation_stage": "metadata",
+      "measurements": {
+        "preflight": null,
+        "colmap": null,
+        "splat": null
+      },
+      "camera_motion": "unknown",
+      "static_scene": "unknown",
+      "projection_type": "unknown",
+      "projection_authority": null,
+      "projection_review_required": true,
+      "equirectangular_processing_ready": false,
+      "stage_a": {
+        "source_page_present": true,
+        "media_url_present": true,
+        "video_media_confirmed": true,
+        "source_sha1_present": true,
+        "source_size_present": true,
+        "author_present": true,
+        "license_verified": true,
+        "duration_present": true,
+        "resolution_present": true,
+        "eligible_for_projection_review": true,
+        "failed_requirements": []
+      }
+    },
+    {
+      "canonical_title": "File:360 ubicacion Cesar Mora.webm",
+      "provider": "Wikimedia Commons",
+      "source_page": "https://commons.wikimedia.org/wiki/File:360_ubicacion_Cesar_Mora.webm",
+      "media_url": "https://upload.wikimedia.org/wikipedia/commons/1/10/360_ubicacion_Cesar_Mora.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "author": "Diemgood",
+      "license": {
+        "name": "CC0",
+        "url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "status": "verified"
+      },
+      "duration_seconds": 9.11,
+      "duration_authority": "Wikimedia Commons videoinfo",
+      "resolution": [
+        480,
+        848
+      ],
+      "source_sha1": "9b751cc1f56266b6be2294ebd396b8a12b44089e",
+      "source_size_bytes": 1038139,
+      "mime": "video/webm",
+      "media_type": "VIDEO",
+      "confirmed_video": true,
+      "commons_categories": [
+        "Category:360-degree videos",
+        "Category:CC-Zero",
+        "Category:Self-published work"
       ],
       "discovered_categories": [
         "Category:360-degree videos"
@@ -1526,14 +1594,15 @@
       "confirmed_video": true,
       "commons_categories": [
         "Category:360-degree videos",
+        "Category:Files with closed captioning in English",
         "Category:Kaneohe Bay",
-        "Category:Media from YouTube",
         "Category:NASA videos in 2018",
         "Category:PD NASA",
         "Category:Uploaded with video2commons",
         "Category:Video display resolution 3840 x 2048",
         "Category:Videos from Greenland",
         "Category:Videos from Hawaii",
+        "Category:Videos from YouTube",
         "Category:Videos uploaded by Eatcha"
       ],
       "discovered_categories": [
